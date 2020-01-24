@@ -1,0 +1,171 @@
+﻿<UserControl x:Class="Project.FC2J.UI.Views.AdminView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Project.FC2J.UI.Views"
+             xmlns:userControls="clr-namespace:Project.FC2J.UI.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:attachedProperties="clr-namespace:Project.FC2J.UI.AttachedProperties"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="13"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextRenderingMode="Auto"
+             Background="{DynamicResource MaterialDesignPaper}"
+             FontFamily="{DynamicResource MaterialDesignFont}"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1024">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.RowSpan="2" 
+                  Visibility="{Binding IsLoadingVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
+                  Panel.ZIndex="1000" >
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </Grid.Background>
+            <!-- Add controls as needed -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <userControls:Spinner x:Name="Spinner" 
+                                          Margin="5" Width="180" Height="180"/>
+
+                <TextBlock Text="Loading ..." HorizontalAlignment="Center" FontSize="20" Foreground="White"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" >
+                <TextBlock Text="Inventory Adjustment For Approval" 
+                                   FontSize="30" FontWeight="Bold" Padding="15"/>
+                <StackPanel Orientation="Horizontal">
+                    <Grid>
+                        <materialDesign:PackIcon Kind="Search" VerticalAlignment="Bottom" Margin="15,0,2,8" Panel.ZIndex="1000" />
+                        <TextBox Padding="15,0,30,0" Name="SearchInput" 
+                                 cal:Message.Attach="[DelayedEvent TextChanged] = [Action FilterLists(SearchInput.Text)]"
+                                 VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="15,5,0,5" Width="200"/>
+                    </Grid>
+                </StackPanel>
+
+            </StackPanel>
+            <Button x:Name="Close" Content="X" Grid.Column="1" 
+                            ToolTip="Close" VerticalAlignment="Top" Margin="0,10,0,0"
+                            Style="{StaticResource MaterialDesignFlatButton}" Height="Auto"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Border Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                    </Border.Effect>
+
+                    <StackPanel >
+
+                        <DataGrid x:Name="CollectionView"                 
+                                  CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
+                                  materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
+                                    SelectedItem="{Binding SelectedInventory}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Requested By"
+                                            Binding="{Binding Path=RequestBy}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Supplier"
+                                            Binding="{Binding Path=Supplier}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Product"
+                                                    Binding="{Binding Path=ProductName}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Quantity"
+                                                    Binding="{Binding Path=Quantity}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Action"
+                                            Binding="{Binding Action, Converter={StaticResource BoolToStocksAction}, FallbackValue='Increment Stocks'}"
+                                            IsReadOnly="True" />
+                                
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </ScrollViewer>
+
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Border Margin="10" Background="White" Padding="10" CornerRadius="10" MinWidth="330" >
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                    </Border.Effect>
+
+                    <StackPanel >
+
+                        <TextBlock Text="Details" FontSize="30" Margin="0,0,0,20"/>
+
+                        <TextBox x:Name="RequestBy" 
+                                attachedProperties:IsFocusedProperty.Value ="True"
+                                 materialDesign:HintAssist.Hint="Request By" 
+                                IsReadOnly="True"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" />
+
+                        <TextBox x:Name="Supplier"  
+                                 materialDesign:HintAssist.Hint="Supplier" 
+                                 IsReadOnly="True"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <TextBox x:Name="ProductName"  
+                                 materialDesign:HintAssist.Hint="Product" 
+                                 IsReadOnly="True"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <TextBox x:Name="Quantity"  
+                                 materialDesign:HintAssist.Hint="Quantity" 
+                                 IsReadOnly="True"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <TextBox x:Name="Action"  
+                                 materialDesign:HintAssist.Hint="Action" 
+                                 IsReadOnly="True"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,15"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="Clear" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="Broom" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="CLEAR" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="Approve" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="CheckCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="APPROVE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="Disapprove"  Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="RemoveCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="DISAPPROVE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </Border>
+            </ScrollViewer>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

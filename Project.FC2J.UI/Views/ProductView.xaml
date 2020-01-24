@@ -1,0 +1,269 @@
+﻿<UserControl x:Class="Project.FC2J.UI.Views.ProductView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Project.FC2J.UI.Views"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:attachedProperties="clr-namespace:Project.FC2J.UI.AttachedProperties"
+             xmlns:userControls="clr-namespace:Project.FC2J.UI.UserControls"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="13"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextRenderingMode="Auto"
+             Background="{DynamicResource MaterialDesignPaper}"
+             FontFamily="{DynamicResource MaterialDesignFont}"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1024">
+    <Grid  >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.RowSpan="2" 
+                  Visibility="{Binding IsLoadingVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
+                  Panel.ZIndex="1000" >
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </Grid.Background>
+            <!-- Add controls as needed -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <userControls:Spinner x:Name="Spinner" 
+                                          Margin="5" Width="180" Height="180"/>
+
+                <TextBlock Text="Loading ..." HorizontalAlignment="Center" FontSize="20" Foreground="White"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" >
+                <TextBlock Text="Products List" 
+                                   FontSize="30" FontWeight="Bold" Padding="15"/>
+                <StackPanel Orientation="Horizontal">
+                    <Grid>
+
+                        <materialDesign:PackIcon Kind="Search" VerticalAlignment="Bottom" Margin="15,0,2,8" Panel.ZIndex="1000" />
+                        <TextBox Padding="15,0,30,0" Name="SearchInput" 
+                                 cal:Message.Attach="[DelayedEvent TextChanged] = [Action FilterLists(SearchInput.Text)]"
+                                 VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="15,5,0,5" Width="200"/>
+
+                    </Grid>
+
+                    <TextBlock x:Name="Count" Text="" Margin="60,0,0,0" FontWeight="Bold" />
+
+                    <TextBlock Text="Color Legend: " Margin="60,0,0,0" FontWeight="Bold" Foreground="#DD958E8E"/>
+                    <TextBlock Text="Products with transaction" Margin="10,0,0,0" Foreground="#3767ff"/>
+                    <TextBlock Text="Products with ZERO (0) stocks" Margin="30,0,0,0" Foreground="OrangeRed"/>
+
+                </StackPanel>
+
+            </StackPanel>
+            <Button x:Name="Close" Content="X" Grid.Column="1" 
+                            ToolTip="Close" VerticalAlignment="Top" Margin="0,10,0,0"
+                            Style="{StaticResource MaterialDesignFlatButton}" Height="Auto"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Border Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                    </Border.Effect>
+
+                    <StackPanel >
+
+                        <DataGrid x:Name="CollectionView"                 
+                                  CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
+                                  materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
+                                    SelectedItem="{Binding SelectedProduct}">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditable}" Value="False">
+                                            <Setter Property="Foreground" Value="#3767ff" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding StockQuantity}" Value="0">
+                                            <Setter Property="Foreground" Value="OrangeRed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Reference No"
+                                            Binding="{Binding Path=SFAReferenceNo}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Stock Coron"
+                                            Binding="{Binding Path=Stock_CORON}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Stock Lubang"
+                                                    Binding="{Binding Path=Stock_LUBANG}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Stock San Ildefonso"
+                                                    Binding="{Binding Path=Stock_SANILDEFONSO}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="SFA Category"
+                                            Binding="{Binding Path=Category}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Internal Category"
+                                            Binding="{Binding Path=InternalCategory}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Is Feeds"
+                                                    Binding="{Binding Path=IsFeeds}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Unit Of Measure"
+                                            Binding="{Binding Path=UnitOfMeasure}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="SFA Unit Of Measure"
+                                            Binding="{Binding Path=SFAUnitOfMeasure}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Sale Price Coron"
+                                            Binding="{Binding Path=SalePrice_CORON, StringFormat=N2}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Sale Price Lubang"
+                                                    Binding="{Binding Path=SalePrice_LUBANG, StringFormat=N2}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Sale Price San Ildefonso"
+                                                    Binding="{Binding Path=SalePrice_SANILDEFONSO, StringFormat=N2}"
+                                                    IsReadOnly="True" />
+                                <DataGridTextColumn Header="Cost Price"
+                                            Binding="{Binding Path=CostPrice, StringFormat=N2}"
+                                            IsReadOnly="True" />
+                                <DataGridTextColumn Header="Is Taxable"
+                                                    Binding="{Binding Path=IsTaxable}"
+                                                    IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </ScrollViewer>
+
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Border Margin="10" Background="White" Padding="10" CornerRadius="10" MinWidth="330" >
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                    </Border.Effect>
+
+                    <StackPanel >
+
+                        <TextBlock Text="Product Details" FontSize="30" Margin="0,0,0,20"/>
+
+                        <TextBlock x:Name="Description"  
+                                   Margin="5" FontSize="20" Foreground="Blue"/>
+
+                        <TextBox x:Name="SFAReferenceNo" 
+                                attachedProperties:IsFocusedProperty.Value ="True"
+                                 materialDesign:HintAssist.Hint="Reference No" 
+                                IsEnabled="{Binding IsEditable}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" />
+
+                        <TextBox x:Name="ProductName"  
+                                 materialDesign:HintAssist.Hint="Name" 
+                                 IsEnabled="{Binding IsEditable}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+
+                        <ComboBox x:Name="Categories" SelectedItem="{Binding SelectedCategory}" 
+                                  materialDesign:HintAssist.Hint="Category" 
+                                  IsEnabled="{Binding IsEditable}"
+                                  Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Category}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <ComboBox x:Name="InternalCategories" SelectedItem="{Binding SelectedInternalCategory}" 
+                              materialDesign:HintAssist.Hint="Internal Category" 
+                              IsEnabled="{Binding IsEditable}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding InternalCategory}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <CheckBox x:Name="IsFeeds" Content="Is Feeds" 
+                                  
+                                  Margin="5,0,5,5"/>
+                        <TextBox x:Name="UnitOfMeasure"   
+                                 materialDesign:HintAssist.Hint="Unit Of Measure" 
+                                 IsEnabled="{Binding IsEditable}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                        <TextBox x:Name="SFAUnitOfMeasure"   
+                                 materialDesign:HintAssist.Hint="SFA Unit Of Measure" 
+                                 IsEnabled="{Binding IsEditable}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <CheckBox x:Name="IsConvertibleToBag" Content="Is Convertible To Bag" Margin="5,0,5,5"/>
+
+                        <TextBox x:Name="KiloPerUnit" Text="{Binding KiloPerUnit, StringFormat=N2}"    
+                                 materialDesign:HintAssist.Hint="Kilo Per Unit" 
+                                 IsEnabled="{Binding IsConvertibleToBag}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <TextBox x:Name="SalePriceCORON" Text="{Binding SalePriceCORON, StringFormat=N2}"    
+                                 materialDesign:HintAssist.Hint="Selling Price Coron" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                        <TextBox x:Name="SalePriceLUBANG" Text="{Binding SalePriceLUBANG, StringFormat=N2}"    
+                                 materialDesign:HintAssist.Hint="Selling Price Lubang" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                        <TextBox x:Name="SalePriceSANILDEFONSO" Text="{Binding SalePriceSANILDEFONSO, StringFormat=N2}"    
+                                 materialDesign:HintAssist.Hint="Selling Price San Ildefonso" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <TextBox x:Name="CostPrice" Text="{Binding CostPrice, StringFormat=N2}"    
+                                 materialDesign:HintAssist.Hint="Purchasing Price" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <CheckBox x:Name="IsTaxable" Content="Is Taxable" Margin="5,5,5,20"/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="Clear" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="Broom" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="CLEAR" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="Delete" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="BinCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="DELETE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="Save"  Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="ContentSave" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="SAVE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </Border>
+            </ScrollViewer>
+
+        </Grid>
+
+
+
+
+
+    </Grid>
+
+</UserControl>
