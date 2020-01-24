@@ -1,0 +1,163 @@
+﻿<Application x:Class="Project.FC2J.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Project.FC2J.UI"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+             xmlns:editors1="clr-namespace:AutoCompleteTextBox.Editors;assembly=AutoCompleteTextBox"
+             xmlns:valueConverters="clr-namespace:Project.FC2J.UI.ValueConverters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <local:Bootstrapper x:Key="Bootstrapper" />
+                </ResourceDictionary>
+
+
+                <!-- Material -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Blue.xaml" />
+
+                <!-- Order is important -->
+                <ResourceDictionary Source="Styles/Colors.xaml" />
+                <ResourceDictionary Source="Styles/Fonts.xaml" />
+                <ResourceDictionary Source="Styles/Buttons.xaml" />
+                <ResourceDictionary Source="Styles/Texts.xaml" />
+                <ResourceDictionary Source="Styles/Labels.xaml" />
+                <ResourceDictionary Source="Styles/DataGrids.xaml" />
+
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+                    <converters:TextFieldHintVisibilityConverter x:Key="TextFieldHintVisibilityConverter" />
+                    <local:BoolToVisiblityConverter x:Key="BoolToHiddenConverter" />
+                    <valueConverters:BoolToStocksAction x:Key="BoolToStocksAction" />
+                    <local:BinaryToImageConverter x:Key="imageConverter" />
+                    <local:StringStarIconConverter x:Key="StringStarIconConverter" />
+                    <local:MarginConverter x:Key="MarginConverter" />
+                    <local:BooleanToDiscountPolicyConverter x:Key="BooleanToDiscountPolicyConverter" />
+                    
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>            
+            <sys:String x:Key="applicationTitle">Warehouse Management System</sys:String>
+            <Style TargetType="CheckBox">
+                <Setter Property="Margin" Value="10"/>
+            </Style>
+
+            <Style x:Key="MaterialAutoCompleteTextBox" TargetType="{x:Type editors1:AutoCompleteTextBox}" >
+                <Setter Property="Focusable" Value="True" />
+                <Setter Property="BorderThickness" Value="0 0 0 1"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="VerticalContentAlignment" Value="Top"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="AllowDrop" Value="true"/>
+                <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource MaterialDesignValidationErrorTemplate}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type editors1:AutoCompleteTextBox}">
+                            <Grid>
+                                <DockPanel>
+                                    <ContentPresenter ContentSource="Icon"
+        							x:Name="PART_Icon"
+        							Visibility="{TemplateBinding IconVisibility}" />
+                                    <Grid>
+                                        <TextBlock x:Name="PART_Watermark"
+        								Text="{TemplateBinding Watermark}"
+        								Visibility="Collapsed"
+        								VerticalAlignment="Center"
+        								HorizontalAlignment="Left"
+        								Focusable="False"
+        								Foreground="Gray"
+        								Margin="3,0" />
+                                        <TextBox x:Name="PART_Editor"
+        								Focusable="True"
+        								HorizontalAlignment="Stretch"
+        								VerticalAlignment="Center"
+        								Style="{StaticResource ResourceKey=MaterialDesignTextBox}"
+        								MaxLength="{Binding MaxLength, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+        								CharacterCasing="{Binding CharacterCasing, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+        								Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    </Grid>
+                                </DockPanel>
+                                <Popup x:Name="PART_Popup"
+        						IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+        						Width="{TemplateBinding ActualWidth}"
+        						HorizontalOffset="0"
+        						MinHeight="25"
+        						MaxHeight="600"
+        						AllowsTransparency="True"
+        						PopupAnimation="Slide"
+        						Focusable="False">
+                                    <Border Background="White"
+        							BorderThickness="1"
+        							BorderBrush="Gray"
+        							CornerRadius="5"
+        							Padding="2">
+                                        <Grid>
+                                            <ListBox x:Name="PART_Selector"
+        									ItemTemplate="{TemplateBinding ItemTemplate}"
+        									ItemTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+        									Focusable="False"
+        									BorderThickness="0"
+        									MaxHeight="{Binding MaxPopupHeight, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+        									ScrollViewer.HorizontalScrollBarVisibility="Auto"
+        									ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                />
+                                            <Border Visibility="{Binding IsLoading, Converter={StaticResource ResourceKey=BoolToVisConverter}, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                                                <ContentPresenter ContentSource="LoadingContent"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </Popup>
+
+                            </Grid>
+                            <!--</Border>-->
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Text"
+        						Value=""
+        						SourceName="PART_Editor">
+                                    <Setter Property="Visibility"
+        							Value="Visible"
+        							TargetName="PART_Watermark" />
+                                </Trigger>
+                                <Trigger Property="IconPlacement"
+        						Value="Left">
+                                    <Setter Property="DockPanel.Dock"
+        							Value="Left"
+        							TargetName="PART_Icon" />
+                                </Trigger>
+                                <Trigger Property="IconPlacement"
+        						Value="Right">
+                                    <Setter Property="DockPanel.Dock"
+        							Value="Right"
+        							TargetName="PART_Icon" />
+                                </Trigger>
+                                <Trigger Property="Validation.HasError" Value="True">
+                                    <Setter Property="BorderBrush"
+        							Value="Red"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DataTemplate x:Key="PartnerTemplate">
+                <Grid>
+                    <TextBlock Text="{Binding Name}"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="PONoTemplate">
+                <Grid>
+                    <TextBlock Text="{Binding PONo}"/>
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,76 @@
+﻿<Window x:Class="Project.FC2J.UI.UserControls.AdjustInventoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Project.FC2J.UI.UserControls"
+        xmlns:attachedProperties="clr-namespace:Project.FC2J.UI.AttachedProperties"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Adjust Inventory" Height="400" Width="450" WindowStartupLocation="CenterScreen" ContentRendered="Window_ContentRendered" ResizeMode="NoResize">
+    <Grid>
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Border Margin="10" Background="White" Padding="10" CornerRadius="10" MinWidth="330" >
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                </Border.Effect>
+
+                <StackPanel >
+
+
+                    <TextBlock Name="StockQuantity"  
+                                   Margin="5" FontSize="20" Foreground="Blue"/>
+
+                    <ComboBox Name="Products" 
+                              materialDesign:HintAssist.Hint="Product" 
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5" SelectionChanged="Products_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox Name="Supplier" 
+                              materialDesign:HintAssist.Hint="Supplier" 
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5" SelectionChanged="Supplier_SelectionChanged" >
+                        <ComboBoxItem >Coron</ComboBoxItem>
+                        <ComboBoxItem >Lubang</ComboBoxItem>
+                        <ComboBoxItem >San Ildefonso</ComboBoxItem>
+                    </ComboBox>
+
+                    <TextBox Name="SFAReferenceNo"  
+                                 materialDesign:HintAssist.Hint="Reference No" 
+                                 IsEnabled="False"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                    <TextBox Name="Quantity" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                             materialDesign:HintAssist.Hint="Quantity" 
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+                    <CheckBox Name="IsAction" Content="Increment [quantity will be added]" IsChecked="True" Margin="5,0,5,5" Checked="IsAction_Checked" Unchecked="IsAction_Checked"/>
+
+                    <TextBox Name="Remarks"   
+                                 materialDesign:HintAssist.Hint="Remarks" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Name="Close" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                            <Grid>
+                                <materialDesign:PackIcon Kind="XamarinOutline" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="CLOSE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+                        <Button Name="Save" IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="10,0,4,0" Click="Save_Click">
+                            <Grid>
+                                <materialDesign:PackIcon Kind="ContentSave" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="SAVE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</Window>

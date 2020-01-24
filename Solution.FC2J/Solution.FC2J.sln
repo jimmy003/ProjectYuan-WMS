@@ -3,9 +3,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{BDC19656-EEBF-4871-B3E3-1840DD6EA590}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{3C20D7F2-B449-4273-99CE-37E4DBEE7753}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{035C1D6D-E044-43C8-9602-7ED798A529B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{2DDCBF4D-7249-438E-8D92-5B6B69C5F350}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.FC2J.API", "Project.FC2J.API\Project.FC2J.API.csproj", "{D09FFAE1-3F7A-4298-AF7C-195E4825AACA}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D09FFAE1-3F7A-4298-AF7C-195E4825AACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D09FFAE1-3F7A-4298-AF7C-195E4825AACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D09FFAE1-3F7A-4298-AF7C-195E4825AACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D09FFAE1-3F7A-4298-AF7C-195E4825AACA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D09FFAE1-3F7A-4298-AF7C-195E4825AACA} = {3C20D7F2-B449-4273-99CE-37E4DBEE7753}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FBE09A66-50CF-413A-A649-0BFEC2A62C7A}

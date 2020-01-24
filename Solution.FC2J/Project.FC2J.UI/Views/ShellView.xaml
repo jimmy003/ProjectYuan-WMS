@@ -1,0 +1,134 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cal="http://www.caliburnproject.org"
+        xmlns:local="clr-namespace:Project.FC2J.UI.Views" x:Class="Project.FC2J.UI.Views.ShellView"
+        mc:Ignorable="d" 
+        Title="Warehouse Management System - FC2J" 
+        Height="700" Width="700"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Icon="../Includes/fc2j.ico" >
+
+    <Border Background="{StaticResource WordBlueBrush}">
+        <Grid>
+            <Grid.Background>
+                <ImageBrush Viewport="0,0,750,500" 
+					ImageSource="../Images/Backgrounds/vector.jpg" Opacity="0.24" ViewportUnits="Absolute" TileMode="Tile" />
+            </Grid.Background>
+            <DockPanel >
+                <Menu DockPanel.Dock="Top"  Padding="5">
+                    
+                    <MenuItem Header="_File">
+                        <MenuItem x:Name="ExitApplication" Header="E_xit" />
+                    </MenuItem>
+
+                    <MenuItem Header="_Content Management"
+						Visibility="{Binding IsContentManagementVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}">
+                        <MenuItem x:Name="Products"
+							Header="_Products" cal:Message.Attach="Handle('PRODUCT')"
+							Visibility="{Binding IsVisible[PRODUCT], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}" />
+                        <MenuItem 
+                                  Header="_Adjust Inventory" cal:Message.Attach="Handle('ADJUSTINVENTORY')"
+                                  Visibility="{Binding IsVisible[ADJUSTINVENTORY], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}" />
+                        <MenuItem 
+                            Header="_Inventory Approval" cal:Message.Attach="Handle('ADJUSTINVENTORYAPPROVAL')"
+                            Visibility="{Binding IsVisible[ADJUSTINVENTORYAPPROVAL], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}" />
+                        <MenuItem x:Name="Partners"
+							Header="_Partners" cal:Message.Attach="Handle('CUSTOMER')"
+							Visibility="{Binding IsVisible[CUSTOMER], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}" />
+                        <MenuItem x:Name="Users"
+							Header="_Users" cal:Message.Attach="Handle('USER')"
+							Visibility="{Binding IsVisible[USER], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}" />
+                    </MenuItem>
+
+                    <MenuItem Header="_Sales" 
+						Visibility="{Binding IsSalesVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}">
+                        
+                        <MenuItem x:Name="Sales" Header="_Sales Order" 
+							cal:Message.Attach="Handle('SALESLIST')"
+							Visibility="{Binding IsVisible[SALESLIST], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+                        
+                        <MenuItem Header="_Price Lists" 
+							cal:Message.Attach="Handle('PRICELIST')"
+							Visibility="{Binding IsVisible[PRICELIST], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                        <MenuItem x:Name="Deductions" Header="_Deductions" 
+                                  cal:Message.Attach="Handle('DEDUCTIONS')"
+                                  Visibility="{Binding IsVisible[DEDUCTIONS], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                        <MenuItem x:Name="Print" Header="P_rint SO" 
+                                  cal:Message.Attach="Handle('PRINTSO')"
+                                  Visibility="{Binding IsVisible[PRINTSO], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                    </MenuItem>
+
+                    <MenuItem Header="_Collections" 
+                              Visibility="{Binding IsCollectionsVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}">
+
+                        <MenuItem x:Name="Receiver" Header="_Receiver" 
+                                  cal:Message.Attach="Handle('RECEIVER')"
+                                  Visibility="{Binding IsVisible[RECEIVER], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                        <MenuItem x:Name="Monitoring" Header="_Monitoring" 
+                                  cal:Message.Attach="Handle('MONITORING')"
+                                  Visibility="{Binding IsVisible[MONITORING], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+
+                    </MenuItem>
+
+                    <MenuItem Header="_Purchases" 
+                              Visibility="{Binding IsPurchasesVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}">
+
+
+                        <MenuItem Header="_Purchase Order" 
+                                  cal:Message.Attach="Handle('PURCHASEORDER')"
+                                  Visibility="{Binding IsVisible[PURCHASEORDER], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                        <MenuItem Header="_Price Lists"  
+                                  cal:Message.Attach="Handle('PRICELIST_PO')"
+                                  Visibility="{Binding IsVisible[PRICELIST_PO], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                    </MenuItem>
+                    <MenuItem Header="_Reports" Visibility="{Binding IsReportsVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}">
+
+                        <MenuItem x:Name="SalesReport" Header="_Sales Report" 
+                                  cal:Message.Attach="Handle('SALESREPORT')"
+                                  Visibility="{Binding IsVisible[SALESREPORT], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+                        <MenuItem x:Name="InventoryReport" Header="_Inventory Report" 
+                                  cal:Message.Attach="Handle('REPORTS_INVENTORY')"
+                                  Visibility="{Binding IsVisible[REPORTS_INVENTORY], Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+                    </MenuItem>
+
+                    <MenuItem Header="_Account" 
+						Visibility="{Binding IsAccountVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}">
+                        
+                        <MenuItem x:Name="Profile" Header="_Profile" 
+							cal:Message.Attach="Handle('PROFILE')"
+							Visibility="{Binding IsProfileVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+                        <MenuItem x:Name="LogOut" 
+                                  Header="_Log Out" 
+                                  Visibility="{Binding IsLogoutVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"/>
+
+                    </MenuItem>
+                    
+                </Menu>
+
+                <Grid x:Name="Overlay" Panel.ZIndex="1000" Visibility="Visible">
+                    <Grid.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.5"/>
+                    </Grid.Background>
+                    <!-- Add controls as needed -->
+                </Grid>
+                <Border>
+                    <ContentControl x:Name="ActiveItem" Margin="5" />
+                </Border>
+
+            </DockPanel>
+        </Grid>
+    </Border>
+
+
+</Window>

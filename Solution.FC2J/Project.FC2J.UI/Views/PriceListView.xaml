@@ -1,0 +1,333 @@
+﻿<UserControl x:Class="Project.FC2J.UI.Views.PriceListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Project.FC2J.UI.Views"
+             mc:Ignorable="d" 
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:attachedProperties="clr-namespace:Project.FC2J.UI.AttachedProperties"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:userControls="clr-namespace:Project.FC2J.UI.UserControls"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="13"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextRenderingMode="Auto"
+             Background="{DynamicResource MaterialDesignPaper}"
+             FontFamily="{DynamicResource MaterialDesignFont}"
+             d:DesignHeight="600" d:DesignWidth="1080">
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.RowSpan="2" 
+              Visibility="{Binding IsLoadingVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
+              Panel.ZIndex="1000" >
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </Grid.Background>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <userControls:Spinner x:Name="Spinner" 
+                                      Margin="5" Width="180" Height="180"/>
+
+                <TextBlock Text="Loading ..." HorizontalAlignment="Center" FontSize="20" Foreground="White"/>
+            </StackPanel>
+        </Grid>
+
+        <materialDesign:Card Grid.Row="0" Padding="10" Margin="10,10,10,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" 
+                           VerticalAlignment="Center" Text="Price Lists - SO" 
+                           FontSize="30" Padding="5"/>
+
+                <Button Grid.Column="1" x:Name="Close" Content="X" 
+                        ToolTip="Close" 
+                        Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+            </Grid>
+
+        </materialDesign:Card>
+
+      
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0"
+                    Margin="10"  Background="White" Padding="10" CornerRadius="10" >
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Padding="5" Grid.Row="0">
+                        <Grid  >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0"  Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Search" Margin="10,10,10,0"/>
+                                <TextBox Background="White" Width="210" Name="SearchInput" 
+                                         cal:Message.Attach="[DelayedEvent TextChanged] = [Action FilterLists(SearchInput.Text)]"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="1" x:Name="Add" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignFlatButton}" Width="40" Height="Auto" Margin="0,5" Padding="2,4" >
+                                <materialDesign:PackIcon Kind="AddBox" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                        <Border Padding="0,10">
+                            <StackPanel >
+                                <ListView x:Name="Pricelists" SelectedItem="{Binding SelectedPricelist}"
+                                          cal:Message.Attach="[Event MouseDoubleClick] = [Action OnRowSelect()]">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="0 0 0 1" Width="260">
+                                                <Grid Height="50">
+                                                    <StackPanel Height="50">
+                                                        <TextBlock Text="{Binding Name}" />
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Subscribed}" Foreground="#DDFF6F0B" Margin="1" FontSize="10"/>
+                                                            <materialDesign:PackIcon Kind="{Binding Subscribed, ConverterParameter=1, Converter={StaticResource StringStarIconConverter}, Mode=OneWay}" Foreground="#DDFF6F0B" Margin="1" VerticalAlignment="Center" Width="12" Height="12"/>
+                                                            <materialDesign:PackIcon Kind="{Binding Subscribed, ConverterParameter=2, Converter={StaticResource StringStarIconConverter}, Mode=OneWay}" Foreground="#DDFF6F0B" Margin="1" VerticalAlignment="Center" Width="12" Height="12"/>
+                                                            <materialDesign:PackIcon Kind="{Binding Subscribed, ConverterParameter=3, Converter={StaticResource StringStarIconConverter}, Mode=OneWay}" Foreground="#DDFF6F0B" Margin="1" VerticalAlignment="Center" Width="12" Height="12"/>
+                                                            <materialDesign:PackIcon Kind="{Binding Subscribed, ConverterParameter=4, Converter={StaticResource StringStarIconConverter}, Mode=OneWay}" Foreground="#DDFF6F0B" Margin="1" VerticalAlignment="Center" Width="12" Height="12"/>
+                                                            <materialDesign:PackIcon Kind="{Binding Subscribed, ConverterParameter=5, Converter={StaticResource StringStarIconConverter}, Mode=OneWay}" Foreground="#DDFF6F0B" Margin="1" VerticalAlignment="Center" Width="12" Height="12"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding DiscountPolicy, Converter={StaticResource BooleanToDiscountPolicyConverter}, Mode=OneWay}" Opacity="0.7" FontSize="9.333"/>
+                                                    </StackPanel>
+                                                    <Image Name="DiscountPolicyImage" HorizontalAlignment="Right" Margin="2 0 10 0" Width="40" Height="40" Source="/WarehouseManagementSystem;component/Images/PriceIncluded.png" Stretch="UniformToFill" />
+                                                </Grid>
+                                            </Border>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding DiscountPolicy}" Value="True">
+                                                    <Setter TargetName="DiscountPolicyImage" Property="Source" Value="/WarehouseManagementSystem;component/Images/ShowDiscount.png"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <!--<ListView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel cal:Action.TargetWithoutContext="{Binding}" />
+                                        </ItemsPanelTemplate>
+                                    </ListView.ItemsPanel>
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="{x:Type ListViewItem}">
+                                            <Setter Property="cal:Message.Attach" 
+                                        Value="[Event MouseDoubleClick] = [Action OnShowDetail($dataContext)]"/>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>-->
+                                </ListView>
+
+                            </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Margin="0,10,10,10"  Background="White" Padding="10" CornerRadius="10" >
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="1"/>
+                </Border.Effect>
+
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0"  >
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="10 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="Save" HorizontalAlignment="Center" 
+                                    Style="{StaticResource MaterialDesignFloatingActionAccentButton}" 
+                                    Margin="0,5" VerticalAlignment="Center" >
+                                <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+                            <Grid Grid.Column="1" Margin="5,0">
+                                <materialDesign:PackIcon Kind="Money" VerticalAlignment="Center" Margin="6,10,2,0" Foreground="{Binding BorderBrush, ElementName=PricelistName}"/>
+                                <TextBox x:Name="PricelistName" attachedProperties:FocusProperty.Value="{Binding AddIsCalled}"  Margin="5" materialDesign:HintAssist.Hint="Name" Padding="10 0 0 0" 
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" VerticalContentAlignment="Bottom" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <StackPanel Margin="5,0" Grid.Column="2" Visibility="Collapsed">
+                                <TextBlock Text="Discount Policy" FontSize="20" />
+                                <RadioButton x:Name="DiscountPolicy1" Content="Discount included in the price" IsChecked="True" />
+                                <RadioButton x:Name="DiscountPolicy2" Content="Show public price &amp; discount to the customer" />
+                            </StackPanel>
+
+                        </Grid>
+                        
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" >
+                            <Border Padding="10">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                                </Border.Effect>
+                                <StackPanel >
+                                    <DataGrid x:Name="Products" 
+                                          CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False" Width="Auto"
+                                        materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" 
+                                          SelectedItem="{Binding SelectedProduct}"
+                                          cal:Message.Attach="[Event MouseDoubleClick] = [Action RowSelect()]">
+
+                                        <DataGrid.Columns>
+
+                                            <DataGridTextColumn Header="Product"
+                                                        Binding="{Binding Name}"
+                                                        Width="120"
+                                                        IsReadOnly="True" />
+
+                                            <DataGridTextColumn Header="Category"
+                                                            Binding="{Binding InternalCategory}"
+                                                            Width="120"
+                                                            IsReadOnly="True" />
+
+                                            <DataGridTextColumn Header="Price CORON"
+                                                                        Binding="{Binding SalePrice_CORON, StringFormat=N2}"
+                                                                        IsReadOnly="True" />
+                                            <DataGridTextColumn Header="Price LUBANG"
+                                                            Binding="{Binding SalePrice_LUBANG, StringFormat=N2}"
+                                                            IsReadOnly="True" />
+                                            <DataGridTextColumn Header="Price SANILDEFONSO"
+                                                            Binding="{Binding SalePrice_SANILDEFONSO, StringFormat=N2}"
+                                                            IsReadOnly="True" />
+
+                                            <DataGridTextColumn Header="Fix Price"
+                                                                    Binding="{Binding DeductionFixPrice, StringFormat=N2}" IsReadOnly="True"/>
+
+                                            <DataGridTextColumn Header="Outright"
+                                                                    Binding="{Binding DeductionOutright, StringFormat=N2}" IsReadOnly="True"/>
+
+                                            <DataGridTextColumn Header="Discount"
+                                                                    Binding="{Binding Discount, StringFormat=N2}" IsReadOnly="True"/>
+
+                                            <DataGridTextColumn Header="Promo"
+                                                                    Binding="{Binding DeductionPromoDiscount, StringFormat=N2}" IsReadOnly="True"/>
+
+                                        </DataGrid.Columns>
+
+                                        <!--<DataGrid.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel cal:Action.TargetWithoutContext="{Binding}" />
+                                            </ItemsPanelTemplate>
+                                        </DataGrid.ItemsPanel>
+                                        <DataGrid.ItemContainerStyle>
+                                            <Style TargetType="{x:Type DataGridRow}">
+                                                <Setter Property="cal:Message.Attach" 
+                                                    Value="[Event MouseDoubleClick] = [Action OnDetail($dataContext)]"/>
+                                            </Style>
+                                        </DataGrid.ItemContainerStyle>-->
+                                    </DataGrid>
+
+                                </StackPanel>
+                            </Border>
+                        </ScrollViewer>
+
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" x:Name="SourcedCustomers" Margin="10" Background="Beige" />
+
+                        <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <StackPanel >
+                                <DataGrid x:Name="SourceCustomers"            
+                              Margin="10,8,10,0" CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
+                              materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8"                            	            
+                              SelectedItem="{Binding SelectedSourceCustomer}" >
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Partner Name"
+                                                Binding="{Binding Name}"
+                                                IsReadOnly="True" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <StackPanel Grid.Column="1" Grid.Row="1" Margin="5,0" VerticalAlignment="Center">
+                            <Button x:Name="AddCustomer" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,0,5" HorizontalAlignment="Center" >
+                                <materialDesign:PackIcon Kind="GreaterThan" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+
+                            <Button x:Name="RemoveCustomer" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,5,0,0" >
+                                <materialDesign:PackIcon Kind="LessThan" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="2" Grid.Row="0" x:Name="SubscribedCustomers" Margin="10" TextWrapping="WrapWithOverflow" FontWeight="Bold" Background="Beige"/>
+
+                        <ScrollViewer Grid.Column="2" Grid.Row="1"  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <StackPanel >
+                                <DataGrid x:Name="TargetCustomers" 
+                              Margin="10,8,10,0" CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
+                              materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" 
+                              SelectedItem="{Binding SelectedTargetCustomer}" >
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Partner Name"
+                                                Binding="{Binding Name}"
+                                                IsReadOnly="True"  />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Grid>
+            </Border>
+
+
+        </Grid>
+
+        <!--Column 0-->
+        
+
+       
+
+
+        
+
+
+        </Grid>
+</UserControl>

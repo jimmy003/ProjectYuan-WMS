@@ -1,0 +1,69 @@
+﻿<Window x:Class="Project.FC2J.UI.UserControls.PricelistDetails"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Project.FC2J.UI.UserControls"
+        xmlns:cal="http://www.caliburnproject.org"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Pricelist Details" Height="480" Width="450" WindowStartupLocation="CenterScreen" ContentRendered="Window_ContentRendered" ResizeMode="NoResize">
+    <Grid>
+        <ScrollViewer  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
+            <Grid >
+                <Border Grid.Row="0" Margin="10" Background="White" Padding="10" CornerRadius="10" >
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="30" Color="LightGray" ShadowDepth="0"/>
+                    </Border.Effect>
+                    <StackPanel>
+
+                        <TextBox Name="ProductName"  
+                                 materialDesign:HintAssist.Hint="Product" 
+                                 IsReadOnly="True"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+
+                        <TextBox Name="SalePriceCoron" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Selling Price - CORON" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+                        <TextBox Name="SalePriceLubang" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Selling Price - LUBANG" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+                        <TextBox Name="SalePriceSanIldefonso" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Selling Price - SANILDEFONSO" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+
+                        <TextBox Name="FixPrice" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Fix Price" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+                        <TextBox Name="Outright" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Outright" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+                        <TextBox Name="Discount" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Discount" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="Quantity_TextChanged"/>
+                        <TextBox Name="Promo" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                                 materialDesign:HintAssist.Hint="Promo" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,15" TextChanged="Quantity_TextChanged"/>
+
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Name="Close" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="XamarinOutline" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="CLOSE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                            <Button Name="Save" IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="10,0,4,0" Click="Save_Click">
+                                <Grid>
+                                    <materialDesign:PackIcon Kind="ContentSave" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <TextBlock Text="SAVE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>
