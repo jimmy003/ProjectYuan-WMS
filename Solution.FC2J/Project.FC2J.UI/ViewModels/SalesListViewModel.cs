@@ -229,8 +229,8 @@ namespace Project.FC2J.UI.ViewModels
                 SelectedPartner = Partners.FirstOrDefault(x => x.Id == _saleData.Value.CustomerId);
                 SelectedPaymentType = Payments.FirstOrDefault(x => x.Id == _saleData.Value.SelectedPaymentTypeId);
 
-                DueDate = _saleData.Value.DueDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
                 DeliveryDate = _saleData.Value.DeliveryDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                DueDate = _saleData.Value.DueDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
                 InvoiceDate = _saleData.Value.OrderDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
 
                 SONo = _saleData.Value.SONo;
@@ -239,10 +239,15 @@ namespace Project.FC2J.UI.ViewModels
                 PONo = _saleData.Value.PONo;
                 SalesId = _saleData.Value.Id.ToString();
 
-                SelectedSupplier = "System.Windows.Controls.ComboBoxItem: " + _saleData.Value.SaleDetails[0].Supplier;
+                
+                //SelectedSupplier = "System.Windows.Controls.ComboBoxItem: San Ildefonso" ;
+                //Supplier = _saleData.Value.SaleDetails[0].Supplier;
 
                 OrderStatusId = Convert.ToInt32(_saleData.Value.OrderStatusId);
-
+                SelectedSupplier = "System.Windows.Controls.ComboBoxItem: " + _saleData.Value.SaleDetails[0].Supplier;
+                IsSupplier = false;
+                IsSupplierDisplay = true;
+                SupplierDisplay = $"Supplier: {_saleData.Value.SaleDetails[0].Supplier}";
                 OtherDeduction = "P" + _saleData.Value.LessPrice.ToString("C").Substring(1);
 
                 IsPickup = _saleData.Value.PickUpDiscount > 0;
@@ -515,12 +520,46 @@ namespace Project.FC2J.UI.ViewModels
                             _supplierEnum = SupplierEnum.SANILDEFONSO;
                             break;
                     }
-                    _events.Publish("SelectedPartner Changed", action =>
+
+                    if (SalesId == null)
                     {
-                        Task.Factory.StartNew(OnLoadProducts());
-                    });
+                        _events.Publish("SelectedPartner Changed",action => { Task.Factory.StartNew(OnLoadProducts()); });
+                    }
                     NotifyOfPropertyChange(() => SelectedSupplier);
                 }
+            }
+        }
+
+        private bool _isSupplierDisplay;
+        public bool IsSupplierDisplay
+        {
+            get { return _isSupplierDisplay; }
+            set
+            {
+                _isSupplierDisplay = value;
+                NotifyOfPropertyChange(() => IsSupplierDisplay);
+            }
+        }
+
+        private bool _isSupplier;
+        public bool IsSupplier
+        {
+            get { return _isSupplier; }
+            set
+            {
+                _isSupplier = value;
+                NotifyOfPropertyChange(() => IsSupplier);
+            }
+        }
+
+        private string _supplierDisplay;
+        public string SupplierDisplay 
+        {
+            get { return _supplierDisplay; }
+            set
+            {
+                _supplierDisplay = value;
+                NotifyOfPropertyChange(() => SupplierDisplay);
             }
         }
 
@@ -635,7 +674,7 @@ namespace Project.FC2J.UI.ViewModels
                     ErrorMessage = $"SelectedPaymentType: {ex.Message}";
                 }
             }
-            DueDate = DeliveryDate;
+            //DueDate = DeliveryDate;
 
         }
 
@@ -787,14 +826,24 @@ namespace Project.FC2J.UI.ViewModels
             get { return _deliveryDate; }
             set
             {
-                _deliveryDate = value;
-                NotifyOfPropertyChange(() => DeliveryDate);
-                NotifyOfPropertyChange(() => CanValidateSale);
+                if(_deliveryDate != value)
+                {
+                    _deliveryDate = value;
+                    NotifyOfPropertyChange(() => DeliveryDate);
+                    NotifyOfPropertyChange(() => CanValidateSale);
+                    try
+                    {
+                        DueDate = Convert.ToDateTime(_deliveryDate).ToShortDateString();
+                    }
+                    catch (Exception e)
+                    {
+                        DueDate = string.Empty;
+                    }
+                }
             }
         }
 
         private string _dueDate;
-
         public string DueDate
         {
             get { return _dueDate; }
@@ -1353,7 +1402,7 @@ namespace Project.FC2J.UI.ViewModels
             get
             {
                 var output = string.IsNullOrWhiteSpace(SalesId) == false
-                              && (OrderStatusId == 1 || OrderStatusId == 2);
+                              && (OrderStatusId == 1 );
                 return output;
             }
         }
@@ -1564,6 +1613,8 @@ namespace Project.FC2J.UI.ViewModels
             SalesId = string.Empty;
 
             OrderStatusId = 1;
+            IsSupplier = true;
+            IsSupplierDisplay = false;
 
         }
 

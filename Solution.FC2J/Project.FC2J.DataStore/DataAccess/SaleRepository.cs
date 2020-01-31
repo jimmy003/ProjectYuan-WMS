@@ -264,28 +264,28 @@ namespace Project.FC2J.DataStore.DataAccess
                         await _spUpdateSaleHeader.ExecuteNonQueryAsync(_sqlParameters.ToArray());
                         await ProcessSaleDetails(sale.CustomerId, sale, sale.Id.ToString());
 
-                        _sqlParameters = new List<SqlParameter>
-                        {
-                            new SqlParameter("@t", 9),
-                            new SqlParameter("@PONo", sale.PONo),
-                            new SqlParameter("@CustomerId", sale.CustomerId)
-                        };
-                        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                        //_sqlParameters = new List<SqlParameter>
+                        //{
+                        //    new SqlParameter("@t", 9),
+                        //    new SqlParameter("@PONo", sale.PONo),
+                        //    new SqlParameter("@CustomerId", sale.CustomerId)
+                        //};
+                        //await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
-                        if (sale.Deductions.Count > 0)
-                        {
-                            foreach (var deduction in sale.Deductions)
-                            {
-                                _sqlParameters = new List<SqlParameter>
-                                {
-                                    new SqlParameter("@t", 7),
-                                    new SqlParameter("@PONo", sale.PONo),
-                                    new SqlParameter("@Id", deduction),
-                                    new SqlParameter("@CustomerId", sale.CustomerId)
-                                };
-                                await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
-                            }
-                        }
+                        //if (sale.Deductions.Count > 0)
+                        //{
+                        //    foreach (var deduction in sale.Deductions)
+                        //    {
+                        //        _sqlParameters = new List<SqlParameter>
+                        //        {
+                        //            new SqlParameter("@t", 7),
+                        //            new SqlParameter("@PONo", sale.PONo),
+                        //            new SqlParameter("@Id", deduction),
+                        //            new SqlParameter("@CustomerId", sale.CustomerId)
+                        //        };
+                        //        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                        //    }
+                        //}
                         #endregion
                         break;
 
@@ -328,6 +328,21 @@ namespace Project.FC2J.DataStore.DataAccess
                         if (sale.Revalidate)
                         {
                             await ProcessSaleDetails(sale.CustomerId, sale, sale.Id.ToString());
+
+                            if (sale.Deductions.Count > 0)
+                            {
+                                foreach (var deduction in sale.Deductions)
+                                {
+                                    _sqlParameters = new List<SqlParameter>
+                                    {
+                                        new SqlParameter("@t", 7),
+                                        new SqlParameter("@PONo", sale.PONo),
+                                        new SqlParameter("@Id", deduction),
+                                        new SqlParameter("@CustomerId", sale.CustomerId)
+                                    };
+                                    await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                                }
+                            }
                         }
                         break;
 
@@ -385,20 +400,7 @@ namespace Project.FC2J.DataStore.DataAccess
 
                 await ProcessSaleDetails(sale.CustomerId, sale, result.Id.ToString());
 
-                if (sale.Deductions.Count > 0)
-                {
-                    foreach (var deduction in sale.Deductions)
-                    {
-                        _sqlParameters = new List<SqlParameter>
-                        {
-                            new SqlParameter("@t", 7),
-                            new SqlParameter("@PONo", sale.PONo),
-                            new SqlParameter("@Id", deduction),
-                            new SqlParameter("@CustomerId", sale.CustomerId)
-                        };
-                        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
-                    }
-                }
+                
 
                 #endregion
 
@@ -434,7 +436,8 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@SubTotalProductTaxPrice", item.SubTotalProductTaxPrice),
                     new SqlParameter("@PriceListId", sale.PriceListId),
                     new SqlParameter("@SupplierId", item.SupplierId),
-                    new SqlParameter("@Supplier", item.Supplier)
+                    new SqlParameter("@Supplier", item.Supplier),
+                    new SqlParameter("@OrderStatusId", sale.OrderStatusId)
                 };
                 await _spInsertSaleDetail.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
