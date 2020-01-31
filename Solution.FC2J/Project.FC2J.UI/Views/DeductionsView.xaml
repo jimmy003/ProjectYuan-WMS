@@ -159,11 +159,17 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Particular"
                                                     Binding="{Binding Path=Particular}"
-                                                    Width="200"
+                                                    Width="250"
                                                     IsReadOnly="True" />
                                 <DataGridTextColumn Header="Amount"
                                                     Width="150"
                                                     Binding="{Binding Path=Amount, StringFormat=N2}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="PO No"
+                                                    Width="140"
+                                                    Binding="{Binding Path=PONo}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Used Amount"
+                                                    Width="150"
+                                                    Binding="{Binding Path=UsedAmount, StringFormat=N2}" IsReadOnly="True"/>
 
                             </DataGrid.Columns>
 

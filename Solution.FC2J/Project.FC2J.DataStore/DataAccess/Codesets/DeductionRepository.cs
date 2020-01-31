@@ -25,7 +25,8 @@ namespace Project.FC2J.DataStore.DataAccess.Codesets
             {
                 new SqlParameter("@CustomerId", customerId)
             };
-            sqlParameters.Add(isUsed > 0 ? new SqlParameter("@t", 4) : new SqlParameter("@t", 3));
+            //sqlParameters.Add(isUsed > 0 ? new SqlParameter("@t", 4) : new SqlParameter("@t", 3));
+            sqlParameters.Add(new SqlParameter("@t", 5));
 
             var value = await _spManageSaleDeduction.GetList<Deduction>(sqlParameters.ToArray());
             return value;
