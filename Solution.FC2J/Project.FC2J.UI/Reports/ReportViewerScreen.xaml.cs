@@ -33,6 +33,7 @@ namespace Project.FC2J.UI.Reports
             _reportEndpoint = reportEndpoint;
             _excelHelper = excelHelper;
             OnPageSettings();
+            InventoryDate.SelectedDate = DateTime.Today;
         }
 
         private void OnPageSettings()
@@ -103,6 +104,17 @@ namespace Project.FC2J.UI.Reports
 
             var date = DateTime.Now;
 
+            try
+            {
+                date = Convert.ToDateTime(InventoryDate.SelectedDate);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Please Select Valid Date", "Invalid Date", MessageBoxButton.OK);
+                return;
+            }
+
+
             var categories = await _reportEndpoint.GetCategoryArrangement(); // common to all 
             var products = await _reportEndpoint.GetInventoryProducts();
 
@@ -138,7 +150,7 @@ namespace Project.FC2J.UI.Reports
             set.Tables.Add(tableLubang);
             set.Tables.Add(tableSanIldefonso);
 
-            var filename = $"DailyInventory-AsOf{DateTime.Now.ToString("ddMMMyyyy-hhmmss")}.xlsx";
+            var filename = $"DailyInventory{date.ToString("ddMMMyyyy")}-GeneratedAsof{DateTime.Now.ToString("ddMMMyyyy-hhmmss")}.xlsx";
             var folder = Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("ddMMMyyyy");
             if (Directory.Exists(folder) == false)
                 Directory.CreateDirectory(folder);

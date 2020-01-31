@@ -6,6 +6,7 @@ using Project.FC2J.DataStore.Interfaces.Codesets;
 using Project.FC2J.DataStore.Internal.DataAccess;
 using Project.FC2J.Models.Customer;
 using Project.FC2J.Models.Product;
+using Project.FC2J.Models.Purchase;
 
 namespace Project.FC2J.DataStore.DataAccess.Codesets
 {
@@ -13,7 +14,7 @@ namespace Project.FC2J.DataStore.DataAccess.Codesets
     {
         private readonly string _spGetPriceLists = "GetPriceLists";
         private readonly string _spInsertPricelist = "InsertPricelist";
-
+        private readonly string _spCopyPricelist = "CopyPricelist";
         private readonly string _spRemovePriceListCustomer = "RemovePriceListCustomer";
 
         private readonly string _spInsertCustomerPricelist = "InsertCustomerPricelist";
@@ -60,29 +61,43 @@ namespace Project.FC2J.DataStore.DataAccess.Codesets
             throw new NotImplementedException();
         }
 
-        public async Task SavePriceListCustomers(PriceListCustomer value)
+        public async Task<PriceListCustomer> SavePriceListCustomers(PriceListCustomer value)
         {
 
-            value.CustomerIds.ForEach(async id =>
+            //value.CustomerIds.ForEach(async id =>
+            //{
+            //    var sqlParameters1 = new List<SqlParameter>()
+            //    {
+            //        new SqlParameter("@CustomerId", id)
+            //    };
+            //    await _spRemovePriceListCustomer.ExecuteNonQueryAsync(sqlParameters1.ToArray());
+            //});
+
+          
+            var sqlParameters2 = new List<SqlParameter>()
             {
-                var sqlParameters1 = new List<SqlParameter>()
-                {
-                    new SqlParameter("@CustomerId", id)
-                };
-                await _spRemovePriceListCustomer.ExecuteNonQueryAsync(sqlParameters1.ToArray());
-            });
+                new SqlParameter("@CustomerId", value.CustomerIds[0]),
+                new SqlParameter("@PriceListId", value.PriceListId)
+            };
 
+            var output = await _spInsertCustomerPricelist.GetRecord<Placeholder>(sqlParameters2.ToArray());
 
-            value.CustomerIds.ForEach(async id =>
+            var priceListCustomer = new PriceListCustomer
             {
-                var sqlParameters2 = new List<SqlParameter>()
-                {
-                    new SqlParameter("@CustomerId", id),
-                    new SqlParameter("@PriceListId", value.PriceListId)
-                };
-                await _spInsertCustomerPricelist.ExecuteNonQueryAsync(sqlParameters2.ToArray());
-            });
+                PriceListId = output.Id
+            };
 
+            return priceListCustomer;
+
+        }
+
+        public async Task RemovePriceListCustomer(long customerId)
+        {
+            var sqlParameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@CustomerId", customerId)
+            };
+            await _spRemovePriceListCustomer.ExecuteNonQueryAsync(sqlParameters.ToArray());
         }
 
         public async Task<List<TargetCustomer>> GetTargetCustomers(long priceListId)
@@ -108,15 +123,26 @@ namespace Project.FC2J.DataStore.DataAccess.Codesets
 
         public async Task<PriceList> Save(PriceList value)
         {
-            var sqlParameters = new List<SqlParameter>()
+            if (value.SourceId > 0)
             {
-                new SqlParameter("@Name", value.Name),
-                new SqlParameter("@DiscountPolicy", value.DiscountPolicy),
-                new SqlParameter("@Subscribed", value.Subscribed),
-                new SqlParameter("@IsForSalesOrder", value.IsForSalesOrder)
-            };
-            value = await _spInsertPricelist.GetRecord<PriceList>(sqlParameters.ToArray());
-
+                var sqlParameters = new List<SqlParameter>()
+                {
+                    new SqlParameter("@Name", value.Name),
+                    new SqlParameter("@Source", value.SourceId)
+                };
+                value = await _spCopyPricelist.GetRecord<PriceList>(sqlParameters.ToArray());
+            }
+            else
+            {
+                var sqlParameters = new List<SqlParameter>()
+                {
+                    new SqlParameter("@Name", value.Name),
+                    new SqlParameter("@DiscountPolicy", value.DiscountPolicy),
+                    new SqlParameter("@Subscribed", value.Subscribed),
+                    new SqlParameter("@IsForSalesOrder", value.IsForSalesOrder)
+                };
+                value = await _spInsertPricelist.GetRecord<PriceList>(sqlParameters.ToArray());
+            }
             return value;
         }
 

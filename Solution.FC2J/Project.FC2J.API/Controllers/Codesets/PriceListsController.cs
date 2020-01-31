@@ -60,14 +60,21 @@ namespace Project.FC2J.API.Controllers.Codesets
         [HttpPost,Route("Customer")]
         public async Task<IActionResult> Post(PriceListCustomer value)
         {
-            await _repo.SavePriceListCustomers(value);
-            return Ok();
+            var output = await _repo.SavePriceListCustomers(value);
+            return Ok(output);
         }
 
         [HttpPut]
         public async Task<IActionResult> Put(PriceList priceList)
         {
             await _repo.Update(priceList);
+            return Ok();
+        }
+
+        [HttpDelete, Route("RemovePriceListCustomer")]
+        public async Task<IActionResult> Delete(long customerId)
+        {
+            await _repo.RemovePriceListCustomer(customerId);
             return Ok();
         }
 

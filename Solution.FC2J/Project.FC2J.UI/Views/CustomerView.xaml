@@ -165,7 +165,7 @@
                         </ComboBox>
 
                         <ComboBox x:Name="PriceLists" SelectedItem="{Binding SelectedPriceList}" 
-                              materialDesign:HintAssist.Hint="Payment Terms" 
+                              materialDesign:HintAssist.Hint="Pricelist" 
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
