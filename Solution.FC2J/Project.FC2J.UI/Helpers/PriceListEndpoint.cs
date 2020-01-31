@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Project.FC2J.Models.Customer;
 using Project.FC2J.Models.Product;
+using Project.FC2J.Models.Purchase;
 using Project.FC2J.UI.Helpers.AppSetting;
 
 namespace Project.FC2J.UI.Helpers
@@ -56,9 +57,9 @@ namespace Project.FC2J.UI.Helpers
             await _apiHelper.Remove(_apiAppSetting.Pricelist + $"?id={id}");
         }
 
-        public async Task SavePriceListCustomers(PriceListCustomer value)
+        public async Task<PriceListCustomer> SavePriceListCustomers(PriceListCustomer value)
         {
-            await _apiHelper.Save<PriceListCustomer> (_apiAppSetting.PricelistCustomer, value);
+            return await _apiHelper.Save<PriceListCustomer> (_apiAppSetting.PricelistCustomer, value);
         }
 
         public async Task<List<TargetCustomer>> GetTargetCustomers(long priceListId)
@@ -70,5 +71,11 @@ namespace Project.FC2J.UI.Helpers
         {
             return await _apiHelper.GetRecord<PriceList>(_apiAppSetting.Pricelist + $"?id={priceListId}");
         }
+
+        public async Task RemovePriceListCustomer(long customerId)
+        {
+            await _apiHelper.Remove (_apiAppSetting.Pricelist + $"/RemovePriceListCustomer?customerId={customerId}");
+        }
+
     }
 }

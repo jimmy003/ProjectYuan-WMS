@@ -9,6 +9,7 @@
         public bool Deleted { get; set; }
         public bool IsForSalesOrder { get; set; }
         public string Email { get; set; }
+        public long SourceId { get; set; }
     }
 
 }

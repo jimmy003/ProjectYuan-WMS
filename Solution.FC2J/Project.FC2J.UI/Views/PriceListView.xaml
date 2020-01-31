@@ -163,25 +163,53 @@
 
                         <Grid Grid.Row="0" Margin="10 5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="200" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" x:Name="Save" HorizontalAlignment="Center" 
-                                    Style="{StaticResource MaterialDesignFloatingActionAccentButton}" 
-                                    Margin="0,5" VerticalAlignment="Center" >
-                                <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            </Button>
+                            
                             <Grid Grid.Column="1" Margin="5,0">
                                 <materialDesign:PackIcon Kind="Money" VerticalAlignment="Center" Margin="6,10,2,0" Foreground="{Binding BorderBrush, ElementName=PricelistName}"/>
-                                <TextBox x:Name="PricelistName" attachedProperties:FocusProperty.Value="{Binding AddIsCalled}"  Margin="5" materialDesign:HintAssist.Hint="Name" Padding="10 0 0 0" 
+                                <TextBox x:Name="PricelistName" attachedProperties:FocusProperty.Value="{Binding AddIsCalled}"  Margin="5" 
+                                         materialDesign:HintAssist.Hint="Pricelist" Padding="10 0 0 0" 
                                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" VerticalContentAlignment="Bottom" VerticalAlignment="Center"/>
                             </Grid>
+                            
 
-                            <StackPanel Margin="5,0" Grid.Column="2" Visibility="Collapsed">
-                                <TextBlock Text="Discount Policy" FontSize="20" />
+                            <StackPanel  Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" >
+                                <Button x:Name="Save" 
+                                        Style="{StaticResource MaterialDesignFlatButton}" Padding="2,4" Margin="0,0,4,0"
+                                        Visibility="{Binding IsButtonSaveVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue='Visible'}">
+                                    <Grid>
+                                        <materialDesign:PackIcon Kind="BinCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding ButtonSaveLabel, FallbackValue='SAVE'}" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </Button>
+                                <TextBox x:Name="CopyAs" Width="200" 
+                                         materialDesign:HintAssist.Hint="Copy As Pricelist"  
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                                         Visibility="{Binding IsCopyAs, Converter={StaticResource BoolToHiddenConverter}, FallbackValue='Visible'}"
+                                         VerticalContentAlignment="Bottom" 
+                                         VerticalAlignment="Center" Margin="5,0,5,0"/>
+                                <Button x:Name="Submit" 
+                                        Style="{StaticResource MaterialDesignFlatButton}" Padding="2,4" Margin="0,0,4,0"
+                                        Visibility="{Binding IsCopyAs, Converter={StaticResource BoolToHiddenConverter}, FallbackValue='Visible'}">
+                                    <Grid>
+                                        <materialDesign:PackIcon Kind="SendCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <TextBlock Text="SUBMIT" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="Cancel" 
+                                        Style="{StaticResource MaterialDesignFlatButton}" Padding="2,4" Margin="0,0,4,0"
+                                        Visibility="{Binding IsCopyAs, Converter={StaticResource BoolToHiddenConverter}, FallbackValue='Visible'}">
+                                    <Grid>
+                                        <materialDesign:PackIcon Kind="FileCancel" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <TextBlock Text="CANCEL" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </Button>
+                                <!--<TextBlock Text="Discount Policy" FontSize="20" />
                                 <RadioButton x:Name="DiscountPolicy1" Content="Discount included in the price" IsChecked="True" />
-                                <RadioButton x:Name="DiscountPolicy2" Content="Show public price &amp; discount to the customer" />
+                                <RadioButton x:Name="DiscountPolicy2" Content="Show public price &amp; discount to the customer" />-->
                             </StackPanel>
 
                         </Grid>

@@ -311,14 +311,18 @@
                                                     <TextBlock Text="Loading..." Margin="5" FontSize="14" />
                                                 </editors:AutoCompleteTextBox.LoadingContent>
                                             </editors:AutoCompleteTextBox>
+                                            <TextBlock x:Name="SupplierDisplay" Margin="10,0,10,10" Width="160" 
+                                                       Visibility="{Binding IsSupplierDisplay,Converter={StaticResource BoolToHiddenConverter},FallbackValue=Collapsed}" VerticalAlignment="Bottom"
+                                                       />
                                             <ComboBox x:Name="Supplier" SelectedItem="{Binding SelectedSupplier}"
+                                                      Visibility="{Binding IsSupplier,Converter={StaticResource BoolToHiddenConverter},FallbackValue=Collapsed}"
                                                       materialDesign:HintAssist.Hint="Supplier" 
                                                       Margin="10,0,10,10"
                                                       Width="120"
                                                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" >
-                                                <ComboBoxItem Name="Supplier1">Coron</ComboBoxItem>
-                                                <ComboBoxItem Name="Supplier2">Lubang</ComboBoxItem>
-                                                <ComboBoxItem Name="Supplier3">San Ildefonso</ComboBoxItem>
+                                                <ComboBoxItem >Coron</ComboBoxItem>
+                                                <ComboBoxItem >Lubang</ComboBoxItem>
+                                                <ComboBoxItem >San Ildefonso</ComboBoxItem>
                                             </ComboBox>
                                         </StackPanel>
                                         

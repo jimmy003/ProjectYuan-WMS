@@ -1,0 +1,21 @@
+Updates as of 01-Feb-2020
+
+COMPLETED
+1. Pricelist 
+- can create new (save)
+- can copy from existing
+
+2. Inventory Report
+- can select date to generate
+
+3. 'Payment Terms' corrected to 'Pricelist'
+
+4. When 'Delivery Date' is changed, 'Due Date' will follow
+
+5. 'Submitted' SO shall not update/deduct the existing stocks. On Validate, the stocks shall be updated acccordingly.
+
+PENDING
+6. SO adjustment, when specific product/item needs to remove or adjust the qty
+
+7. Deductions List
+- to include summary of items already used/consumed with Invoice or PO number

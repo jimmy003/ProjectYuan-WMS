@@ -11,6 +11,7 @@ using Caliburn.Micro;
 using Microsoft.Reporting.WinForms;
 using Project.FC2J.Models.Customer;
 using Project.FC2J.Models.Product;
+using Project.FC2J.Models.Purchase;
 using Project.FC2J.UI.Helpers;
 using Project.FC2J.UI.Helpers.AppSetting;
 using Project.FC2J.UI.Helpers.Products;
@@ -86,7 +87,6 @@ namespace Project.FC2J.UI.ViewModels
                 allPriceLists = await _priceListEndpoint.GetList();
                 var pricelistsMap = _mapper.Map<List<PricelistDisplayModel>>(allPriceLists);
                 Pricelists = new BindingList<PricelistDisplayModel>(pricelistsMap);
-
             }
             catch (Exception ex)
             {
@@ -95,8 +95,8 @@ namespace Project.FC2J.UI.ViewModels
 
             _addIsCalled = false;
             NotifyOfPropertyChange(() => PricelistNameEnabled);
-            NotifyOfPropertyChange(() => DiscountPolicy1Enabled);
-            NotifyOfPropertyChange(() => DiscountPolicy2Enabled);
+            //NotifyOfPropertyChange(() => DiscountPolicy1Enabled);
+            //NotifyOfPropertyChange(() => DiscountPolicy2Enabled);
             NotifyOfPropertyChange(() => PricelistName);
             IsGridVisible = true;
 
@@ -232,25 +232,54 @@ namespace Project.FC2J.UI.ViewModels
 
         public bool CanAddCustomer => SelectedSourceCustomer != null;
 
-        public void AddCustomer()
+        public async Task AddCustomer()
         {
             TargetCustomers.Add(SelectedSourceCustomer);
+
+            var priceListCustomer = new PriceListCustomer { PriceListId = SelectedPricelist.Id };
+            priceListCustomer.CustomerIds.Add(SelectedSourceCustomer.Id);
+            var output = await _priceListEndpoint.SavePriceListCustomers(priceListCustomer);
+            SelectedPricelist.Subscribed += 1;
+
+            //update PriceLists
+
+            var pricelist = Pricelists.FirstOrDefault(item => item.Id == output.PriceListId);
+            if (pricelist != null)
+            {
+                pricelist.Subscribed -= 1;
+            }
+
+
             SourceCustomers.Remove(SelectedSourceCustomer);
             SelectedSourceCustomer = null;
             NotifyOfPropertyChange(() => SubscribedCustomers);
             NotifyOfPropertyChange(() => SourcedCustomers);
 
+            //if (TargetCustomers != null)
+            //{
+            //    var priceListCustomer = new PriceListCustomer { PriceListId = value.Id };
+            //    foreach (var customer in TargetCustomers)
+            //    {
+            //        priceListCustomer.CustomerIds.Add(customer.Id);
+            //    }
+
+            //    await _priceListEndpoint.SavePriceListCustomers(priceListCustomer);
+            //}
+
         }
         public bool CanRemoveCustomer => SelectedTargetCustomer != null;
 
-        public void RemoveCustomer()
+        public async Task RemoveCustomer()
         {
             SourceCustomers.Add(SelectedTargetCustomer);
+
+            await _priceListEndpoint.RemovePriceListCustomer(SelectedTargetCustomer.Id);
+            SelectedPricelist.Subscribed -= 1;
+
             TargetCustomers.Remove(SelectedTargetCustomer);
-            SelectedTargetCustomer = null;
+
             NotifyOfPropertyChange(() => SubscribedCustomers);
             NotifyOfPropertyChange(() => SourcedCustomers);
-
         }
 
         public string SubscribedCustomers => TargetCustomers == null ? "This Partners subscribed to this pricelist" : $"{TargetCustomers.Count} Partner" + (TargetCustomers.Count > 1 ? "s" : "") + " subscribed to this pricelist";
@@ -308,9 +337,22 @@ namespace Project.FC2J.UI.ViewModels
        
 
         //Controls Enabled
-        public bool PricelistNameEnabled => AddIsCalled || SelectedPricelist != null;
-        public bool DiscountPolicy1Enabled => AddIsCalled || SelectedPricelist != null;
-        public bool DiscountPolicy2Enabled => AddIsCalled || SelectedPricelist != null;
+        public bool PricelistNameEnabled => AddIsCalled;
+
+        private string _copyAs;
+        public string CopyAs
+        {
+            get { return _copyAs; }
+            set
+            {
+                if(_copyAs != value)
+                {
+                    _copyAs = value;
+                    NotifyOfPropertyChange(() => CopyAs);
+                    NotifyOfPropertyChange(() => CanSubmit);
+                }
+            }
+        }
 
 
         private string _pricelistName;
@@ -369,103 +411,163 @@ namespace Project.FC2J.UI.ViewModels
                 NotifyOfPropertyChange(() => SubscribedCustomers);
             }
         }
-        public bool AddIsCalled => _addIsCalled;
+        
+        //public bool AddIsCalled => _addIsCalled;
+        private bool _addIsCalled;
+        public bool AddIsCalled
+        {
+            get { return _addIsCalled; }
+            set
+            {
+                _addIsCalled = value;
+                NotifyOfPropertyChange(() => AddIsCalled);
+            }
+        }
 
-        private bool _addIsCalled = false;
+        
         public async Task Add()
         {
-            _addIsCalled = true;
+
+            PricelistName = string.Empty;
+            AddIsCalled = true;
             NotifyOfPropertyChange(() => PricelistNameEnabled);
-            NotifyOfPropertyChange(() => DiscountPolicy1Enabled);
-            NotifyOfPropertyChange(() => DiscountPolicy2Enabled);
+            
             await LoadProducts();
             await LoadCustomers();
+
+            TargetCustomers = new BindingList<CustomerDisplayModel>();
+            NotifyOfPropertyChange(() => SubscribedCustomers);
+            OnButtonSave(false);
         }
 
         public bool CanSave => !string.IsNullOrEmpty(PricelistName);
 
+        private string _buttonSaveLabel = "SAVE";    
+        public string ButtonSaveLabel
+        {
+            get { return _buttonSaveLabel; }
+            set
+            {
+                _buttonSaveLabel = value; 
+                NotifyOfPropertyChange(() => ButtonSaveLabel);
+            }
+        }
+
+        private bool _isButtonSaveVisible;
+        public bool IsButtonSaveVisible
+        {
+            get { return _isButtonSaveVisible; }
+            set
+            {
+                _isButtonSaveVisible = value;
+                NotifyOfPropertyChange(() => IsButtonSaveVisible);
+            }
+        }
+
+        private bool _isCopyAs;
+        public bool IsCopyAs
+        {
+            get { return _isCopyAs; }
+            set
+            {
+                _isCopyAs = value;
+                NotifyOfPropertyChange(() => IsCopyAs);
+            }
+        }
+
+        public bool SaveEnabled => !IsCopyAs;
+        
+
+        public bool CanCancel => true;
+        public bool CanSubmit => string.IsNullOrEmpty(CopyAs) == false;
+
+        public void Cancel()
+        {
+            IsCopyAs = false;
+            NotifyOfPropertyChange(() => SaveEnabled);
+        }
+
+        public async Task Submit()
+        {
+            if (MessageBox.Show("Are you sure?", $"Copy Pricelist [{PricelistName}] as[{CopyAs}] Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                var value = new PriceList
+                {
+                    Name = CopyAs,
+                    SourceId = SelectedPricelist.Id
+                };
+
+                value = await _priceListEndpoint.Save(value);
+                if (value.Id.Equals(-1))
+                {
+                    MessageBox.Show("Pricelist name already exist", "Error", MessageBoxButton.OK ,MessageBoxImage.Error );
+                }
+                else
+                {
+                    //add to list 
+                    value.Name = CopyAs;
+                    allPriceLists.Add(value);
+                    Pricelists.Add(_mapper.Map<PricelistDisplayModel>(value));
+                    SelectedPricelist = _mapper.Map<PricelistDisplayModel>(value);
+                    NotifyOfPropertyChange(() => Pricelists);
+                    await OnRowSelect();
+                    
+                    //clear 
+
+                    CopyAs = string.Empty;
+                    Cancel();
+                    
+                    MessageBox.Show("Successfully copied", "Confirmed", MessageBoxButton.OK);
+
+                }
+                
+            }
+
+        }
+
         public async Task Save()
         {
-            //return;
-            //if (MessageBox.Show("Are you sure?", "Save PriceList Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            //{
-            //    var value = new PriceList
-            //    {
-            //        Name = PricelistName,
-            //        DiscountPolicy = !DiscountPolicy1,
-            //        Subscribed = TargetCustomers.Count,
-            //        IsForSalesOrder = true
-            //    };
+            if (ButtonSaveLabel.Equals("SAVE"))
+            {
+                if (MessageBox.Show("Are you sure?", "Save PriceList Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    var value = new PriceList
+                    {
+                        Name = PricelistName,
+                        DiscountPolicy = true,
+                        Subscribed = TargetCustomers.Count,
+                        IsForSalesOrder = true
+                    };
 
-            //    if (SelectedPricelist != null)
-            //    {
-            //        //edited
-            //        try
-            //        {
+                    value = await _priceListEndpoint.Save(value);
+                    if (value.Id.Equals(-1))
+                    {
+                        MessageBox.Show("Pricelist name already exist", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        AddIsCalled = false;
 
-            //            value.Id = SelectedPricelist.Id;
-            //            await _priceListEndpoint.Update(value);
+                        ////reset all after saved
+                        Products = new ObservableCollection<PricelistProducts>();
+                        SourceCustomers = new BindingList<CustomerDisplayModel>();
+                        TargetCustomers = new BindingList<CustomerDisplayModel>();
+                        await LoadPriceLists();
 
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Console.WriteLine(ex);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        try
-            //        {
-            //            value = await _priceListEndpoint.Save(value);
+                        MessageBox.Show("Successfully saved?", $"PriceList ({PricelistName})", MessageBoxButton.OK);
 
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Console.WriteLine(ex);
-            //        }
+                        PricelistName = string.Empty;
+                        NotifyOfPropertyChange(() => CanSave);
+                        NotifyOfPropertyChange(() => PricelistNameEnabled);
+                    }
 
-            //    }
-
-            //    if (TargetCustomers != null)
-            //    {
-            //        var priceListCustomer = new PriceListCustomer { PriceListId = value.Id };
-            //        foreach (var customer in TargetCustomers)
-            //        {
-            //            priceListCustomer.CustomerIds.Add(customer.Id);
-            //        }
-
-            //        await _priceListEndpoint.SavePriceListCustomers(priceListCustomer);
-            //    }
-
-            //    //logic to save the deductions here
-            //    var productDeductionsMap = _mapper.Map<List<ProductDeduction>>(Products);
-            //    var productDeductions = new List<ProductDeduction>(productDeductionsMap);
-            //    var priceListProduct = new PriceListProduct
-            //    {
-            //        PriceListId = value.Id,
-            //        ProductDeductions = productDeductions
-            //    };
-
-            //    await _customerEndpoint.SaveCustomerPricelist(priceListProduct);
-
-            //    //reset all after saved
-            //    Products = new ObservableCollection<PricelistProducts>();
-            //    SourceCustomers = new BindingList<CustomerDisplayModel>();
-            //    TargetCustomers = new BindingList<CustomerDisplayModel>();
-            //    await LoadPriceLists();
-
-            //    MessageBox.Show("Successfully saved?", $"PriceList ({PricelistName})", MessageBoxButton.OK);
-
-            //    PricelistName = string.Empty;
-            //    NotifyOfPropertyChange(() => CanSave);
-            //    NotifyOfPropertyChange(() => PricelistNameEnabled);
-            //    NotifyOfPropertyChange(() => DiscountPolicy1Enabled);
-            //    NotifyOfPropertyChange(() => DiscountPolicy2Enabled);
-            //    SearchInput = string.Empty;
-
-
-            //}
-
+                }
+            }
+            else
+            {
+                IsCopyAs = true;
+                NotifyOfPropertyChange(() => SaveEnabled);
+            }
 
         }
 
@@ -484,11 +586,16 @@ namespace Project.FC2J.UI.ViewModels
             DiscountPolicy1 = !SelectedPricelist.DiscountPolicy;
             if (!DiscountPolicy1)
                 DiscountPolicy2 = true;
+
+            OnButtonSave(true);
             NotifyOfPropertyChange(() => CanSave);
             NotifyOfPropertyChange(() => PricelistNameEnabled);
-            NotifyOfPropertyChange(() => DiscountPolicy1Enabled);
-            NotifyOfPropertyChange(() => DiscountPolicy2Enabled);
+        }
 
+        private void OnButtonSave(bool b)
+        {
+            IsButtonSaveVisible = true;
+            ButtonSaveLabel = b ? "COPY AS" : "SAVE";
         }
 
         private List<TargetCustomer> _targetCustomersId = new List<TargetCustomer>();
@@ -499,9 +606,10 @@ namespace Project.FC2J.UI.ViewModels
             try
             {
                 _targetCustomersId = await _priceListEndpoint.GetTargetCustomers(id);
+                TargetCustomers = new BindingList<CustomerDisplayModel>();
+
                 if (_targetCustomersId.Count > 0)
                 {
-                    TargetCustomers = new BindingList<CustomerDisplayModel>();
                     
                     foreach (var customerId in _targetCustomersId)
                     {
