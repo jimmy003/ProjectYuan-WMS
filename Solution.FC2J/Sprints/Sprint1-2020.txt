@@ -14,8 +14,24 @@ COMPLETED
 
 5. 'Submitted' SO shall not update/deduct the existing stocks. On Validate, the stocks shall be updated acccordingly.
 
-PENDING
 6. SO adjustment, when specific product/item needs to remove or adjust the qty
 
 7. Deductions List
 - to include summary of items already used/consumed with Invoice or PO number
+
+8. Printing SO 
+
+9. PO Adjustment, prior to submit
+
+11. Purchase Adjustment on Submitted PO
+- Submitted PO, must have a way to edit the items and the system must be abled to re-submit
+
+PENDING
+
+10. Additional MTD REPORT
+- new worksheet linked to 'Converted'
+- additional fields 'Sales Personnel' & 'Position' in Customer master, this is to 
+generate the quota in the MTD report
+- new worksheet linked to 'Converted' to generate number of bags by Sales Personnel
+
+

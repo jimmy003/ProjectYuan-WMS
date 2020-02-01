@@ -193,7 +193,7 @@
                                         <Button x:Name="Submit" HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFlatButton}">
                                             <Grid>
                                                 <materialDesign:PackIcon Kind="CheckCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                                <TextBlock Text="SUBMIT" FontSize="14" HorizontalAlignment="Right" Margin="20,5,0,5"/>
+                                                <TextBlock Text="{Binding SubmitLabel, FallbackValue='SUBMIT'}"  FontSize="14" HorizontalAlignment="Right" Margin="20,5,0,5"/>
                                             </Grid>
                                         </Button>
                                         <Button x:Name="Acknowledge" HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFlatButton}">

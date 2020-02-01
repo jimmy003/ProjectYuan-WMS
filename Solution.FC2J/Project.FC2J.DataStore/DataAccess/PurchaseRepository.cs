@@ -133,13 +133,17 @@ namespace Project.FC2J.DataStore.DataAccess
                 new SqlParameter("@PriceListId", value.PoHeader.PriceListId),
                 new SqlParameter("@SupplierName", value.PoHeader.SupplierName),
                 new SqlParameter("@SupplierEmail", value.PoHeader.SupplierEmail),
-                new SqlParameter("@IsVatable", value.PoHeader.IsVatable)
+                new SqlParameter("@IsVatable", value.PoHeader.IsVatable),
+                new SqlParameter("@IsResubmit", value.PoHeader.AcknowledgedUser)
+
             };
 
             var result = await _spInsertPurchaseHeader.GetRecord<PoHeader>(_sqlParameters.ToArray());
             value.PoHeader.Id = result.Id;
 
             #endregion
+
+            if (value.PoHeader.Id == -1) return value;
 
             #region Po Details
             foreach (var detail in value.PoDetails)
@@ -161,7 +165,7 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@IsTaxable", detail.IsTaxable),
                     new SqlParameter("@TaxRate", detail.TaxRate),
                     new SqlParameter("@TaxPrice", detail.TaxPrice)
-                   
+
                 };
                 await _spInsertPurchaseDetail.ExecuteNonQueryAsync(_sqlParameters.ToArray());
             }
@@ -189,7 +193,7 @@ namespace Project.FC2J.DataStore.DataAccess
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    
+
                 }
 
                 //Send email here 
@@ -203,7 +207,7 @@ namespace Project.FC2J.DataStore.DataAccess
                         Body = body
                     };
                     await emailPayload.Send();
-                    
+
                 }
                 catch (Exception e)
                 {

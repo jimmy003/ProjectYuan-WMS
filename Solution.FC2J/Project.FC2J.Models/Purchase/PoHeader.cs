@@ -25,7 +25,7 @@ namespace Project.FC2J.Models.Purchase
         public string UserName { get; set; }
         public DateTime SubmittedDate { get; set; }
 
-        public string AcknowledgedUser { get; set; }
+        public string AcknowledgedUser { get; set; } //used in re-submit
         public DateTime AcknowledgedDate { get; set; }
 
         public string DeliveredUser { get; set; }

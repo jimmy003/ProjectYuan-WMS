@@ -48,6 +48,7 @@ namespace Project.FC2J.UI.ViewModels
             await LoadPriceLists();
             OnReset();
             IsLoadingVisible = false;
+            SubmitLabel = "SUBMIT";
         }
 
         private async Task LoadPriceLists()
@@ -106,25 +107,77 @@ namespace Project.FC2J.UI.ViewModels
             TryClose();
         }
 
-        public bool CanSubmit => Cart?.Count > 0 && string.IsNullOrWhiteSpace(PONo) == false && IsSubmitted == false;
+        public bool CanSubmit => (Cart?.Count > 0 && string.IsNullOrWhiteSpace(PONo) == false && IsSubmitted == false) || (Cart?.Count > 0 && string.IsNullOrWhiteSpace(PONo) == false && IsAcknowledged == false);
 
         private PurchaseOrder _po = new PurchaseOrder();
 
         public async Task Submit()
         {
-            if (MessageBox.Show("Are you sure?", "Submit Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (SubmitLabel.Equals("SUBMIT"))
+
             {
-                SetPoPayload();
+                if (MessageBox.Show("Are you sure?", "Submit Confirmation", MessageBoxButton.YesNo) ==
+                    MessageBoxResult.Yes)
+                {
+                    SetPoPayload();
 
-                var result =  await _purchaseEndpoint.Save(_po);
+                    var result = await _purchaseEndpoint.Save(_po);
+                    if (result.PoHeader.Id == -1)
+                    {
+                        MessageBox.Show("PO No already exist, kindly change.", "Duplicate PO No", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Purchase Order successfully saved.", "Confirmation", MessageBoxButton.OK);
+                    }
+                    IsSubmitted = true;
+                    Id = result.PoHeader.Id;
+                    SubmitLabel = "UPDATE";
+                }
+            }
+            else if (SubmitLabel.Equals("UPDATE"))
+            {
+                IsSubmitted = false;
+                SubmitLabel = "RE-SUBMIT";
+            }
+            else if (SubmitLabel.Equals("RE-SUBMIT"))
+            {
+                if (MessageBox.Show("Are you sure?", "Submit Confirmation", MessageBoxButton.YesNo) ==
+                    MessageBoxResult.Yes)
+                {
+                    SetPoPayload(true);
 
-                MessageBox.Show("Purchase Order successfully saved.", "Confirmation", MessageBoxButton.OK);
-                IsSubmitted = true;
-                Id = result.PoHeader.Id;
+                    var result = await _purchaseEndpoint.Save(_po);
+                    if (result.PoHeader.Id == -1)
+                    {
+                        MessageBox.Show("PO No already exist, kindly change.", "Duplicate PO No", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Purchase Order successfully saved.", "Confirmation", MessageBoxButton.OK);
+                    }
+                    IsSubmitted = true;
+                    Id = result.PoHeader.Id;
+                    SubmitLabel = "UPDATE";
+                }
             }
         }
 
-        private void SetPoPayload()
+        private string _submitLabel;
+        public string SubmitLabel
+        {
+            get { return _submitLabel; }
+            set
+            {
+                _submitLabel = value; 
+                NotifyOfPropertyChange(() => SubmitLabel);
+            }
+        }
+
+
+        private void SetPoPayload(bool isResubmit = false)
         {
             _po.PoHeader = new PoHeader
             {
@@ -145,7 +198,13 @@ namespace Project.FC2J.UI.ViewModels
                 PriceListId = Convert.ToInt64(SelectedPriceList?.Id),
                 SupplierName = SelectedPriceList?.Name,
                 SupplierEmail = SelectedPriceList?.Email,
+                AcknowledgedUser = ""
             };
+
+            if (isResubmit)
+            {
+                _po.PoHeader.AcknowledgedUser = _oldPONo;
+            }
 
             var count = 0;
             var poDetails = new List<PoDetail>();
@@ -294,6 +353,7 @@ namespace Project.FC2J.UI.ViewModels
                 IsShowNormalGrid = true;
                 IsDeliverMode = false;
                 IsAcknowledged = false;
+                SubmitLabel = "UPDATE";
             }
             else
             {
@@ -319,6 +379,7 @@ namespace Project.FC2J.UI.ViewModels
             NotifyOfPropertyChange(() => TaxPrice);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanDeliver);
+            NotifyOfPropertyChange(() => CanSubmit);
         }
 
         private async Task LoadPaymentInvoices()
@@ -387,6 +448,7 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
+        private string _oldPONo;
         public async Task ListPurchases()
         {
             var inputDialog = new PoListView
@@ -396,6 +458,7 @@ namespace Project.FC2J.UI.ViewModels
 
             if (inputDialog.ShowDialog() != true) return;
             PONo = inputDialog.PONo;
+            _oldPONo = PONo;
             await ReloadPODetails();
         }
 
@@ -728,10 +791,12 @@ namespace Project.FC2J.UI.ViewModels
             NotifyOfPropertyChange(() => TaxPrice);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanDeliver);
+            NotifyOfPropertyChange(() => CanSubmit);
         }
 
         public void OnEditDetail()
         {
+            if (IsAcknowledged || IsSubmitted) return;
             if (SelectedCartItem == null) return;
             var cartItem = new CartItemWindow(SelectedCartItem.Description, SelectedCartItem.CartQuantity);
             var dialogResult = cartItem.ShowDialog();
