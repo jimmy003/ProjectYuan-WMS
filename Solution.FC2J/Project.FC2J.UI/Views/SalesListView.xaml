@@ -574,7 +574,8 @@
 
                                     <DataGrid x:Name="Cart" SelectedItem="{Binding SelectedCartItem}" 
                                               CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
-                                                materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto" >
+                                                materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"
+                                              cal:Message.Attach="[Event MouseDoubleClick] = [Action OnEditDetail()]">
 
                                         <DataGrid.Columns>
 

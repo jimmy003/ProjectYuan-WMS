@@ -61,8 +61,8 @@ namespace Project.FC2J.UI.Models
             }
         }
 
-        private int _supplier;
-        public int Supplier
+        private string _supplier;
+        public string Supplier
         {
             get { return _supplier; }
             set

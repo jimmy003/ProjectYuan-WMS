@@ -717,12 +717,40 @@ namespace Project.FC2J.UI.ViewModels
             if (MessageBox.Show("Are you sure?", "Remove Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 Cart.Remove(SelectedCartItem);
+                OnUpdateCartItem();
+            }
+        }
 
-                NotifyOfPropertyChange(() => TotalQuantity);
-                NotifyOfPropertyChange(() => SubTotal);
-                NotifyOfPropertyChange(() => TaxPrice);
-                NotifyOfPropertyChange(() => Total);
-                NotifyOfPropertyChange(() => CanDeliver);
+        private void OnUpdateCartItem()
+        {
+            NotifyOfPropertyChange(() => TotalQuantity);
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => TaxPrice);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanDeliver);
+        }
+
+        public void OnEditDetail()
+        {
+            if (SelectedCartItem == null) return;
+            var cartItem = new CartItemWindow(SelectedCartItem.Description, SelectedCartItem.CartQuantity);
+            var dialogResult = cartItem.ShowDialog();
+
+            if (Convert.ToBoolean(dialogResult))
+            {
+                var value = cartItem.QuantityUpdated;
+
+                if (value > 0)
+                {
+                    SelectedCartItem.Product.StockQuantity = value;
+                    var existingItem = Cart.FirstOrDefault(x => x.Product.Id == SelectedCartItem.Product.Id);
+                    if (existingItem != null)
+                    {
+                        existingItem.CartQuantity = value;
+                    }
+
+                    OnUpdateCartItem();
+                }
             }
         }
 

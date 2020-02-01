@@ -250,6 +250,9 @@
     <Compile Include="UserControls\AdjustInventoryWindow.xaml.cs">
       <DependentUpon>AdjustInventoryWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\CartItemWindow.xaml.cs">
+      <DependentUpon>CartItemWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\DatePickerCalendar.cs" />
     <Compile Include="UserControls\PoListView.xaml.cs">
       <DependentUpon>PoListView.xaml</DependentUpon>
@@ -384,6 +387,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\AdjustInventoryWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CartItemWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

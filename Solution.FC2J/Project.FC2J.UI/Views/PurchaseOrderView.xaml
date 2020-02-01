@@ -298,6 +298,7 @@
                                 Visibility="{Binding IsShowNormalGrid, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Visible}"
                                 x:Name="Cart" SelectedItem="{Binding SelectedCartItem}" 
                                           CanUserSortColumns="True" CanUserAddRows="False" 
+                                        cal:Message.Attach="[Event MouseDoubleClick] = [Action OnEditDetail()]"
                                           AutoGenerateColumns="False"
                                             materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
                                           materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto" Margin="0,0,20,0" >

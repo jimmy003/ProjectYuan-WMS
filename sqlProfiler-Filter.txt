@@ -1,0 +1,41 @@
+Core .Net SqlClient Data Provider
+.Net SqlClient Data Provider
+
+
+1476700161
+
+PVI076@GMAIL 
+gwqbdldpfwcsvaae
+
+App-Password
+tqzffexniulvdexk
+
+Microsoft Rdlc Report Designer for Visual Studio
+Microsoft Reporting Services Projects
+
+14-Dec-2019
+batch - to process daily inventory - beginning balance
+
+
+23-Dec-2019
+* altered sps
+GetProducts
+InsertProduct
+UpdateProduct
+
+GetSalesReport
+- @ADDRESS2
+- @ISFEEDS
+
+GetCustomerAddressGrouping
+
+nodnihojkbubuckh
+
+
+InventoryAdjustment
+- add isApproved
+- add ApprovedDate
+- add ApprovedBy
+UpdateProductInventory
+
+<!--SelectedItem="{Binding SelectedSale}"-->

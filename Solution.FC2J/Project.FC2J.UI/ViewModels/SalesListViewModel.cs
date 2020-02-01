@@ -10,9 +10,10 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Project.FC2J.Models.Customer;
 using Project.FC2J.Models.Order;
 using Project.FC2J.Models.User;
@@ -20,6 +21,10 @@ using Project.FC2J.UI.Helpers.AppSetting;
 using Project.FC2J.UI.Helpers.Products;
 using Project.FC2J.UI.Models;
 using Project.FC2J.UI.Providers;
+using Project.FC2J.UI.UserControls;
+using MessageBox = System.Windows.MessageBox;
+using Screen = Caliburn.Micro.Screen;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Project.FC2J.UI.ViewModels
 {
@@ -194,6 +199,8 @@ namespace Project.FC2J.UI.ViewModels
                 MessageBox.Show($"Record is {value.OrderStatus} already", "System Information", MessageBoxButton.OK);
             }
         }
+
+        
 
         private List<Deduction> _usedDeductions = new List<Deduction>();
 
@@ -1200,33 +1207,53 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
+        public void OnEditDetail()
+        {
+            if (SelectedCartItem == null) return;
+            var cartItem = new CartItemWindow(SelectedCartItem.Description, SelectedCartItem.CartQuantity);
+            var dialogResult = cartItem.ShowDialog();
+            
+            if (Convert.ToBoolean(dialogResult))
+            {
+                var value = cartItem.QuantityUpdated;
+
+                if (value > 0)
+                {
+                    SelectedCartItem.Product.StockQuantity = value;
+                    var existingItem = Cart.FirstOrDefault(x => x.Product.Id == SelectedCartItem.Product.Id);
+                    if (existingItem != null)
+                    {
+                        existingItem.CartQuantity = value;
+                    }
+
+                    OnUpdateCartItem();
+                }
+            }
+        }
+
         public void RemoveFromCart()
         {
             if (MessageBox.Show("Are you sure?", "Remove Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                SelectedCartItem.Product.StockQuantity += 1;
-                if (SelectedCartItem.CartQuantity > 1)
-                {
-                    SelectedCartItem.CartQuantity -= 1;
-                }
-                else
-                {
-                    Cart.Remove(SelectedCartItem);
-                }
-
-                NotifyOfPropertyChange(() => PickupDiscount);
-                NotifyOfPropertyChange(() => SubTotal);
-                NotifyOfPropertyChange(() => Tax);
-                NotifyOfPropertyChange(() => Total);
-                NotifyOfPropertyChange(() => TotalQuantity);
-                NotifyOfPropertyChange(() => TotalQuantityUOMComputed);
-                NotifyOfPropertyChange(() => Deductions);
-                NotifyOfPropertyChange(() => CanCheckOut);
-                NotifyOfPropertyChange(() => CanAddToCart);
-                NotifyOfPropertyChange(() => StockQuantity);
-                NotifyOfPropertyChange(() => CanValidateSale);
-
+                SelectedCartItem.Product.StockQuantity += SelectedCartItem.CartQuantity;
+                Cart.Remove(SelectedCartItem);
+                OnUpdateCartItem();
             }
+        }
+
+        private void OnUpdateCartItem()
+        {
+            NotifyOfPropertyChange(() => PickupDiscount);
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => TotalQuantity);
+            NotifyOfPropertyChange(() => TotalQuantityUOMComputed);
+            NotifyOfPropertyChange(() => Deductions);
+            NotifyOfPropertyChange(() => CanCheckOut);
+            NotifyOfPropertyChange(() => CanAddToCart);
+            NotifyOfPropertyChange(() => StockQuantity);
+            NotifyOfPropertyChange(() => CanValidateSale);
         }
 
         public bool CanCheckOut
