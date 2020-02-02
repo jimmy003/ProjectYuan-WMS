@@ -17,6 +17,7 @@ namespace Project.FC2J.DataStore.DataAccess
         private readonly string _spGetDailyInventory = "GetDailyInventory";
         private readonly string _spGetCategoryArrangement = "GetCategoryArrangement";
         private readonly string _spGetCustomerAddress2 = "GetCustomerAddress2";
+        private readonly string _spGetPersonnel = "GetPersonnel";
         private readonly string _spGetDailyInventoryCustomers = "GetDailyInventoryCustomers";
         private readonly string _spGetInventoryProducts = "GetInventoryProducts";
         private readonly string _spGetSalesReport = "GetSalesReport";
@@ -95,6 +96,8 @@ namespace Project.FC2J.DataStore.DataAccess
             };
             return await _spGetPurchasesReportSMAHC.GetDataTable(_sqlParameters.ToArray());
         }
+
+
         public async Task<DataTable> GetSalesReportSMAHC(ProjectReportParameter reportParameter)
         {
             _sqlParameters = new List<SqlParameter>()
@@ -160,6 +163,12 @@ namespace Project.FC2J.DataStore.DataAccess
         {
             return await _spGetCustomerAddress2.GetList<ProjectCustomerAddress2>();
         }
+
+        public async Task<List<Personnel>> GetPersonnel()
+        {
+            return await _spGetPersonnel.GetList<Personnel>();
+        }
+
         public async Task<List<ProductInternalCategory>> GetCategoryArrangement()
         {
             return await _spGetCategoryArrangement.GetList<ProductInternalCategory>();

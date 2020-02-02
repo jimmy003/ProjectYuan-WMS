@@ -20,6 +20,7 @@ namespace Project.FC2J.DataStore.Interfaces
         Task<DataTable> GetPurchaseReportMTDConverted(ProjectReportParameter reportParameter);
         Task<DataTable> GetMTDSalesReportConverted(ProjectReportParameter reportParameter);
         Task<List<ProjectCustomerAddress2>> GetCustomerAddress2();
+        Task<List<Personnel>> GetPersonnel();
         Task<DataTable> GetSalesReportSMAHC(ProjectReportParameter reportParameter);
         Task<DataTable> GetPurchasesReportSMAHC(ProjectReportParameter reportParameter);
         Task<DataTable> GetSalesReportMonthlyBIR(ProjectReportParameter reportParameter);

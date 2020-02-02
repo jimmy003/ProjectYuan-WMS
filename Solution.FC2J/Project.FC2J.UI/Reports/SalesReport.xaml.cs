@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,6 +33,7 @@ namespace Project.FC2J.UI.Reports
         private const string _report3 = "Monthly Sales Report (For BIR)";
         private const string _report4 = "Monthly Purchases Report (For BIR)";
         private const string _report5 = "Customer Summary Report";
+        private const int _startingColumn = 3;
 
         private string _mtdSalesPathFilename = Directory.GetCurrentDirectory();
         private string _selectedReport;
@@ -179,6 +181,8 @@ namespace Project.FC2J.UI.Reports
 
         }
 
+        
+
         private async Task OnGenerateMTDSalesReport()
         {
 
@@ -196,6 +200,9 @@ namespace Project.FC2J.UI.Reports
 
             var mainTable = new DataTable { TableName = "NOT-CONVERTED" };
             var dtConverted = new DataTable { TableName = "CONVERTED" };
+            var dtConvertedByTown = new DataTable { TableName = "CONVERTEDBYTOWN" };
+            var dtSalesPersonnel = new DataTable { TableName = "SALESPERSONNEL" };
+
             string aggregateLabel = "";
             var targetTotals = "";
 
@@ -205,9 +212,13 @@ namespace Project.FC2J.UI.Reports
                 #region MyRegion
 
                 List<ProjectCustomerAddress2> address2;
+                List<Personnel> personnel;
                 if (_selectedReport == _report1)
                 {
                     address2 = await _reportEndpoint.GetCustomerAddress2();
+                    personnel = await _reportEndpoint.GetPersonnel();
+                    SetupTable(dtConvertedByTown, address2, dtConverted);
+                    SetupPersonnelTable(dtSalesPersonnel, personnel, dtConverted);
                 }
                 else
                 {
@@ -219,7 +230,6 @@ namespace Project.FC2J.UI.Reports
 
                 #endregion
 
-
                 //first
                 aggregateLabel = "TOTAL HOGS";
                 var categories = GetListProductInternalCategories("PREMIUM,EXPERT YELLOW,EXPERT WHITE,BONANZA,JUMBO").ToList();
@@ -230,13 +240,13 @@ namespace Project.FC2J.UI.Reports
                     targetTotals += $"TOTAL-{category.InternalCategory.MakeOneWord()}";
                 }
 
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, isFirstAddress2);
-                SetTotalForCategories(mainTable, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2);
+                SetTotalForCategories(mainTable, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
                 isMerged = false;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, isFirstAddress2, true);
-                SetTotalForCategories(dtConverted, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, true);
+                SetTotalForCategories(dtConverted, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
 
                 
@@ -253,13 +263,13 @@ namespace Project.FC2J.UI.Reports
 
                 isMerged = true;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, isFirstAddress2, false,true);
-                SetTotalForCategories(mainTable, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, false,true);
+                SetTotalForCategories(mainTable, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
                 isMerged = true;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, isFirstAddress2, true, true);
-                SetTotalForCategories(dtConverted, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, true, true);
+                SetTotalForCategories(dtConverted, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
 
 
@@ -274,13 +284,13 @@ namespace Project.FC2J.UI.Reports
 
                 isMerged = true;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, isFirstAddress2, false, true);
-                SetTotalForCategories(mainTable, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, false, true);
+                SetTotalForCategories(mainTable, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
                 isMerged = true;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, isFirstAddress2, true, true);
-                SetTotalForCategories(dtConverted, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, true, true);
+                SetTotalForCategories(dtConverted, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
 
                 //4th
@@ -294,19 +304,19 @@ namespace Project.FC2J.UI.Reports
 
                 isMerged = true;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, isFirstAddress2, false, true);
-                SetTotalForCategories(mainTable, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, mainTable, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, false, true);
+                SetTotalForCategories(mainTable, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
                 isMerged = true;
                 isFirstAddress2 = true;
-                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, isFirstAddress2, true, true);
-                SetTotalForCategories(dtConverted, aggregateLabel, targetTotals);
+                await PopulateDataTable(address2, reportParameter, categories, isMerged, dtConverted, dtConvertedByTown, dtSalesPersonnel, isFirstAddress2, true, true);
+                SetTotalForCategories(dtConverted, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
 
                 //finally
                 aggregateLabel = "OVERALL TOTAL";
                 targetTotals = "TOTAL TRADETOTAL GAMEFOWLTOTAL FARM";
-                SetTotalForCategories(mainTable, aggregateLabel, targetTotals);
+                SetTotalForCategories(mainTable, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
 
             }
@@ -354,10 +364,22 @@ namespace Project.FC2J.UI.Reports
 
 
             var mainDataSet = new DataSet("Mainreport");
+            if (_selectedReport == _report1)
+            {
+                mainTable.Columns.Remove("PersonnelId");
+            }
             mainDataSet.Tables.Add(mainTable);
 
             if (reportParameter.IsFeeds)
+            {
+                if (_selectedReport == _report1)
+                    dtConverted.Columns.Remove("PersonnelId");
                 mainDataSet.Tables.Add(dtConverted);
+                if (_selectedReport == _report1)
+                {
+                    mainDataSet.Tables.Add(dtConvertedByTown);
+                }
+            }
 
             await SaveToFile(reportParameter, mainDataSet);
 
@@ -365,8 +387,142 @@ namespace Project.FC2J.UI.Reports
             ViewMTDSales.Visibility = Visibility.Visible;
         }
 
-        private void SetTotalForCategories(DataTable mainTable, string aggregateLabel,
-            string targetTotals)
+        private void UpdateRowValue(DataTable dtConvertedByTown, string address, string column, double value)
+        {
+            try
+            {
+                if (dtConvertedByTown.Columns.Count > 0)
+                {
+                    var expression = $"TOWN='{address.Replace("'", "''")}'";
+                    var rowToUpdate = dtConvertedByTown.Select(expression).FirstOrDefault();
+                    if (rowToUpdate == null) return;
+                    rowToUpdate[column] = value;
+                }
+                
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private void UpdatePersonnelRowValue(DataTable dtSalesPersonnel, int personnelId, string category, float value)
+        {
+            try
+            {
+                if (dtSalesPersonnel.Columns.Count > 0)
+                {
+                    var expression = $"ID={personnelId}";
+                    var rowToUpdate = dtSalesPersonnel.Select(expression).FirstOrDefault();
+                    if (rowToUpdate == null) return;
+                    rowToUpdate[category] = Convert.ToInt64(rowToUpdate[category])  + value;
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private void SetupPersonnelTable(DataTable dtSalesPersonnel, List<Personnel> personnel, DataTable dtSource)
+        {
+
+            dtSalesPersonnel.Columns.Add("ID", typeof(String)); //Shall be removed on the Generation of report
+            dtSalesPersonnel.Columns.Add("SALES PERSONNEL", typeof(String));
+            dtSalesPersonnel.Columns.Add("POSITION", typeof(String));
+            dtSalesPersonnel.Columns.Add("TOTAL-PREMIUM", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-EXPERTYELLOW", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-EXPERTWHITE", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-BONANZA", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-JUMBO", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL HOGS", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-PUREBLEND", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL TRADE", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-GRAINS", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-INTEGRA", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL GAMEFOWL", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-ESSENTIALBROILER", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL-PICESSENTIALS", typeof(Double));
+            dtSalesPersonnel.Columns.Add("TOTAL FARM", typeof(Double));
+            dtSalesPersonnel.Columns.Add("OVERALL TOTAL", typeof(Double));
+
+            var pos = 0;
+            dtSalesPersonnel.Rows.Clear();
+            foreach (var customerPersonnel in personnel)
+            {
+                var dr = dtSalesPersonnel.NewRow(); //Create New Row
+                dr[0] = customerPersonnel.Id; // Set Column Value
+                dr[1] = customerPersonnel.Name; // Set Column Value
+                dr[2] = customerPersonnel.Position; // Set Column Value
+                dtSalesPersonnel.Rows.InsertAt(dr, pos); // InsertAt specified position
+                pos++;
+            }
+
+            Console.WriteLine(pos);
+
+        }
+        private void SetupTable(DataTable dtConvertedByTown, List<ProjectCustomerAddress2> address2, DataTable dtSource)
+        {
+            //dtConvertedByTown.Columns.Add(currentCategory);
+            //var dr = mainTable.NewRow(); //Create New Row
+            //dr[1] = currentAddress; // Set Column Value
+            //mainTable.Rows.InsertAt(dr, 0); // InsertAt specified position
+
+            //DataColumn workCol = workTable.Columns.Add("CustID", typeof(Int32));
+            //workCol.AllowDBNull = false;
+            //workCol.Unique = true;
+            //workTable.Columns.Add("CustFName", typeof(String));
+            //workTable.Columns.Add("Purchases", typeof(Double));
+
+            //aggregateLabel = "TOTAL HOGS";
+            //var categories = GetListProductInternalCategories("PREMIUM,EXPERT YELLOW,EXPERT WHITE,BONANZA,JUMBO").ToList();
+
+            //aggregateLabel = "TOTAL TRADE";
+            //categories = GetListProductInternalCategories("PUREBLEND").ToList();
+
+            //aggregateLabel = "TOTAL GAMEFOWL";
+            //categories = GetListProductInternalCategories("GRAINS,INTEGRA").ToList();
+
+            //aggregateLabel = "TOTAL FARM";
+            //categories = GetListProductInternalCategories("ESSENTIAL BROILER,PIC / ESSENTIALS").ToList();
+
+
+            //aggregateLabel = "OVERALL TOTAL";
+
+
+            dtConvertedByTown.Columns.Add("TOWN", typeof(String));
+            dtConvertedByTown.Columns.Add("TOTAL-PREMIUM", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-EXPERTYELLOW", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-EXPERTWHITE", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-BONANZA", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-JUMBO", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL HOGS", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-PUREBLEND", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL TRADE", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-GRAINS", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-INTEGRA", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL GAMEFOWL", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-ESSENTIALBROILER", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL-PICESSENTIALS", typeof(Double));
+            dtConvertedByTown.Columns.Add("TOTAL FARM", typeof(Double));
+            dtConvertedByTown.Columns.Add("OVERALL TOTAL", typeof(Double));
+
+            var pos = 0;
+            dtConvertedByTown.Rows.Clear();
+            foreach (var customerAddress2 in address2)
+            {
+                var dr = dtConvertedByTown.NewRow(); //Create New Row
+                dr[0] = customerAddress2.Address2; // Set Column Value
+                dtConvertedByTown.Rows.InsertAt(dr, pos); // InsertAt specified position
+                pos++;
+            }
+
+            Console.WriteLine(pos);
+
+        }
+
+        private void SetTotalForCategories(DataTable mainTable, DataTable dtConvertedByTown, DataTable dtSalesPersonnel, string aggregateLabel, string targetTotals)
         {
             mainTable.Columns.Add(aggregateLabel);
 
@@ -392,7 +548,7 @@ namespace Project.FC2J.UI.Reports
                 rowTotal = 0;
 
                 
-                for (var i = 2; i < mainTable.Columns.Count; i++)
+                for (var i = _startingColumn; i < mainTable.Columns.Count; i++)
                 {
                     if(targetTotals.Contains(mainTable.Columns[i].ColumnName))
                     {
@@ -402,6 +558,11 @@ namespace Project.FC2J.UI.Reports
                 }
 
                 rowToUpdate[aggregateLabel] = rowTotal;
+                var value = row[0];
+                if (value == DBNull.Value)
+                {
+                    UpdateRowValue(dtConvertedByTown, address: row[1].ToString(), column: aggregateLabel, value: rowTotal);
+                }
             }
         }
 
@@ -467,7 +628,7 @@ namespace Project.FC2J.UI.Reports
         }
 
         private async Task PopulateDataTable(List<ProjectCustomerAddress2> address2, ProjectReportParameter reportParameter, List<ProductInternalCategory> categories,
-            bool isMerged, DataTable mainTable, bool isFirstAddress2, bool isConverted=false, bool isOverrideIsFirstCategory = false)
+            bool isMerged, DataTable mainTable,DataTable dtConvertedByTown, DataTable dtSalesPersonnel, bool isFirstAddress2, bool isConverted=false, bool isOverrideIsFirstCategory = false)
         {
             DataRow rowToUpdate;
             DataTable reportTable;
@@ -512,13 +673,15 @@ namespace Project.FC2J.UI.Reports
                                     rowTotal = 0;
 
                                     if (rowToUpdate == null) continue;
-                                    for (var i = 2; i < reportTable.Columns.Count; i++)
+                                    for (var i = _startingColumn; i < reportTable.Columns.Count; i++)
                                     {
                                         rowTotal += Convert.ToSingle(row[i]);
                                         colTotal[i] += Convert.ToSingle(row[i]);
                                     }
 
                                     rowToUpdate[currentCategory] = rowTotal;
+                                    //update value=rowTotal using PersonnelId and currentCategory 
+                                    //UpdatePersonnelRowValue(dtSalesPersonnel, personnelId: Convert.ToInt32(row[0]), category: currentCategory, value: rowTotal);
                                 }
 
                                 expression = _selectedReport == _report1 ? $"customerName='{currentAddress}'" : $"supplierName='{currentAddress}'";
@@ -526,13 +689,14 @@ namespace Project.FC2J.UI.Reports
                                 if (rowToUpdate != null)
                                 {
                                     rowTotal = 0;
-                                    for (var i = 2; i < colTotal.Length; i++)
+                                    for (var i = _startingColumn; i < colTotal.Length; i++)
                                     {
                                         rowToUpdate[reportTable.Columns[i].ColumnName] = colTotal[i];
                                         rowTotal += Convert.ToSingle(colTotal[i]);
                                     }
 
                                     rowToUpdate[currentCategory] = rowTotal;
+                                    UpdateRowValue(dtConvertedByTown, address: currentAddress, column: currentCategory, value: rowTotal);
                                 }
                             }
 
@@ -540,7 +704,7 @@ namespace Project.FC2J.UI.Reports
                             {
                                 if (isFirstAddress2)
                                 {
-                                    for (var i = 2; i < reportTable.Columns.Count; i++)
+                                    for (var i = _startingColumn; i < reportTable.Columns.Count; i++)
                                     {
                                         mainTable.Columns.Add((string) reportTable.Columns[i].ColumnName);
                                     }
@@ -548,7 +712,7 @@ namespace Project.FC2J.UI.Reports
                                     mainTable.Columns.Add(currentCategory);
 
                                     //populate the new added columns
-                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory);
+                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory, dtConvertedByTown);
 
                                 }
                                 else
@@ -570,7 +734,7 @@ namespace Project.FC2J.UI.Reports
                                     }
 
                                     //populate the new added columns
-                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory);
+                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory, dtConvertedByTown);
                                 }
                             }
                         }
@@ -589,6 +753,8 @@ namespace Project.FC2J.UI.Reports
                     isFirstAddress2 = false;
             }
         }
+
+        
 
         private async Task<DataTable> SetReportTable(ProjectReportParameter reportParameter, bool isConverted)
         {
@@ -621,7 +787,7 @@ namespace Project.FC2J.UI.Reports
             return reportTable;
         }
 
-        private void InsertAndArrangeDataTable(DataTable reportTable, DataTable mainTable, string currentAddress, string currentCategory)
+        private void InsertAndArrangeDataTable(DataTable reportTable, DataTable mainTable, string currentAddress, string currentCategory, DataTable dtConvertedByTown)
         {
             string expression;
             DataRow rowToUpdate;
@@ -634,7 +800,7 @@ namespace Project.FC2J.UI.Reports
                 rowTotal = 0;
 
                 if (rowToUpdate == null) continue;
-                for (var i = 2; i < reportTable.Columns.Count; i++)
+                for (var i = _startingColumn; i < reportTable.Columns.Count; i++)
                 {
                     rowToUpdate[reportTable.Columns[i].ColumnName] = row[i];
                     rowTotal += Convert.ToSingle(row[i]);
@@ -649,12 +815,13 @@ namespace Project.FC2J.UI.Reports
             if (rowToUpdate != null)
             {
                 rowTotal = 0;
-                for (var i = 2; i < colTotal.Length; i++)
+                for (var i = _startingColumn; i < colTotal.Length; i++)
                 {
                     rowToUpdate[reportTable.Columns[i].ColumnName] = decimal.Round(Convert.ToDecimal(colTotal[i]), 2, MidpointRounding.AwayFromZero);
                     rowTotal += Convert.ToSingle(colTotal[i]);
                 }
                 rowToUpdate[currentCategory] = rowTotal;
+                UpdateRowValue(dtConvertedByTown, address: currentAddress, column: currentCategory, value: rowTotal);
             }
         }
 

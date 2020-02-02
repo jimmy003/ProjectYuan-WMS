@@ -96,6 +96,11 @@ namespace Project.FC2J.UI.Helpers.Reports
             return await _apiHelper.GetList<ProjectCustomerAddress2>(_apiAppSetting.Report + "/GetCustomerAddress2");
         }
 
+        public async Task<List<Personnel>> GetPersonnel()
+        {
+            return await _apiHelper.GetList<Personnel>(_apiAppSetting.Report + "/GetPersonnel");
+        }
+
         public async Task<List<DailyInventory>> GetDailyInventory(string inventoryDate, int sourceId)
         {
             return await _apiHelper.GetList<DailyInventory>(_apiAppSetting.Report + $"/GetDailyInventory?inventoryDate={inventoryDate}&sourceId={sourceId}");

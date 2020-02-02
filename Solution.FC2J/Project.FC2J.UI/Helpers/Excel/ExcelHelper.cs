@@ -86,19 +86,40 @@ namespace Project.FC2J.UI.Helpers.Excel
             switch (reportTypeEnum)
             {
                 case ReportTypeEnum.SalesMTDFeeds:
-                    for (int i = 0; i < 3; i++)
+                    if (table.TableName.Equals("CONVERTEDBYTOWN"))
                     {
-                        var headerListRow = new Row();
-                        var cellList = new Cell {DataType = CellValues.String};
-                        if (i == 0)
-                            cellList.CellValue = new CellValue($"Volume Monitoring per Dealer");
-                        else if (i == 1)
-                            cellList.CellValue = new CellValue("");
-                        else if (i == 2)
-                            cellList.CellValue = new CellValue("");
+                        for (int i = 0; i < 3; i++)
+                        {
+                            var headerListRow = new Row();
+                            var cellList = new Cell { DataType = CellValues.String };
+                            if (i == 0)
+                                cellList.CellValue =
+                                    new CellValue($"DATE AS OF: {DateTime.Now.ToString("dd MMM yyyy")}");
+                            else if (i == 1)
+                                cellList.CellValue = new CellValue("");
+                            else if (i == 2)
+                                cellList.CellValue = new CellValue("");
 
-                        headerListRow.AppendChild(cellList);
-                        sheetData.AppendChild(headerListRow);
+                            headerListRow.AppendChild(cellList);
+                            sheetData.AppendChild(headerListRow);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            var headerListRow = new Row();
+                            var cellList = new Cell { DataType = CellValues.String };
+                            if (i == 0)
+                                cellList.CellValue = new CellValue($"Volume Monitoring per Dealer");
+                            else if (i == 1)
+                                cellList.CellValue = new CellValue("");
+                            else if (i == 2)
+                                cellList.CellValue = new CellValue("");
+
+                            headerListRow.AppendChild(cellList);
+                            sheetData.AppendChild(headerListRow);
+                        }
                     }
                     break;
                 case ReportTypeEnum.SalesMTDVet:
@@ -316,7 +337,7 @@ namespace Project.FC2J.UI.Helpers.Excel
             }
             else if (reportTypeEnum == ReportTypeEnum.SalesMTDFeeds)
             {
-                cell.DataType = col.ToUpper().Equals("CUSTOMERNAME") ? CellValues.String : CellValues.Number;
+                cell.DataType = col.ToUpper().Equals("CUSTOMERNAME") || col.ToUpper().Equals("TOWN") ? CellValues.String : CellValues.Number;
             }
             else if (reportTypeEnum == ReportTypeEnum.PurchasesMTDFeeds)
             {

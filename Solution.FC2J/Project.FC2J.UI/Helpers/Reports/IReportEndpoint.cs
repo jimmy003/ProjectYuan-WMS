@@ -17,6 +17,7 @@ namespace Project.FC2J.UI.Helpers.Reports
         Task<List<DailyInventory>> GetDailyInventory(string inventoryDate, int sourceId);
         Task<List<ProductInternalCategory>> GetCategoryArrangement();
         Task<List<ProjectCustomerAddress2>> GetCustomerAddress2();
+        Task<List<Personnel>> GetPersonnel();
         Task<List<DailyInventoryCustomer>> GetDailyInventoryCustomers(string inventoryDate, int sourceId);
         Task<List<InventoryProduct>> GetInventoryProducts();
         Task<DataTable> GetMonthToDateSalesReport(ProjectReportParameter reportParameter);

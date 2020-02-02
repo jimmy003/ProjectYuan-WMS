@@ -114,6 +114,12 @@ namespace Project.FC2J.API.Controllers
             return Ok(await _repo.GetCustomerAddress2());
         }
 
+        [HttpGet, Route("GetPersonnel")]
+        public async Task<IActionResult> GetPersonnel()
+        {
+            return Ok(await _repo.GetPersonnel());
+        }
+
         [HttpGet, Route("GetDailyInventoryCustomers")]
         public async Task<IActionResult> GetDailyInventoryCustomers(string inventoryDate, int sourceId)
         {

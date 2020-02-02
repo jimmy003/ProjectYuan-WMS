@@ -65,6 +65,7 @@
     <Compile Include="Product\CartItem.cs" />
     <Compile Include="Product\CustomerAddress2.cs" />
     <Compile Include="Product\InventoryAdjustment.cs" />
+    <Compile Include="Product\Personnel.cs" />
     <Compile Include="Product\Product.cs" />
     <Compile Include="Product\ProductSFACategory.cs" />
     <Compile Include="Product\ProductPrice.cs" />
