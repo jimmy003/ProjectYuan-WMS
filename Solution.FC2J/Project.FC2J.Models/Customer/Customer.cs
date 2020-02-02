@@ -17,6 +17,7 @@ namespace Project.FC2J.Models.Customer
         public string PaymentType { get; set; }
         public string PriceList { get; set; }
         public long PriceListId { get; set; }
+        public int PersonnelId { get; set; }
         public bool Deleted { get; set; }
         public List<Payment> PaymentDetails { get; set; } = new List<Payment>();
         public List<PriceList> PriceListDetails { get; set; } = new List<PriceList>();

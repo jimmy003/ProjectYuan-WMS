@@ -86,7 +86,7 @@ namespace Project.FC2J.UI.Helpers.Excel
             switch (reportTypeEnum)
             {
                 case ReportTypeEnum.SalesMTDFeeds:
-                    if (table.TableName.Equals("CONVERTEDBYTOWN"))
+                    if (table.TableName.Equals("CONVERTEDBYTOWN") || table.TableName.Equals("SALESPERSONNEL"))
                     {
                         for (int i = 0; i < 3; i++)
                         {
@@ -337,7 +337,11 @@ namespace Project.FC2J.UI.Helpers.Excel
             }
             else if (reportTypeEnum == ReportTypeEnum.SalesMTDFeeds)
             {
-                cell.DataType = col.ToUpper().Equals("CUSTOMERNAME") || col.ToUpper().Equals("TOWN") ? CellValues.String : CellValues.Number;
+                cell.DataType = col.ToUpper().Equals("CUSTOMERNAME") 
+                                || col.ToUpper().Equals("TOWN")
+                                || col.ToUpper().Equals("SALES PERSONNEL")
+                                || col.ToUpper().Equals("POSITION")
+                    ? CellValues.String : CellValues.Number;
             }
             else if (reportTypeEnum == ReportTypeEnum.PurchasesMTDFeeds)
             {

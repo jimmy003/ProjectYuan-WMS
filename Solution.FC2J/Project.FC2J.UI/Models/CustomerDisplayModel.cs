@@ -143,7 +143,16 @@ namespace Project.FC2J.UI.Models
                 CallPropertyChanged(nameof(PriceListId));
             }
         }
-
+        private int _personnelId;
+        public int PersonnelId
+        {
+            get { return _personnelId; }
+            set
+            {
+                _personnelId = value;
+                CallPropertyChanged(nameof(PersonnelId));
+            }
+        }
         public bool Deleted { get; set; }
 
         public List<Payment> PaymentDetails { get; set; } = new List<Payment>();

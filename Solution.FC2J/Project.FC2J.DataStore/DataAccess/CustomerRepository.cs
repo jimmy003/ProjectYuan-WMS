@@ -363,6 +363,7 @@ namespace Project.FC2J.DataStore
                 sqlParameters.Add(new SqlParameter("@TIN", _customer.TIN.EmptyNull().Replace("'", "''")));
                 sqlParameters.Add(new SqlParameter("@PaymentTypeId", _customer.PaymentTypeId));
                 sqlParameters.Add(new SqlParameter("@PriceListId", _customer.PriceListId));
+                sqlParameters.Add(new SqlParameter("@PersonnelId", _customer.PersonnelId));
 
             }
             catch (Exception ex)

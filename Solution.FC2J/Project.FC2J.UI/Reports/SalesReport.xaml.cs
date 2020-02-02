@@ -318,6 +318,8 @@ namespace Project.FC2J.UI.Reports
                 targetTotals = "TOTAL TRADETOTAL GAMEFOWLTOTAL FARM";
                 SetTotalForCategories(mainTable, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
 
+                SetTotalForCategories(dtConverted, dtConvertedByTown, dtSalesPersonnel, aggregateLabel, targetTotals);
+
 
             }
             else
@@ -373,11 +375,16 @@ namespace Project.FC2J.UI.Reports
             if (reportParameter.IsFeeds)
             {
                 if (_selectedReport == _report1)
+                {
                     dtConverted.Columns.Remove("PersonnelId");
+                    dtSalesPersonnel.Columns.Remove("ID");
+                }
                 mainDataSet.Tables.Add(dtConverted);
+
                 if (_selectedReport == _report1)
                 {
                     mainDataSet.Tables.Add(dtConvertedByTown);
+                    mainDataSet.Tables.Add(dtSalesPersonnel);
                 }
             }
 
@@ -415,7 +422,10 @@ namespace Project.FC2J.UI.Reports
                     var expression = $"ID={personnelId}";
                     var rowToUpdate = dtSalesPersonnel.Select(expression).FirstOrDefault();
                     if (rowToUpdate == null) return;
-                    rowToUpdate[category] = Convert.ToInt64(rowToUpdate[category])  + value;
+                    if (rowToUpdate.IsNull(category) == false)
+                        rowToUpdate[category] = Convert.ToInt64(rowToUpdate[category])  + value;
+                    else
+                        rowToUpdate[category] = value;
                 }
 
             }
@@ -530,7 +540,6 @@ namespace Project.FC2J.UI.Reports
             DataRow rowToUpdate = null;  
             float rowTotal = 0;
             
-
             foreach (DataRow row in mainTable.Rows)
             {
                 
@@ -558,12 +567,46 @@ namespace Project.FC2J.UI.Reports
                 }
 
                 rowToUpdate[aggregateLabel] = rowTotal;
+                if (!mainTable.TableName.Equals("CONVERTED")) continue;
                 var value = row[0];
                 if (value == DBNull.Value)
                 {
-                    UpdateRowValue(dtConvertedByTown, address: row[1].ToString(), column: aggregateLabel, value: rowTotal);
+                    UpdateRowValue(dtConvertedByTown, address: row[1].ToString(), column: aggregateLabel,value: rowTotal);
                 }
+
             }
+
+            if (_selectedReport != _report1 || !mainTable.TableName.Equals("CONVERTED")) return;
+
+            foreach (DataRow row in dtSalesPersonnel.Rows)
+            {
+
+                try
+                {
+                    expression = $"ID={Convert.ToSingle(row[0])}";
+                    rowToUpdate = dtSalesPersonnel.Select(expression).FirstOrDefault();
+                    if (rowToUpdate == null) continue;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
+                rowTotal = 0;
+
+                for (var i = _startingColumn + 1; i < dtSalesPersonnel.Columns.Count; i++)
+                {
+                    if (targetTotals.Contains(dtSalesPersonnel.Columns[i].ColumnName))
+                    {
+                        if (row.IsNull(dtSalesPersonnel.Columns[i].ColumnName) == false)
+                            rowTotal += Convert.ToSingle(row[i]);
+                    }
+                }
+
+                rowToUpdate[aggregateLabel] = rowTotal;
+
+            }
+
         }
 
         private IEnumerable<ProductInternalCategory> GetListProductInternalCategories(string value)
@@ -677,11 +720,15 @@ namespace Project.FC2J.UI.Reports
                                     {
                                         rowTotal += Convert.ToSingle(row[i]);
                                         colTotal[i] += Convert.ToSingle(row[i]);
+
+                                        if (mainTable.TableName.Equals("CONVERTED"))
+                                            UpdatePersonnelRowValue(dtSalesPersonnel, personnelId: Convert.ToInt32(row[2]), category: currentCategory, value: Convert.ToSingle(row[i]));
+
                                     }
 
                                     rowToUpdate[currentCategory] = rowTotal;
-                                    //update value=rowTotal using PersonnelId and currentCategory 
-                                    //UpdatePersonnelRowValue(dtSalesPersonnel, personnelId: Convert.ToInt32(row[0]), category: currentCategory, value: rowTotal);
+                                    
+                                    
                                 }
 
                                 expression = _selectedReport == _report1 ? $"customerName='{currentAddress}'" : $"supplierName='{currentAddress}'";
@@ -696,7 +743,8 @@ namespace Project.FC2J.UI.Reports
                                     }
 
                                     rowToUpdate[currentCategory] = rowTotal;
-                                    UpdateRowValue(dtConvertedByTown, address: currentAddress, column: currentCategory, value: rowTotal);
+                                    if (mainTable.TableName.Equals("CONVERTED"))
+                                        UpdateRowValue(dtConvertedByTown, address: currentAddress, column: currentCategory, value: rowTotal);
                                 }
                             }
 
@@ -712,7 +760,7 @@ namespace Project.FC2J.UI.Reports
                                     mainTable.Columns.Add(currentCategory);
 
                                     //populate the new added columns
-                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory, dtConvertedByTown);
+                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory, dtConvertedByTown, dtSalesPersonnel);
 
                                 }
                                 else
@@ -729,12 +777,13 @@ namespace Project.FC2J.UI.Reports
                                             dr = mainTable.NewRow();
                                             dr[0] = reportTable.Rows[i][0];
                                             dr[1] = reportTable.Rows[i][1];
+                                            dr[2] = reportTable.Rows[i][2];
                                             mainTable.Rows.Add(dr);
                                         }
                                     }
 
                                     //populate the new added columns
-                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory, dtConvertedByTown);
+                                    InsertAndArrangeDataTable(reportTable, mainTable, currentAddress, currentCategory, dtConvertedByTown, dtSalesPersonnel);
                                 }
                             }
                         }
@@ -787,7 +836,7 @@ namespace Project.FC2J.UI.Reports
             return reportTable;
         }
 
-        private void InsertAndArrangeDataTable(DataTable reportTable, DataTable mainTable, string currentAddress, string currentCategory, DataTable dtConvertedByTown)
+        private void InsertAndArrangeDataTable(DataTable reportTable, DataTable mainTable, string currentAddress, string currentCategory, DataTable dtConvertedByTown, DataTable dtSalesPersonnel)
         {
             string expression;
             DataRow rowToUpdate;
@@ -805,9 +854,14 @@ namespace Project.FC2J.UI.Reports
                     rowToUpdate[reportTable.Columns[i].ColumnName] = row[i];
                     rowTotal += Convert.ToSingle(row[i]);
                     colTotal[i] += Convert.ToSingle(row[i]);
+
+                    if (mainTable.TableName.Equals("CONVERTED"))
+                        UpdatePersonnelRowValue(dtSalesPersonnel, personnelId: Convert.ToInt32(row[2]), category: currentCategory, value: Convert.ToSingle(row[i]));
+
                 }
 
                 rowToUpdate[currentCategory] = rowTotal;
+
             }
 
             expression = _selectedReport == _report1 ? $"customerName='{currentAddress}'" : $"supplierName='{currentAddress}'";
@@ -821,7 +875,9 @@ namespace Project.FC2J.UI.Reports
                     rowTotal += Convert.ToSingle(colTotal[i]);
                 }
                 rowToUpdate[currentCategory] = rowTotal;
-                UpdateRowValue(dtConvertedByTown, address: currentAddress, column: currentCategory, value: rowTotal);
+                if (mainTable.TableName.Equals("CONVERTED"))
+                    UpdateRowValue(dtConvertedByTown, address: currentAddress, column: currentCategory, value: rowTotal);
+
             }
         }
 

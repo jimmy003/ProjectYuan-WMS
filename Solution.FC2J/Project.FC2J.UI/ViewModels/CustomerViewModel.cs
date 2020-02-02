@@ -5,31 +5,31 @@ using Project.FC2J.UI.Helpers;
 using Project.FC2J.UI.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
+using Project.FC2J.Models.Product;
 using Project.FC2J.UI.Helpers.AppSetting;
+using Project.FC2J.UI.Helpers.Reports;
 
 namespace Project.FC2J.UI.ViewModels
 {
     public class CustomerViewModel : Screen
     {
-        private BindingList<CustomerDisplayModel> _partners;
         private readonly IMapper _mapper;
         private readonly ICustomerEndpoint _customerEndpoint;
         private readonly IPriceListEndpoint _priceListEndpoint;
-        private readonly IApiAppSetting _appSetting;
+        private IReportEndpoint _reportEndpoint;
 
-
-        public CustomerViewModel(ICustomerEndpoint customerEndpoint, IMapper mapper, IApiAppSetting appSetting, IPriceListEndpoint priceListEndpoint)
+        public CustomerViewModel(ICustomerEndpoint customerEndpoint, IMapper mapper, IApiAppSetting appSetting, IPriceListEndpoint priceListEndpoint, IReportEndpoint reportEndpoint)
         {
             _customerEndpoint = customerEndpoint;
             _mapper = mapper;
-            _appSetting = appSetting;
             _priceListEndpoint = priceListEndpoint;
+            _reportEndpoint = reportEndpoint;
             IsLoadingVisible = true;
         }
         private bool _isLoadingVisible;
@@ -43,15 +43,41 @@ namespace Project.FC2J.UI.ViewModels
                 NotifyOfPropertyChange(() => IsLoadingVisible);
             }
         }
-        public BindingList<CustomerDisplayModel> Partners
+
+        //private BindingList<CustomerDisplayModel> _partners;
+        //public BindingList<CustomerDisplayModel> Partners
+        //{
+        //    get { return _partners; }
+        //    set
+        //    {
+        //        _partners = value;
+        //        NotifyOfPropertyChange(() => Partners);
+        //    }
+        //}
+
+        private ObservableCollection<CustomerDisplayModel> _partners;
+        public ObservableCollection<CustomerDisplayModel> Partners
         {
             get { return _partners; }
             set
             {
                 _partners = value;
                 NotifyOfPropertyChange(() => Partners);
+                NotifyOfPropertyChange(() => CollectionView);
             }
         }
+
+        private CollectionView _collectionView = null;
+        public CollectionView CollectionView
+        {
+            get
+            {
+                _collectionView = (CollectionView)CollectionViewSource.GetDefaultView(Partners);
+                _collectionView?.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+                return _collectionView;
+            }
+        }
+
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
@@ -121,6 +147,41 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
+        private BindingList<Personnel> _personnel;
+        public BindingList<Personnel> Personnel
+        {
+            get { return _personnel; }
+            set
+            {
+                _personnel = value;
+                NotifyOfPropertyChange(() => Personnel);
+            }
+        }
+
+        private Personnel _selectedPersonnel;
+        public Personnel SelectedPersonnel
+        {
+            get { return _selectedPersonnel; }
+            set
+            {
+                _selectedPersonnel = value;
+                NotifyOfPropertyChange(() => SelectedPersonnel);
+            }
+        }
+        
+        private async Task LoadPersonnel()
+        {
+            try
+            {
+                var personnel = await _reportEndpoint.GetPersonnel();
+                Personnel = new BindingList<Personnel>(personnel);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
         private async Task LoadPriceLists()
         {
@@ -135,6 +196,7 @@ namespace Project.FC2J.UI.ViewModels
                 Console.WriteLine(ex.Message);
             }
         }
+
         private async Task LoadPaymentTypes()
         {
             try
@@ -182,15 +244,16 @@ namespace Project.FC2J.UI.ViewModels
                 partners = _mapper.Map<List<CustomerDisplayModel>>(allPartners.Where(c => c.Name.ToLower().Contains(SearchInput.ToLower())));
             }
             
-            Partners = new BindingList<CustomerDisplayModel>(partners);
+            Partners = new ObservableCollection<CustomerDisplayModel>(partners);
         }
         private async Task LoadPartners()
         {
             allPartners = await _customerEndpoint.GetList();
             var partners = _mapper.Map<List<CustomerDisplayModel>>(allPartners);
-            Partners = new BindingList<CustomerDisplayModel>(partners);
+            Partners = new ObservableCollection<CustomerDisplayModel>(partners);
             await LoadPaymentTypes();
             await LoadPriceLists();
+            await LoadPersonnel();
             await LoadFarms();
         }
 
@@ -229,10 +292,25 @@ namespace Project.FC2J.UI.ViewModels
                         IsFarm = false;
                         SelectedFarm = null;
                     }
+
                     var existingPriceList = PriceLists.FirstOrDefault(x => x.Id == _selectedPartner.PriceListId);
-                    SelectedPriceList = existingPriceList;
+                    if(existingPriceList !=null)
+                    {
+                        SelectedPriceList = existingPriceList;
+                    }
+
+                    var existingPersonnel = Personnel.FirstOrDefault(x => x.Id == _selectedPartner.PersonnelId);
+                    if (existingPersonnel != null)
+                    {
+                        SelectedPersonnel = existingPersonnel;
+                    }
+
                     var existingPaymentType = Payments.FirstOrDefault(x => x.Id == _selectedPartner.PaymentTypeId);
-                    SelectedPaymentType = existingPaymentType;
+                    if(existingPaymentType != null)
+                    {
+                        SelectedPaymentType = existingPaymentType;
+                    }
+
                     
                 }
 
@@ -399,6 +477,7 @@ namespace Project.FC2J.UI.ViewModels
             SelectedPaymentType = null;
             SelectedPriceList = null;
             SelectedPartner = null;
+            SelectedPersonnel = null;
             IsFarm = false;
             NotifyOfPropertyChange(() => CanDelete);
         }
@@ -455,7 +534,8 @@ namespace Project.FC2J.UI.ViewModels
                     PaymentType = SelectedPaymentType.PaymentType,
                     PaymentTypeId = SelectedPaymentType.Id,
                     PriceList = SelectedPriceList.Name,
-                    PriceListId = SelectedPriceList.Id
+                    PriceListId = SelectedPriceList.Id,
+                    PersonnelId = SelectedPersonnel.Id
                 };
 
                 if (SelectedPartner == null)
@@ -480,6 +560,7 @@ namespace Project.FC2J.UI.ViewModels
                     SelectedPartner.PaymentTypeId = SelectedPaymentType.Id;
                     SelectedPartner.PriceListId = SelectedPriceList.Id;
                     SelectedPartner.PriceList = SelectedPriceList.Name;
+                    SelectedPartner.PersonnelId = SelectedPersonnel.Id;
                 }
                 OnClear();
             }
