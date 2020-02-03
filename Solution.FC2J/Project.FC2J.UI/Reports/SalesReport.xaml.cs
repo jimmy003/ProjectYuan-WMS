@@ -366,7 +366,7 @@ namespace Project.FC2J.UI.Reports
 
 
             var mainDataSet = new DataSet("Mainreport");
-            if (_selectedReport == _report1)
+            if (_selectedReport == _report1 && reportParameter.IsFeeds)
             {
                 mainTable.Columns.Remove("PersonnelId");
             }
@@ -374,14 +374,14 @@ namespace Project.FC2J.UI.Reports
 
             if (reportParameter.IsFeeds)
             {
-                if (_selectedReport == _report1)
+                if (_selectedReport == _report1 && reportParameter.IsFeeds)
                 {
                     dtConverted.Columns.Remove("PersonnelId");
                     dtSalesPersonnel.Columns.Remove("ID");
                 }
                 mainDataSet.Tables.Add(dtConverted);
 
-                if (_selectedReport == _report1)
+                if (_selectedReport == _report1 && reportParameter.IsFeeds)
                 {
                     mainDataSet.Tables.Add(dtConvertedByTown);
                     mainDataSet.Tables.Add(dtSalesPersonnel);
