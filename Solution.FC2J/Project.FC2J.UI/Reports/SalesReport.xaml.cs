@@ -83,10 +83,12 @@ namespace Project.FC2J.UI.Reports
 
         private async Task OnGenerateCustomerAccountSummaryReport()
         {
+            
+
             var reportParameter = new ProjectReportParameter
             {
-                DateFrom = Convert.ToDateTime(DateFrom.Text),
-                DateTo = Convert.ToDateTime(DateTo.Text)
+                DateFrom = DateRangePicker.From,
+                DateTo = DateRangePicker.To
             };
 
             var dtCustomerAccountSummary = await _reportEndpoint.GetCustomerAccountSummary(reportParameter);
@@ -194,9 +196,11 @@ namespace Project.FC2J.UI.Reports
                 IsFeeds = Convert.ToBoolean(IsFeeds.IsChecked),
                 Address2 = "SAN JOSE DEL MONTE",
                 InternalCategory = "PREMIUM",
-                DateFrom = Convert.ToDateTime(DateFrom.Text),
-                DateTo = Convert.ToDateTime(DateTo.Text)
+                DateFrom = DateRangePicker.From,
+                DateTo = DateRangePicker.To
             };
+
+            //_dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
 
             var mainTable = new DataTable { TableName = "NOT-CONVERTED" };
             var dtConverted = new DataTable { TableName = "CONVERTED" };
@@ -895,9 +899,7 @@ namespace Project.FC2J.UI.Reports
             {
                 case _report1:
                     _reportTypeEnum = ReportTypeEnum.SalesMTDFeeds;
-                    DateFrom.Text = $"01-{DateTime.Now.ToString("MMM-yyyy")}";
-                    DateTo.Text = DateTime.Now.ToString("dd-MMM-yyyy");
-                    _dateRange = $"{DateFrom.Text} till {DateTo.Text}";
+                    _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
 
                     IsFeeds.IsChecked = true;
                     Report1Parameter.Visibility = Visibility.Visible;
@@ -906,9 +908,8 @@ namespace Project.FC2J.UI.Reports
                     break;
                 case _report2:
                     _reportTypeEnum = ReportTypeEnum.PurchasesMTDFeeds;
-                    DateFrom.Text = $"01-{DateTime.Now.ToString("MMM-yyyy")}";
-                    DateTo.Text = DateTime.Now.ToString("dd-MMM-yyyy");
-                    _dateRange = $"{DateFrom.Text} till {DateTo.Text}";
+                    _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
+
 
                     IsFeeds.IsChecked = true;
                     Report1Parameter.Visibility = Visibility.Visible;
@@ -932,9 +933,7 @@ namespace Project.FC2J.UI.Reports
 
                 case _report5:
                     _reportTypeEnum = ReportTypeEnum.CustomerAccountSummary;
-                    DateFrom.Text = $"01-{DateTime.Now.AddMonths(-2).ToString("MMM-yyyy")}";
-                    DateTo.Text = DateTime.Now.ToString("dd-MMM-yyyy");
-                    _dateRange = $"{DateFrom.Text} till {DateTo.Text}";
+                    _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
 
                     IsFeeds.Visibility = Visibility.Collapsed;
                     Report1Parameter.Visibility = Visibility.Visible;
@@ -969,6 +968,9 @@ namespace Project.FC2J.UI.Reports
 
         }
 
-      
+        private void DateRangePicker_DateRangeChanged(object sender, RoutedPropertyChangedEventArgs<Rh.DateRange.Picker.DateRangeValue> e)
+        {
+            var value = DateRangePicker.From;
+        }
     }
 }

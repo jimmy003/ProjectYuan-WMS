@@ -131,6 +131,9 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Rh.DateRange.Picker, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rh.DateRange.Picker.0.9.1.0\lib\net40\Rh.DateRange.Picker.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -240,12 +243,15 @@
     <Compile Include="Models\SaleDetailDisplayModel.cs" />
     <Compile Include="Models\SalesDisplayModel.cs" />
     <Compile Include="Models\UserDisplayModel.cs" />
+    <Compile Include="Reports\OrientationToIsCheckedConverter.cs" />
     <Compile Include="Reports\ReportViewerScreen.xaml.cs">
       <DependentUpon>ReportViewerScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\SalesReport.xaml.cs">
       <DependentUpon>SalesReport.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Reports\SelectedDateFormatToIsCheckedConverter.cs" />
+    <Compile Include="Reports\StyleToIsCheckedConverter.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="UserControls\AdjustInventoryWindow.xaml.cs">
       <DependentUpon>AdjustInventoryWindow.xaml</DependentUpon>
@@ -354,6 +360,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Reports\ObjectDataProviders.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Reports\RegularControlStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Reports\ReportViewerScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -361,6 +375,10 @@
     <Page Include="Reports\SalesReport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Reports\SampleCustomStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Styles\Buttons.xaml">
       <SubType>Designer</SubType>

@@ -6,8 +6,18 @@
         xmlns:local="clr-namespace:Project.FC2J.UI.Reports"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:userControls="clr-namespace:Project.FC2J.UI.UserControls"
+        xmlns:p="clr-namespace:Project.FC2J.UI.Properties"
+        xmlns:rh="http://schemas.rollinghours.com/wpf"
         mc:Ignorable="d"
-        Title="Reports" Height="320" Width="600" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Reports" Height="350" Width="600" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="LightGreen"/>
+                <Setter Property="Width" Value="75"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -50,14 +60,12 @@
                 <StackPanel Name="Report1Parameter" Grid.Row="1" Visibility="Collapsed" >
 
                     <CheckBox Name="IsFeeds" Content="Is Feeds" Checked="IsFeeds_Checked" Unchecked="IsFeeds_Checked"/>
-                    <TextBox Name="DateFrom"  
-                             materialDesign:HintAssist.Hint="Date From" 
-                             IsEnabled="False"
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,5,5,5"/>
-                    <TextBox Name="DateTo"  
-                             materialDesign:HintAssist.Hint="Date To" 
-                             IsEnabled="False"
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,5,5,5"/>
+
+                    <rh:DateRangePicker Margin="20,2"
+                        Name="DateRangePicker" From="{Binding DateFrom}"
+                                        To="{Binding DateTo}"
+                                        KindOfRange="{Binding DateRangeKind}"
+                                        Orientation="Vertical" DateRangeChanged="DateRangePicker_DateRangeChanged" />
 
                     <Button Name="ViewMTDSales" Click="ViewMTDSales_OnClick" Visibility="Collapsed" HorizontalAlignment="Left" 
                             Style="{StaticResource MaterialDesignFlatButton}">
