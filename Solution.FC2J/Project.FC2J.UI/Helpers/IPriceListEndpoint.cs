@@ -18,5 +18,6 @@ namespace Project.FC2J.UI.Helpers
         Task UpdatePOPricelist(PriceList priceList);
         Task UpdatePricelistTemplateDetails(long pricelistTemplateId, Product value);
         Task RemovePriceListCustomer(long customerId);
+        Task UpdatePricelistName(PriceList value);
     }
 }

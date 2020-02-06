@@ -77,5 +77,9 @@ namespace Project.FC2J.UI.Helpers
             await _apiHelper.Remove (_apiAppSetting.Pricelist + $"/RemovePriceListCustomer?customerId={customerId}");
         }
 
+        public async Task UpdatePricelistName(PriceList value)
+        {
+            await _apiHelper.Update<PriceList>(_apiAppSetting.Pricelist + "/UpdatePricelistName", value);
+        }
     }
 }
