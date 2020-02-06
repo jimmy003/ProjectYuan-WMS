@@ -15,5 +15,6 @@ namespace Project.FC2J.DataStore.Interfaces.Codesets
         Task UpdatePOPricelist(PriceList value);
         Task UpdatePricelistTemplateDetails(long pricelistTemplateId, Product value);
         Task RemovePriceListCustomer(long customerId);
+        Task UpdatePricelistName(PriceList value);
     }
 }

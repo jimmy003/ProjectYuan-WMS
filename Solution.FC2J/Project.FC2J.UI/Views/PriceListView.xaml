@@ -168,20 +168,31 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             
-                            <Grid Grid.Column="1" Margin="5,0">
-                                <materialDesign:PackIcon Kind="Money" VerticalAlignment="Center" Margin="6,10,2,0" Foreground="{Binding BorderBrush, ElementName=PricelistName}"/>
-                                <TextBox x:Name="PricelistName" attachedProperties:FocusProperty.Value="{Binding AddIsCalled}"  Margin="5" 
-                                         materialDesign:HintAssist.Hint="Pricelist" Padding="10 0 0 0" 
-                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" VerticalContentAlignment="Bottom" VerticalAlignment="Center"/>
-                            </Grid>
-                            
+                            <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                <Button x:Name="Update" 
+                                        Style="{StaticResource MaterialDesignFlatButton}" Padding="2,4" Margin="0,0,4,0">
+                                    <Grid>
+                                        <materialDesign:PackIcon Kind="Refresh" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <TextBlock Text="UPDATE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </Button>
+
+                                <Grid Margin="5,0" VerticalAlignment="Center" HorizontalAlignment="Center" Width="190">
+                                    <materialDesign:PackIcon Kind="Money" VerticalAlignment="Center" Margin="6,10,2,0" Foreground="{Binding BorderBrush, ElementName=PricelistName}"/>
+                                    <TextBox x:Name="PricelistName" attachedProperties:FocusProperty.Value="{Binding AddIsCalled}"  Margin="5" 
+                                             materialDesign:HintAssist.Hint="Pricelist" Padding="10 0 0 0" 
+                                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" VerticalContentAlignment="Bottom" VerticalAlignment="Center"/>
+                                </Grid>
+
+
+                            </StackPanel>
 
                             <StackPanel  Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" >
                                 <Button x:Name="Save" 
                                         Style="{StaticResource MaterialDesignFlatButton}" Padding="2,4" Margin="0,0,4,0"
                                         Visibility="{Binding IsButtonSaveVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue='Visible'}">
                                     <Grid>
-                                        <materialDesign:PackIcon Kind="BinCircle" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <materialDesign:PackIcon Kind="ContentSave" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding ButtonSaveLabel, FallbackValue='SAVE'}" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
                                     </Grid>
                                 </Button>
@@ -207,9 +218,6 @@
                                         <TextBlock Text="CANCEL" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
                                     </Grid>
                                 </Button>
-                                <!--<TextBlock Text="Discount Policy" FontSize="20" />
-                                <RadioButton x:Name="DiscountPolicy1" Content="Discount included in the price" IsChecked="True" />
-                                <RadioButton x:Name="DiscountPolicy2" Content="Show public price &amp; discount to the customer" />-->
                             </StackPanel>
 
                         </Grid>

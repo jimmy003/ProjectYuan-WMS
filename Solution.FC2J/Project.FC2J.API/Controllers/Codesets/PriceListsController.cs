@@ -71,6 +71,13 @@ namespace Project.FC2J.API.Controllers.Codesets
             return Ok();
         }
 
+        [HttpPut,Route("UpdatePricelistName")]
+        public async Task<IActionResult> UpdatePricelistName(PriceList value)
+        {
+            await _repo.UpdatePricelistName(value);
+            return Ok();
+        }
+
         [HttpDelete, Route("RemovePriceListCustomer")]
         public async Task<IActionResult> Delete(long customerId)
         {

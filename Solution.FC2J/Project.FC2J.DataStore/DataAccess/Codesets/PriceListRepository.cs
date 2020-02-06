@@ -16,6 +16,7 @@ namespace Project.FC2J.DataStore.DataAccess.Codesets
         private readonly string _spInsertPricelist = "InsertPricelist";
         private readonly string _spCopyPricelist = "CopyPricelist";
         private readonly string _spRemovePriceListCustomer = "RemovePriceListCustomer";
+        private readonly string _spUpdatePricelistName = "UpdatePricelistName";
 
         private readonly string _spInsertCustomerPricelist = "InsertCustomerPricelist";
 
@@ -98,6 +99,16 @@ namespace Project.FC2J.DataStore.DataAccess.Codesets
                 new SqlParameter("@CustomerId", customerId)
             };
             await _spRemovePriceListCustomer.ExecuteNonQueryAsync(sqlParameters.ToArray());
+        }
+
+        public async Task UpdatePricelistName(PriceList value)
+        {
+            var sqlParameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@Name", value.Name),
+                new SqlParameter("@Id", value.Id)
+            };
+            await _spUpdatePricelistName.ExecuteNonQueryAsync(sqlParameters.ToArray());
         }
 
         public async Task<List<TargetCustomer>> GetTargetCustomers(long priceListId)

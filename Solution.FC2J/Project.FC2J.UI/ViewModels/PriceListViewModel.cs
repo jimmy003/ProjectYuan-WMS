@@ -42,6 +42,8 @@ namespace Project.FC2J.UI.ViewModels
         {
             base.OnViewLoaded(view);
             IsGridVisible = false;
+            EditIsCalled = false;
+            NotifyOfPropertyChange(() => CanUpdate);
             await LoadPriceLists();
         }
 
@@ -337,7 +339,7 @@ namespace Project.FC2J.UI.ViewModels
        
 
         //Controls Enabled
-        public bool PricelistNameEnabled => AddIsCalled;
+        public bool PricelistNameEnabled => AddIsCalled || EditIsCalled;
 
         private string _copyAs;
         public string CopyAs
@@ -361,9 +363,13 @@ namespace Project.FC2J.UI.ViewModels
             get { return _pricelistName; }
             set
             {
-                _pricelistName = value;
-                NotifyOfPropertyChange(() => PricelistName);
-                NotifyOfPropertyChange(() => CanSave);
+                if(_pricelistName != value)
+                {
+                    _pricelistName = value;
+                    NotifyOfPropertyChange(() => PricelistName);
+                    NotifyOfPropertyChange(() => CanSave);
+                    NotifyOfPropertyChange(() => CanUpdate);
+                }
             }
         }
 
@@ -424,6 +430,17 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
+        private bool _editIsCalled;
+        public bool EditIsCalled
+        {
+            get { return _editIsCalled; }
+            set
+            {
+                _editIsCalled = value;
+                NotifyOfPropertyChange(() => EditIsCalled);
+            }
+        }
+
         
         public async Task Add()
         {
@@ -441,6 +458,43 @@ namespace Project.FC2J.UI.ViewModels
         }
 
         public bool CanSave => !string.IsNullOrEmpty(PricelistName);
+
+        public bool CanUpdate
+        {
+            get
+            {
+                var output = string.IsNullOrEmpty(PricelistName) == false && EditIsCalled && PricelistName != SelectedPricelist.Name;
+                return output;
+            }
+        }
+
+        public async Task Update()
+        {
+
+            var itemExist = allPriceLists.FirstOrDefault(c => c.Name.ToLower().Equals(PricelistName.ToLower()) && c.Id != SelectedPricelist.Id );
+            if (itemExist != null)
+            {
+                MessageBox.Show("Pricelist name already exist", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                if (MessageBox.Show($"Are you sure?{Environment.NewLine}Update Pricelist from [{SelectedPricelist.Name}] to [{PricelistName}]", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    var value = new PriceList
+                    {
+                        Name = PricelistName,
+                        Id = SelectedPricelist.Id
+                    };
+
+                    await _priceListEndpoint.UpdatePricelistName(value);
+                    SelectedPricelist.Name = PricelistName;
+                    MessageBox.Show("Successfully Updated", "Confirmed", MessageBoxButton.OK);
+
+
+                }
+            }
+
+        }
 
         private string _buttonSaveLabel = "SAVE";    
         public string ButtonSaveLabel
@@ -583,6 +637,7 @@ namespace Project.FC2J.UI.ViewModels
             await LoadTargetCustomers(SelectedPricelist.Id);
 
             PricelistName = SelectedPricelist.Name;
+            EditIsCalled = true;
             DiscountPolicy1 = !SelectedPricelist.DiscountPolicy;
             if (!DiscountPolicy1)
                 DiscountPolicy2 = true;
