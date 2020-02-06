@@ -58,7 +58,7 @@ namespace Project.FC2J.UI.Reports
             ReportViewer.SetPageSettings(pageSetting);
             ReportViewer.RefreshReport();
             ReportViewer.Reset();
-            //
+            //03Feb2020
 
         }
 
