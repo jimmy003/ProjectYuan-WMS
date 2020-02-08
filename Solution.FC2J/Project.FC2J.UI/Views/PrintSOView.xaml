@@ -197,7 +197,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="105" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="Cash Discount:" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="Passbook promo:" HorizontalAlignment="Right" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="{Binding CashDiscount}" Margin="6,0,0,0" />
                                         </Grid>
                                         <Grid x:Name="GridPickupDiscount" Margin="0,2">

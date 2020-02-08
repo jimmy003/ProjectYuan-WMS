@@ -971,6 +971,7 @@ namespace Project.FC2J.UI.Reports
         private void DateRangePicker_DateRangeChanged(object sender, RoutedPropertyChangedEventArgs<Rh.DateRange.Picker.DateRangeValue> e)
         {
             var value = DateRangePicker.From;
+            _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
         }
     }
 }

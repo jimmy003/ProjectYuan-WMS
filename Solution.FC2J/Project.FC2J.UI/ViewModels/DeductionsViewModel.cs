@@ -113,7 +113,7 @@ namespace Project.FC2J.UI.ViewModels
 
         public bool CanDelete => SelectedDeduction != null && string.IsNullOrEmpty(SelectedDeduction.PONo) ;
 
-        public bool CanSave => string.IsNullOrEmpty(Particular)==false && Amount > 0 && string.IsNullOrEmpty(SelectedDeduction.PONo);
+        public bool CanSave => string.IsNullOrEmpty(Particular)==false && Amount > 0 && string.IsNullOrEmpty(SelectedDeduction?.PONo);
 
         public bool CanShow => ControlsEnabled;
 
