@@ -594,35 +594,36 @@ namespace Project.FC2J.UI.ViewModels
             }
             set
             {
-                _selectedPartner = value;
-
-                NotifyOfPropertyChange(() => SelectedPartner);
-                SelectedPaymentType = null;
-                if (SelectedPartner != null)
+                if (_selectedPartner != value)
                 {
-                    var existingPaymentType = Payments.FirstOrDefault(x => x.Id == _selectedPartner.PaymentTypeId);
-                    SelectedPaymentType = existingPaymentType;
+                    _selectedPartner = value;
+
+                    NotifyOfPropertyChange(() => SelectedPartner);
+                    DeliveryDate = DateTime.Now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    SelectedPaymentType = null;
+                    if (SelectedPartner != null)
+                    {
+                        var existingPaymentType = Payments.FirstOrDefault(x => x.Id == _selectedPartner.PaymentTypeId);
+                        SelectedPaymentType = existingPaymentType;
+                    }
+                    NotifyOfPropertyChange(() => CanCheckOut);
+                    NotifyOfPropertyChange(() => CanValidateSale);
+
+                    NotifyOfPropertyChange(() => Brgy);
+                    NotifyOfPropertyChange(() => City);
+                    NotifyOfPropertyChange(() => PriceListId);
+                    NotifyOfPropertyChange(() => PriceList);
+
+                    _events.Publish("SelectedPartner Changed", action =>
+                    {
+                        Task.Factory.StartNew(OnLoadProducts());
+                    });
+
+                    NotifyOfPropertyChange(() => ProductsControlEnabled);
+                    NotifyOfPropertyChange(() => ItemQuantityEnabled);
+                    NotifyOfPropertyChange(() => CanShowPriceList);
+                    NotifyOfPropertyChange(() => CanShowDeduction);
                 }
-                NotifyOfPropertyChange(() => CanCheckOut);
-                NotifyOfPropertyChange(() => CanValidateSale);
-
-                NotifyOfPropertyChange(() => Brgy);
-                NotifyOfPropertyChange(() => City);
-                NotifyOfPropertyChange(() => PriceListId);
-                NotifyOfPropertyChange(() => PriceList);
-
-                _events.Publish("SelectedPartner Changed", action =>
-                {
-                    Task.Factory.StartNew(OnLoadProducts());
-                });
-
-                NotifyOfPropertyChange(() => ProductsControlEnabled);
-                NotifyOfPropertyChange(() => ItemQuantityEnabled);
-                NotifyOfPropertyChange(() => CanShowPriceList);
-                NotifyOfPropertyChange(() => CanShowDeduction);
-
-
-
             }
         }
 
@@ -655,35 +656,11 @@ namespace Project.FC2J.UI.ViewModels
                 _selectedPaymentType = value;
                 NotifyOfPropertyChange(() => SelectedPaymentType);
                 NotifyOfPropertyChange(() => CanCheckOut);
-                CalculateDeliveryDate();
+                CalculateDueDate();
             }
         }
 
-        private void CalculateDeliveryDate()
-        {
-            DeliveryDate = DateTime.Now.ToString("MM/dd/yyyy",
-                System.Globalization.CultureInfo.InvariantCulture);
-
-            if (_selectedPaymentType != null)
-            {
-                try
-                {
-                    if (!_selectedPaymentType.PaymentType.ToLower().Equals("immediate payment"))
-                    {
-                        var d = Convert.ToInt32(_selectedPaymentType.PaymentType.ToLower().Replace(" days", ""));
-                        DeliveryDate = DateTime.Now.AddDays(d).ToString("MM/dd/yyyy",
-                            System.Globalization.CultureInfo.InvariantCulture);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    ErrorMessage = $"SelectedPaymentType: {ex.Message}";
-                }
-            }
-            //DueDate = DeliveryDate;
-
-        }
+       
 
         private ProductDisplayModel _selectedProduct;
 
@@ -838,16 +815,40 @@ namespace Project.FC2J.UI.ViewModels
                     _deliveryDate = value;
                     NotifyOfPropertyChange(() => DeliveryDate);
                     NotifyOfPropertyChange(() => CanValidateSale);
-                    try
-                    {
-                        DueDate = Convert.ToDateTime(_deliveryDate).ToShortDateString();
-                    }
-                    catch (Exception e)
-                    {
-                        DueDate = string.Empty;
-                    }
+                    CalculateDueDate();
                 }
             }
+        }
+
+        private void CalculateDueDate()
+        {
+            
+            if (_selectedPaymentType != null)
+            {
+                try
+                {
+                    if (!_selectedPaymentType.PaymentType.ToLower().Equals("immediate payment"))
+                    {
+                        var d = Convert.ToInt32(_selectedPaymentType.PaymentType.ToLower().Replace(" days", ""));
+                        DueDate = Convert.ToDateTime(DeliveryDate).AddDays(d).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        DueDate = Convert.ToDateTime(DeliveryDate).ToShortDateString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    ErrorMessage = $"SelectedPaymentType: {ex.Message}";
+                }
+            }
+            else
+            {
+                DueDate = DeliveryDate;
+            }
+            
+
         }
 
         private string _dueDate;

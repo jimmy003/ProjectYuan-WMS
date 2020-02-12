@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using AutoMapper;
@@ -44,7 +45,15 @@ namespace Project.FC2J.UI.ViewModels
             PrintDialog printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
-                printDialog.PrintVisual(_toPrint, "Sales Order");
+                try
+                {
+                    printDialog.PrintVisual(_toPrint, "Sales Order");
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"{e.Message}","Printing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                
             }
         }
 
