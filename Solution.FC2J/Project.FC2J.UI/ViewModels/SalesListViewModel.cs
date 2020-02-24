@@ -347,6 +347,7 @@ namespace Project.FC2J.UI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => TotalQuantity);
+            
             NotifyOfPropertyChange(() => TotalQuantityUOMComputed);
             NotifyOfPropertyChange(() => CanCheckOut);
             NotifyOfPropertyChange(() => StockQuantity);
@@ -952,6 +953,7 @@ namespace Project.FC2J.UI.ViewModels
 
        
         public string SubTotal => "P" + CalculateSubTotal().ToString("C").Substring(1);
+
         private decimal CalculateSubTotal()
         {
             decimal subTotal = 0;
@@ -1187,6 +1189,7 @@ namespace Project.FC2J.UI.ViewModels
             NotifyOfPropertyChange(() => Deductions);
             NotifyOfPropertyChange(() => PickupDiscount);
             NotifyOfPropertyChange(() => SubTotal);
+            
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             

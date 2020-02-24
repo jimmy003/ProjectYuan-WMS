@@ -638,6 +638,9 @@
                                             <DataGridTextColumn Header="Sub Total"
                                                                 Binding="{Binding SubTotal, StringFormat=N2}"
                                                                 IsReadOnly="True" />
+                                            <DataGridTextColumn Header="Net Price"
+                                                                Binding="{Binding NetPrice, StringFormat=N2}"
+                                                                IsReadOnly="True" />
                                         </DataGrid.Columns>
                                     </DataGrid>
 
