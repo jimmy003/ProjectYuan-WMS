@@ -41,6 +41,7 @@ namespace Project.FC2J.UI.ViewModels
        
         public void Print(object source)
         {
+            
             EnumVisual((Visual)this.GetView());
             PrintDialog printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
@@ -59,7 +60,7 @@ namespace Project.FC2J.UI.ViewModels
 
         public static void EnumVisual(Visual myVisual)
         {
-            
+            _toPrint = null;
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(myVisual); i++)
             {
                 // Retrieve child visual at specified index value.
