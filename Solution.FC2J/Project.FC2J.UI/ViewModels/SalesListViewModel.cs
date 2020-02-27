@@ -2368,8 +2368,10 @@ namespace Project.FC2J.UI.ViewModels
             }
             else if (OrderStatusId != 3)
             {
+                
                 IsDeductionControlsVisible = true;
                 await LoadDeductions();
+
                 _usedDeductions.ForEach(item =>
                 {
                     var _newDeduction = new Deduction
@@ -2380,10 +2382,20 @@ namespace Project.FC2J.UI.ViewModels
                         PONo = item.PONo,
                         UsedAmount = item.UsedAmount,
                     };
-                    _allDeductions.Add(_newDeduction);
-                    var deduction = _mapper.Map<DeductionDisplayModel>(_newDeduction);
-                    deduction.IsChecked = true;
-                    DeductionsList.Add(deduction);
+
+                    var deductionItem = DeductionsList.FirstOrDefault(i => i.PONo == item.PONo);
+                    if (deductionItem != null)
+                    {
+                        deductionItem.IsChecked = true;
+                    }
+                    else
+                    {
+                        _allDeductions.Add(_newDeduction);
+                        var deduction = _mapper.Map<DeductionDisplayModel>(_newDeduction);
+                        deduction.IsChecked = true;
+                        DeductionsList.Add(deduction);
+                    }
+
                 });
 
                 

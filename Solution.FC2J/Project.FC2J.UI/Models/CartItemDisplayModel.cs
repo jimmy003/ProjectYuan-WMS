@@ -158,7 +158,8 @@ namespace Project.FC2J.UI.Models
             {
                 decimal subTotal = 0;
                 subTotal = (Product.DeductionFixPrice > 0 ? Product.DeductionFixPrice : Product.SalePrice) * (decimal)CartQuantity;
-                subTotal -= (Outright - Promo - (decimal)Discount);
+                decimal deduction = (Outright + Promo + (decimal)Discount) * (decimal)CartQuantity;
+                subTotal -= deduction;
                 return subTotal;
             }
         }

@@ -99,6 +99,7 @@ namespace Project.FC2J.UI.ViewModels
             IsSubmitted = false;
             RetrieveLabel = "RETRIEVE";
             IsDeliveredAll = false;
+            SubmitLabel = "SUBMIT";
             Id = 0;
         }
 
@@ -218,7 +219,7 @@ namespace Project.FC2J.UI.ViewModels
                     Quantity = cartItemDisplayModel.CartQuantity,
                     Name = cartItemDisplayModel.Product.Name,
                     Category = cartItemDisplayModel.Product.Category,
-                    SalePrice = cartItemDisplayModel.Product.CostPrice,
+                    SalePrice = cartItemDisplayModel.Product.SalePrice,
                     UnitDiscount = cartItemDisplayModel.Product.UnitDiscount,
                     UnitOfMeasure = cartItemDisplayModel.Product.UnitOfMeasure,
                     SFAUnitOfMeasure = cartItemDisplayModel.Product.SFAUnitOfMeasure,
