@@ -260,7 +260,8 @@
                                     <StackPanel>
                                         <Grid>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                                <TextBlock Text="Sales Order" FontSize="30" Margin="0 0 0 5"/>
+                                                <TextBlock Text="Sales Order" 
+                                                           FontSize="30" Margin="0 0 0 5"/>
                                                 <TextBlock Text="#" Foreground="Gray"
                                                            Visibility="{Binding IsSalesId, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                                                            Margin="4,0,0,0" HorizontalAlignment="Left"/>
@@ -293,8 +294,17 @@
                                             <TextBlock Text="Invoice No:" Margin="0 5" Width="200" />
                                             <TextBlock x:Name="InvoiceNo" Text="INV " Margin="10,5,0,5" Width="200" />
                                         </StackPanel>
-
-                                        <TextBox x:Name="PONo" materialDesign:HintAssist.Hint="PO Number" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 5" Width="200" HorizontalAlignment="Left"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox x:Name="PONo" 
+                                                 materialDesign:HintAssist.Hint="PO Number" 
+                                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 5" Width="200" HorizontalAlignment="Left"/>
+                                            <Button x:Name="EditPONo" HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFlatButton}" Margin="10,0,0,0">
+                                                <Grid>
+                                                    <materialDesign:PackIcon Kind="Edit" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="EDIT" FontSize="14" HorizontalAlignment="Right" Margin="20 5 0 5"/>
+                                                </Grid>
+                                            </Button>
+                                        </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <editors:AutoCompleteTextBox 

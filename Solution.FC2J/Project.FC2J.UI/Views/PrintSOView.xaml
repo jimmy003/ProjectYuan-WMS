@@ -149,12 +149,12 @@
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="45" />
                                                             <ColumnDefinition Width="45" />
-                                                            <ColumnDefinition Width="224" />
-                                                            <ColumnDefinition Width="65" />
-                                                            <ColumnDefinition Width="90" />
+                                                            <ColumnDefinition Width="259" />
+                                                            <ColumnDefinition Width="60" />
+                                                            <ColumnDefinition Width="60" />
                                                         </Grid.ColumnDefinitions>
                                                         <Grid.RowDefinitions>
-                                                            <RowDefinition Height="10"/>
+                                                            <RowDefinition Height="13"/>
                                                         </Grid.RowDefinitions>
                                                         <TextBlock Grid.Row="0" Grid.Column="0" Style="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding OrderQuantity, StringFormat=N2}" />
                                                         <TextBlock Grid.Row="0" Grid.Column="1" Style="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding ProductUnitOfMeasure}"/>

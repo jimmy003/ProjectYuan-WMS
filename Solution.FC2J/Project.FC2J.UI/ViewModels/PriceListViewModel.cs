@@ -81,6 +81,30 @@ namespace Project.FC2J.UI.ViewModels
 
             Pricelists = new BindingList<PricelistDisplayModel>(priceLists);
         }
+        private List<Product> allProductRecords = new List<Product>();
+
+        public void FilterProductLists(string value)
+        {
+            List<PricelistProducts> products;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                if (Products.Count != allProductRecords.Count)
+                    products = _mapper.Map<List<PricelistProducts>>(allProductRecords);
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                products = _mapper.Map<List<PricelistProducts>>(allProductRecords.Where(c => c.Name.ToLower().Contains(value.ToLower())));
+            }
+            Products = new ObservableCollection<PricelistProducts>(products);
+            
+        }
+
+        //
 
         private async Task LoadPriceLists()
         {
@@ -139,8 +163,8 @@ namespace Project.FC2J.UI.ViewModels
         {
             try
             {
-                var getProducts = await _productEndpoint.GetList(id);
-                var productsMap = _mapper.Map<List<PricelistProducts>>(getProducts);
+                allProductRecords = await _productEndpoint.GetList(id);
+                var productsMap = _mapper.Map<List<PricelistProducts>>(allProductRecords);
                 Products = new ObservableCollection<PricelistProducts>(productsMap);
 
             }

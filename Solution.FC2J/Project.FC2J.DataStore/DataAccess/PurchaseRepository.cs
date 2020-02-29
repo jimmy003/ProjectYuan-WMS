@@ -359,8 +359,8 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@ProductId", detail.ProductId),
                     new SqlParameter("@IsDelivered", detail.IsDelivered),
                     new SqlParameter("@DeliveredUser", value.PoHeader.UserName),
-                    new SqlParameter("@Quantity", detail.Quantity) //this will update StockQuantity of Product if the Delivered
-
+                    new SqlParameter("@Quantity", detail.Quantity), //this will update StockQuantity of Product if the Delivered
+                    new SqlParameter("@SupplierId", supplierId)
                 };
                 await _spUpdatePurchaseDetail.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 

@@ -426,6 +426,7 @@ namespace Project.FC2J.UI.ViewModels
                 NotifyOfPropertyChange(() => IsSalesId);
                 NotifyOfPropertyChange(() => CanValidateSale);
                 NotifyOfPropertyChange(() => PONoEnabled);
+                NotifyOfPropertyChange(() => CanEditPONo);
                 NotifyOfPropertyChange(() => PartnersControlEnabled);
                 NotifyOfPropertyChange(() => SupplierEnabled);
                 NotifyOfPropertyChange(() => DeliveryDateEnabled);
@@ -1210,6 +1211,7 @@ namespace Project.FC2J.UI.ViewModels
                 return output;
             }
         }
+        
 
         public void OnEditDetail()
         {
@@ -1537,6 +1539,21 @@ namespace Project.FC2J.UI.ViewModels
             MessageBox.Show("Sales is validated!", "System Confirmation", MessageBoxButton.OK);
             OrderStatusId = (int)_saleData.Value.OrderStatusId;
 
+        }
+
+        public bool CanEditPONo => string.IsNullOrEmpty(SalesId) == false;
+
+        public async Task EditPONo()
+        {
+            string customerId = _saleData.Value.CustomerId.ToString();
+            string salesId = _saleData.Value.Id.ToString();
+            
+            var adjustPONo = new AdjustPONumber(PONo, customerId, salesId, _saleEndpoint);
+            adjustPONo.ShowDialog();
+
+            PONo = adjustPONo.NewPONo;
+
+            _saleData.Value.PONo = PONo;
         }
 
 

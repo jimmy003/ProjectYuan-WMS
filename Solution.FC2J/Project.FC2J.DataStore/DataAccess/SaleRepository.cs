@@ -20,6 +20,8 @@ namespace Project.FC2J.DataStore.DataAccess
         private readonly string _spUpdateSaleHeader = "UpdateSaleHeader";
         private readonly string _spValidateSaleHeader = "ValidateSaleHeader";
         private readonly string _spGetSales = "GetSales";
+        private readonly string _spUpdatePONo = "UpdatePONo";
+        private readonly string _spGetSalesForPrint = "GetSalesPrint";
         private readonly string _spGetCollections = "GetCollections";
         private readonly string _spGetCollected = "GetCollected";
         private readonly string _spGetSaleDetails = "GetSaleDetails";
@@ -454,6 +456,25 @@ namespace Project.FC2J.DataStore.DataAccess
                     await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
                 }
             }
+        }
+
+        public async Task<List<OrderHeader>> GetSalesForPrint(string userName)
+        {
+            var value = await _spGetSalesForPrint.GetList<OrderHeader>(new SqlParameter("@UserName", userName));
+            return value;
+        }
+
+        public async Task UpdatePONumber(string customerId, string poNo, string newPoNO, long salesId)
+        {
+
+            _sqlParameters = new List<SqlParameter>
+                    {
+                        new SqlParameter("@CustomerId", customerId),
+                        new SqlParameter("@OldPONo", poNo),
+                        new SqlParameter("@NewPONo", newPoNO),
+                        new SqlParameter("@Id", salesId)
+                    };
+            await _spUpdatePONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
         }
     }
 }

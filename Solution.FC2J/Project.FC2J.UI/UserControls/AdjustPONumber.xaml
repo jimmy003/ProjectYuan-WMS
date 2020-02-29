@@ -1,0 +1,46 @@
+﻿<Window x:Class="Project.FC2J.UI.UserControls.AdjustPONumber"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Project.FC2J.UI.UserControls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Adjust PO Number" Height="200" Width="450" WindowStartupLocation="CenterScreen" ContentRendered="Window_ContentRendered" ResizeMode="NoResize">
+    <Grid>
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Border Margin="10" Background="White" Padding="10" CornerRadius="10" MinWidth="330" >
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                </Border.Effect>
+
+                <StackPanel >
+                    <TextBlock Name="OldPONo"  
+                                   Margin="5" FontSize="20" Foreground="Blue"/>
+
+                    <TextBox Name="PONo" PreviewTextInput="PreviewTextInputHandler" DataObject.Pasting="PastingHandler" 
+                             materialDesign:HintAssist.Hint="New PO Number" 
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5" TextChanged="PONo_TextChanged"/>
+
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Name="Close" IsCancel="True" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
+                            <Grid>
+                                <materialDesign:PackIcon Kind="XamarinOutline" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="CLOSE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+                        <Button Name="Save" IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="10,0,4,0" Click="Save_Click">
+                            <Grid>
+                                <materialDesign:PackIcon Kind="ContentSave" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <TextBlock Text="SAVE" FontSize="10" Margin="20,5,0,5" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</Window>

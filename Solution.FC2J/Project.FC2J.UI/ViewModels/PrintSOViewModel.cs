@@ -92,7 +92,7 @@ namespace Project.FC2J.UI.ViewModels
 
         private async Task LoadSales()
         {
-            var salesList = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
+            var salesList = await _saleEndpoint.GetSalesForPrint(_loggedInUser.User.UserName.ToLower());
             var sales = _mapper.Map<List<SalesDisplayModel>>(salesList);
             Sales = new BindingList<SalesDisplayModel>(sales);
         }
