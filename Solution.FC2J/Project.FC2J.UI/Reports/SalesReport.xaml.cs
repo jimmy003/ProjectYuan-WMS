@@ -104,6 +104,47 @@ namespace Project.FC2J.UI.Reports
             var mainDataSet = new DataSet("Mainreport");
             mainDataSet.Tables.Add(dtCustomerAccountSummary);
 
+            #region Aggregation of columns
+            
+            var totalC = 0m;
+            var totalE = 0m;
+            var totalF = 0m;
+            var totalG = 0m;
+
+            var columnA = 0;
+            var columnC = 2;
+            var columnE = 4;
+            var columnF = 5;
+            var columnG = 6;
+
+            var dr = dtCustomerAccountSummary.NewRow(); //Create New Row
+            dr[0] = "TOTAL ==>"; // Set Column Value
+            dtCustomerAccountSummary.Rows.Add(dr); 
+
+            //C, E, F, G
+            foreach (DataRow row in dtCustomerAccountSummary.Rows)
+            {
+                if (row[columnA].ToString().Equals("TOTAL ==>"))
+                {
+                    row[columnC] = totalC;
+                    row[columnE] = totalE;
+                    row[columnF] = totalF;
+                    row[columnG] = totalG;
+                }
+                else
+                {
+                    if(row[columnC] != DBNull.Value)
+                        totalC += Convert.ToDecimal(row[columnC]);
+                    if (row[columnE] != DBNull.Value)
+                        totalE += Convert.ToDecimal(row[columnE]);
+                    if (row[columnF] != DBNull.Value)
+                        totalF += Convert.ToDecimal(row[columnF]);
+                    if (row[columnG] != DBNull.Value)
+                        totalG += Convert.ToDecimal(row[columnG]);
+                }
+            }
+            #endregion
+
             await SaveToFile(reportParameter, mainDataSet);
 
             GeneratedMTDSales.Text = _mtdSalesFilename;
