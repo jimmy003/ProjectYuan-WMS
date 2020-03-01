@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -173,8 +174,200 @@ namespace Project.FC2J.UI.Reports
 
                 var vatExempt = await _reportEndpoint.GetPurchasesReportMonthlyVatExempt(reportParameter);
                 vatExempt.TableName = "VATEXEMPT";
+
                 var vatable = await _reportEndpoint.GetPurchasesReportMonthlyVatable(reportParameter);
                 vatable.TableName = "VATABLE";
+
+                #region Aggregation of VATEXEMPT
+                if(vatExempt.Rows.Count > 0)
+                {
+                    var totalC = 0m;
+                    var totalD = 0m;
+                    var totalE = 0m;
+                    var totalF = 0m;
+                    var totalG = 0m;
+                    var totalAmount = 0m;
+                    var purchaseDate = string.Empty;
+
+                    var columnPurchaseDate = 0;
+
+                    var columnAmount = 2;
+                    var columnTotalAmount = 3;
+                    var columnWtax = 4;
+                    var columnNotConverted = 5;
+                    var columnConverted = 6;
+
+                    var dr = vatExempt.NewRow(); //Create New Row
+                    dr[0] = "TOTAL ==>"; // Set Column Value
+                    vatExempt.Rows.Add(dr);
+
+                    DataRow previousRow = null;
+                    //C, E, F, G
+                    foreach (DataRow row in vatExempt.Rows)
+                    {
+
+                        if (row[columnPurchaseDate].ToString().Equals("TOTAL ==>"))
+                        {
+                            previousRow[columnTotalAmount] = totalAmount;
+                            totalD += totalAmount;
+
+                            row[columnAmount] = totalC;
+                            row[columnTotalAmount] = totalD;
+                            row[columnWtax] = totalE;
+                            row[columnNotConverted] = totalF;
+                            row[columnConverted] = totalG;
+                        }
+                        else
+                        {
+
+                            if (string.IsNullOrEmpty(purchaseDate))
+                            {
+                                purchaseDate = row[columnPurchaseDate].ToString();
+                                if (row[columnAmount] != DBNull.Value)
+                                    totalAmount = Convert.ToDecimal(row[columnAmount]);
+                            }
+                            else
+                            {
+                                if (purchaseDate == row[columnPurchaseDate].ToString())
+                                {
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount += Convert.ToDecimal(row[columnAmount]);
+                                }
+                                else
+                                {
+
+
+                                    previousRow[columnTotalAmount] = totalAmount;
+
+                                    purchaseDate = row[columnPurchaseDate].ToString();
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount = Convert.ToDecimal(row[columnAmount]);
+
+                                }
+                            }
+
+
+                            if (row[columnAmount] != DBNull.Value)
+                                totalC += Convert.ToDecimal(row[columnAmount]);
+                            if (row[columnTotalAmount] != DBNull.Value)
+                                totalD += ParseDecimal(row[columnTotalAmount].ToString());
+                            if (row[columnWtax] != DBNull.Value)
+                                totalE += Convert.ToDecimal(row[columnWtax]);
+                            if (row[columnNotConverted] != DBNull.Value)
+                                totalF += Convert.ToDecimal(row[columnNotConverted]);
+                            if (row[columnConverted] != DBNull.Value)
+                                totalG += Convert.ToDecimal(row[columnConverted]);
+
+
+                        }
+
+                        previousRow = row;
+
+                    }
+                }
+                #endregion
+
+                #region Aggregation of VATABLE
+                if(vatable.Rows.Count > 0)
+                {
+                    var totalC = 0m;
+                    var totalD = 0m;
+                    var totalE = 0m;
+                    var totalF = 0m;
+                    var totalG = 0m;
+                    var totalH = 0m;
+                    var totalI = 0m;
+                    var totalAmount = 0m;
+                    var purchaseDate = string.Empty;
+
+                    var columnPurchaseDate = 0;
+
+                    var columnAmount = 2;
+                    var columnTotalAmount = 3;
+                    var columnVatableSales = 4;
+                    var columnVat = 5;
+                    var columnWtax = 6;
+                    var columnNotConverted = 7;
+                    var columnConverted = 8;
+
+                    var dr = vatable.NewRow(); //Create New Row
+                    dr[0] = "TOTAL ==>"; // Set Column Value
+                    vatable.Rows.Add(dr);
+
+                    DataRow previousRow = null;
+                    
+                    foreach (DataRow row in vatable.Rows)
+                    {
+
+                        if (row[columnPurchaseDate].ToString().Equals("TOTAL ==>"))
+                        {
+                            previousRow[columnTotalAmount] = totalAmount;
+                            totalD += totalAmount;
+
+                            row[columnAmount] = totalC;
+                            row[columnTotalAmount] = totalD;
+                            row[columnVatableSales] = totalE;
+                            row[columnVat] = totalF;
+                            row[columnWtax] = totalG;
+                            row[columnNotConverted] = totalH;
+                            row[columnConverted] = totalI;
+                        }
+                        else
+                        {
+
+                            if (string.IsNullOrEmpty(purchaseDate))
+                            {
+                                purchaseDate = row[columnPurchaseDate].ToString();
+                                if (row[columnAmount] != DBNull.Value)
+                                    totalAmount = Convert.ToDecimal(row[columnAmount]);
+                            }
+                            else
+                            {
+                                if (purchaseDate == row[columnPurchaseDate].ToString())
+                                {
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount += Convert.ToDecimal(row[columnAmount]);
+                                }
+                                else
+                                {
+
+
+                                    previousRow[columnTotalAmount] = totalAmount;
+
+                                    purchaseDate = row[columnPurchaseDate].ToString();
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount = Convert.ToDecimal(row[columnAmount]);
+
+                                }
+                            }
+
+
+                            if (row[columnAmount] != DBNull.Value)
+                                totalC += Convert.ToDecimal(row[columnAmount]);
+                            if (row[columnTotalAmount] != DBNull.Value)
+                                totalD += ParseDecimal(row[columnTotalAmount].ToString());
+
+                            if (row[columnVatableSales] != DBNull.Value)
+                                totalE += ParseDecimal(row[columnVatableSales].ToString());
+                            if (row[columnVat] != DBNull.Value)
+                                totalF += ParseDecimal(row[columnVat].ToString());
+
+                            if (row[columnWtax] != DBNull.Value)
+                                totalG += Convert.ToDecimal(row[columnWtax]);
+                            if (row[columnNotConverted] != DBNull.Value)
+                                totalH += Convert.ToDecimal(row[columnNotConverted]);
+                            if (row[columnConverted] != DBNull.Value)
+                                totalI += Convert.ToDecimal(row[columnConverted]);
+
+
+                        }
+
+                        previousRow = row;
+
+                    }
+                }
+                #endregion
+
 
                 var mainDataSet = new DataSet("Mainreport");
                 mainDataSet.Tables.Add(vatExempt);
@@ -190,6 +383,20 @@ namespace Project.FC2J.UI.Reports
                 MessageBox.Show(e.Message, "Error",MessageBoxButton.OK);
             }
 
+        }
+
+        private decimal ParseDecimal(string value)
+        {
+            decimal number;
+            NumberStyles style;
+            CultureInfo provider;
+
+            style = NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands;
+            provider = new CultureInfo("en-US");
+
+            if (string.IsNullOrEmpty(value)) return 0;
+            number = Decimal.Parse(value, style, provider);
+            return number;
         }
 
         private async Task OnProcessMonthly()
