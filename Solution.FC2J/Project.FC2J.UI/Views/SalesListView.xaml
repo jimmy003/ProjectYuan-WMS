@@ -533,7 +533,7 @@
                                     <DropShadowEffect BlurRadius="30" Color="LightGray" ShadowDepth="0"/>
                                 </Border.Effect>
                                 <StackPanel>
-                                    <TextBlock Text="Details" FontSize="30" Margin="0 0 0 5" Width="410" HorizontalAlignment="Left"/>
+                                    <TextBlock Text="Details" FontSize="30" Margin="0 0 0 5" Width="510" HorizontalAlignment="Left"/>
                                     <StackPanel >
                                         <StackPanel Orientation="Horizontal">
                                             <editors:AutoCompleteTextBox 
@@ -546,7 +546,7 @@
                                                 DisplayMember="Name"
                                                 Provider="{Binding ProductsProvider}"
                                                 ItemTemplate="{StaticResource ResourceKey=ProductTemplate}"
-                                                Margin="5,5,0,5" Width="200" SelectedItem="{Binding SelectedProduct, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}">
+                                                Margin="5,5,0,5" Width="300" SelectedItem="{Binding SelectedProduct, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}">
                                                 <editors:AutoCompleteTextBox.LoadingContent>
                                                     <TextBlock Text="Loading..." Margin="5"  />
                                                 </editors:AutoCompleteTextBox.LoadingContent>

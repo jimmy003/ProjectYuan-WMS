@@ -400,8 +400,15 @@ namespace Project.FC2J.UI.ViewModels
         private async Task LoadProducts()
         {
             var productList = await _customerEndpoint.GetCustomerPriceList(SelectedPartner.Id, Convert.ToInt32(_supplierEnum));
-            var products = _mapper.Map<List<ProductDisplayModel>>(productList);
-            Products = new BindingList<ProductDisplayModel>(products);
+            if(productList.Count > 0 )
+            {
+                var products = _mapper.Map<List<ProductDisplayModel>>(productList);
+                Products = new BindingList<ProductDisplayModel>(products);
+            }
+            else
+            {
+                MessageBox.Show("Selected Partner does not have assigned pricelist", "Pricelist not mapped", MessageBoxButton.OK, MessageBoxImage.Error); 
+            }
         }
 
         private async Task LoadPartners()

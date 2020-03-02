@@ -831,7 +831,7 @@ namespace Project.FC2J.UI.ViewModels
                     .Sum(item => item.CartQuantity);
             }
         }
-        public decimal SubTotal => CalculateSubTotal();
+        public decimal SubTotal => CalculateSubTotal() - CalculateTaxPrice();
         public decimal TaxPrice => CalculateTaxPrice();
 
         private decimal CalculateSubTotal()
@@ -852,12 +852,13 @@ namespace Project.FC2J.UI.ViewModels
                 .Sum(item => item.PoTax);
         }
 
-        public string Total => "P" + CalculateTotal().ToString("C").Substring(1);
+        public string Total => "P" + CalculateTotal().ToString("N4");
 
         private decimal CalculateTotal()
         {
-            return CalculateSubTotal() + CalculateTaxPrice();
+            return CalculateSubTotal();// + CalculateTaxPrice();
         }
+
         private string _deliveryDate;
         public string DeliveryDate
         {
