@@ -105,8 +105,8 @@ namespace Project.FC2J.DataStore.Interfaces
             {
                 new SqlParameter("@Id", productPrice.Id),
                 new SqlParameter("@PriceListId", productPrice.PriceListId),
-                new SqlParameter("@SalePrice", productPrice.SalePrice),
-                new SqlParameter("@UnitDiscount", productPrice.UnitDiscount)
+                new SqlParameter("@SalePrice", productPrice.SalePrice.ToString()),
+                new SqlParameter("@UnitDiscount", productPrice.UnitDiscount.ToString())
             };
             await _spUpdateProductPrice.ExecuteNonQueryAsync(sqlParameters.ToArray());
         }

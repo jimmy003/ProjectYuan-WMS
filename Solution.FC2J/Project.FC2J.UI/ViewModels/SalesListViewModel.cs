@@ -104,11 +104,22 @@ namespace Project.FC2J.UI.ViewModels
 
 
         #region Sales List
+        //private List<Product> allRecords = new List<Product>();
+        //private async Task LoadProducts()
+        //{
+        //    allRecords = await _productEndpoint.GetList();
+        //    var products = _mapper.Map<List<ProductDisplayModel>>(allRecords);
+        //    Products = new ObservableCollection<ProductDisplayModel>(products);
+        //    IsGridVisible = true;
+        //    NotifyOfPropertyChange(() => Count);
+        //}
+
+        private List<OrderHeader> allRecords = new List<OrderHeader>();
 
         private async Task LoadSales()
         {
-            var salesList = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
-            var sales = _mapper.Map<List<SalesDisplayModel>>(salesList);
+            allRecords = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
+            var sales = _mapper.Map<List<SalesDisplayModel>>(allRecords);
             Sales = new ObservableCollection<SalesDisplayModel>(sales);
             await Show("0");
             IsGridVisible = true;
@@ -146,6 +157,49 @@ namespace Project.FC2J.UI.ViewModels
                 _selectedSale = value;
                 NotifyOfPropertyChange(() => SelectedSale);
             }
+        }
+
+        private string _searchInput;
+        public string SearchInput
+        {
+            get { return _searchInput; }
+            set
+            {
+                _searchInput = value;
+                NotifyOfPropertyChange(() => SearchInput);
+            }
+        }
+
+        public async Task FilterLists(string value)
+        {
+            await Task.Run(() =>
+            {
+                List<SalesDisplayModel> sales;
+                SearchInput = value;
+
+                if (string.IsNullOrWhiteSpace(SearchInput))
+                {
+                    if (Sales.Count != allRecords.Count)
+                        sales = _mapper.Map<List<SalesDisplayModel>>(allRecords);
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    sales = _mapper.Map<List<SalesDisplayModel>>(allRecords.Where(c => c.DeliveryDate.ToString("dd/MM/yyyy").Contains(SearchInput)));
+                    if (sales.Count == 0) //by Customer Name
+                    {
+                        sales = _mapper.Map<List<SalesDisplayModel>>(allRecords.Where(c => c.CustomerName.ToLower().Contains(SearchInput.ToLower())));
+                    }
+                    if (sales.Count == 0) //by PO No
+                    {
+                        sales = _mapper.Map<List<SalesDisplayModel>>(allRecords.Where(c => c.PONo.Contains(SearchInput)));
+                    }
+                }
+                Sales = new ObservableCollection<SalesDisplayModel>(sales);
+            });
         }
 
         private ObservableCollection<SalesDisplayModel> _sales;

@@ -266,6 +266,7 @@ namespace Project.FC2J.DataStore.DataAccess
                         await _spUpdateSaleHeader.ExecuteNonQueryAsync(_sqlParameters.ToArray());
                         await ProcessSaleDetails(sale.CustomerId, sale, sale.Id.ToString());
 
+                        //-- reset the deductions using Id only with PONo
                         _sqlParameters = new List<SqlParameter>
                         {
                             new SqlParameter("@t", 9),
@@ -357,8 +358,28 @@ namespace Project.FC2J.DataStore.DataAccess
                             new SqlParameter("@PONo", sale.PONo),
                             new SqlParameter("@OverrideUser", sale.OverrideUser)
                         };
-
                         await _spCancelSaleOrder.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+                        
+                        //Adjust Inventory
+                        _sqlParameters = new List<SqlParameter>
+                        {
+                            new SqlParameter("@PONo", sale.PONo),
+                            new SqlParameter("@CustomerId", sale.CustomerId),
+                            new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
+                        };
+                        await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+                        //-- reset the deductions using Id only with PONo
+                        _sqlParameters = new List<SqlParameter>
+                        {
+                            new SqlParameter("@t", 9),
+                            new SqlParameter("@PONo", sale.PONo),
+                            new SqlParameter("@CustomerId", sale.CustomerId)
+                        };
+                        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+
                         break;
                 }
             }
@@ -419,11 +440,12 @@ namespace Project.FC2J.DataStore.DataAccess
             {
                 _sqlParameters = new List<SqlParameter>
                 {
-                    new SqlParameter("@PONo", sale.PONo)
+                    new SqlParameter("@PONo", sale.PONo),
+                    new SqlParameter("@CustomerId", customerId),
+                    new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
                 };
                 await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
             }
-
             foreach (var item in sale.SaleDetails)
             {
                 _sqlParameters = new List<SqlParameter>
