@@ -496,19 +496,21 @@ namespace Project.FC2J.UI.ViewModels
 
         public async Task DeletePaymentInvoice()
         {
-            if (MessageBox.Show("Are you sure?", $"Delete Payment Invoice ({SelectedPaymentInvoice.InvoiceNo}) Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            var invoiceNo = SelectedPaymentInvoice.InvoiceNo;
+
+            if (MessageBox.Show("Are you sure?", $"Delete Payment Invoice ({invoiceNo}) Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 await _purchaseEndpoint.DeletePayment(SelectedPaymentInvoice.Id, _loggedInUser.User.UserName.ToLower());
-
 
                 MessageBox.Show("Payment Invoice successfully deleted.", "Confirmation", MessageBoxButton.OK);
                 await LoadPaymentInvoices();
 
                 foreach (var cartItemDisplayModel in Cart)
                 {
-                    if (cartItemDisplayModel.InvoiceNo == SelectedPaymentInvoice.InvoiceNo)
+                    if (cartItemDisplayModel.InvoiceNo == invoiceNo)
                         cartItemDisplayModel.InvoiceNo = string.Empty;
                 }
+
 
             }
         }

@@ -16,7 +16,7 @@
              Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="{DynamicResource MaterialDesignFont}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="1000">
+             d:DesignHeight="550" d:DesignWidth="1000">
     <UserControl.Resources>
         <DataTemplate x:Key="ProductTemplate">
             <Grid>
