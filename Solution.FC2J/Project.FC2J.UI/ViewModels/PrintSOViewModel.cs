@@ -90,11 +90,16 @@ namespace Project.FC2J.UI.ViewModels
             await LoadSales();
         }
 
+        public bool IsVisible { get; set; } = false;
+
         private async Task LoadSales()
         {
+            IsVisible = false;
             var salesList = await _saleEndpoint.GetSalesForPrint(_loggedInUser.User.UserName.ToLower());
             var sales = _mapper.Map<List<SalesDisplayModel>>(salesList);
+            IsVisible = true;
             Sales = new BindingList<SalesDisplayModel>(sales);
+            
         }
 
         public SaleSuggestionProvider PONoProvider
@@ -115,6 +120,7 @@ namespace Project.FC2J.UI.ViewModels
                 _sales = value;
                 NotifyOfPropertyChange(() => Sales);
                 NotifyOfPropertyChange(() => PONoProvider);
+                NotifyOfPropertyChange(() => IsVisible);
             }
         }
 

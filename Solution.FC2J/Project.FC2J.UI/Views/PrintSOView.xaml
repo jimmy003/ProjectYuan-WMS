@@ -46,6 +46,7 @@
                                 materialDesign:HintAssist.Hint="PO Number"
                                 CharacterCasing="Upper"
                                 DisplayMember="PONo"
+                                Visibility="{Binding IsVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                                 Provider="{Binding PONoProvider}"
                                 ItemTemplate="{StaticResource ResourceKey=PONoTemplate}"
                                 Margin="15,5,0,5" VerticalAlignment="Center" 

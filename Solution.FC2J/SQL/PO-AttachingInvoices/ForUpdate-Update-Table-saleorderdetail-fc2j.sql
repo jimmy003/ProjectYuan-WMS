@@ -1,0 +1,1 @@
+UPDATE [sale.order.detail].[FC2J] SET InvoiceNo = ''
