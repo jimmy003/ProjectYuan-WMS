@@ -13,7 +13,7 @@ namespace Project.FC2J.DataStore.Interfaces
         Task<PurchaseOrder> Save(PurchaseOrder value, bool isSendEmail);
         Task<POPayment> InsertPayment(POPayment value);
         Task<List<POPayment>> GetPayments(long id);
-        Task DeletePayment(long id, string deletedBy);
+        Task DeletePayment(long id, string deletedBy, string invoiceNo);
         Task InsertInvoiceDetail(long poHeaderId, long productId, string invoiceNo);
         Task<List<PoHeader>> GetPurchases(string userName);
     }

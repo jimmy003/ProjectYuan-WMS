@@ -243,15 +243,16 @@ namespace Project.FC2J.UI.ViewModels
         {
             value = SelectedSale;
 
-            if (value.OrderStatusId <= 3)
-            {
-                await Show("1");
-                await OnShowSalesDetail(value);
-            }
-            else
-            {
-                MessageBox.Show($"Record is {value.OrderStatus} already", "System Information", MessageBoxButton.OK);
-            }
+            await Show("1");
+            await OnShowSalesDetail(value);
+
+            //if (value.OrderStatusId <= 3)
+            //{
+            //}
+            //else
+            //{
+            //    MessageBox.Show($"Record is {value.OrderStatus} already", "System Information", MessageBoxButton.OK);
+            //}
         }
 
         

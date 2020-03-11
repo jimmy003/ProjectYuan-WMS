@@ -82,9 +82,9 @@ namespace Project.FC2J.API.Controllers
         }
 
         [HttpDelete, Route("Payment")]
-        public async Task<IActionResult> DeletePayment(long id, string deletedBy)
+        public async Task<IActionResult> DeletePayment(long id, string deletedBy, string invoiceNo)
         {
-            await _repo.DeletePayment(id, deletedBy);
+            await _repo.DeletePayment(id, deletedBy, invoiceNo);
             return Ok();
         }
 
