@@ -9,6 +9,13 @@ using Project.FC2J.Models.Sale;
 
 namespace Project.FC2J.DataStore.DataAccess
 {
+    public enum CancelledOrReturnedEnum
+    {
+        None =0,
+        Cancelled =1,
+        Returned = 2
+    }
+
     public class SaleRepository : ISaleRepository
     {
         private readonly string _spGetSONo = "GetSONo";
@@ -72,8 +79,23 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@ProductId", _return.ProductId),
                     new SqlParameter("@ReturnQuantity", _return.OrderQuantity)
                 };
-
                 await _spUpdateSaleDetailWithReturns.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+                //Must Create Returned Inventory to negate the made transaction validated/delivered
+                foreach (var item in receiveInvoice.Returns)
+                {
+                    _sqlParameters = new List<SqlParameter>
+                    {
+                        new SqlParameter("@ProductId", item.ProductId),
+                        new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
+                        new SqlParameter("@Quantity", item.OrderQuantity),
+                        new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                        new SqlParameter("@SupplierId", item.SupplierId),
+                        new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Returned)
+                    };
+                    await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                }
+
             }
 
             _sqlParameters = new List<SqlParameter>()
@@ -351,6 +373,7 @@ namespace Project.FC2J.DataStore.DataAccess
 
                     }
                     case 3:
+
                         _sqlParameters = new List<SqlParameter>()
                         {
                             new SqlParameter("@Id", sale.Id),
@@ -360,15 +383,28 @@ namespace Project.FC2J.DataStore.DataAccess
                         };
                         await _spCancelSaleOrder.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
-                        
-                        //Adjust Inventory
-                        _sqlParameters = new List<SqlParameter>
+                        //Must Create Cancelled Inventory to negate the 
+                        foreach (var item in sale.SaleDetails)
                         {
-                            new SqlParameter("@PONo", sale.PONo),
-                            new SqlParameter("@CustomerId", sale.CustomerId),
-                            new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
-                        };
-                        await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                            _sqlParameters = new List<SqlParameter>
+                            {
+                                new SqlParameter("@ProductId", item.ProductId),
+                                new SqlParameter("@CustomerId", sale.CustomerId),
+                                new SqlParameter("@Quantity", item.OrderQuantity),
+                                new SqlParameter("@PONo", sale.PONo),
+                                new SqlParameter("@SupplierId", item.SupplierId),
+                                new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Cancelled)
+                            };
+                            await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                        }
+
+                        //_sqlParameters = new List<SqlParameter>
+                        //{
+                        //    new SqlParameter("@PONo", sale.PONo),
+                        //    new SqlParameter("@CustomerId", sale.CustomerId),
+                        //    new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
+                        //};
+                        //await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
                         //-- reset the deductions using Id only with PONo
                         _sqlParameters = new List<SqlParameter>
