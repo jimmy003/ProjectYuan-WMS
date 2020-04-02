@@ -1347,8 +1347,8 @@ namespace Project.FC2J.UI.ViewModels
             {
                 try
                 {
-
-                    OrderStatusId = 1;
+                    
+                    OrderStatusId = (int)OrderStatusEnum.SUBMITTED; 
                     decimal lessPriceValue;
                     Decimal.TryParse(OtherDeduction?.Replace("P",""), out lessPriceValue);
                     long _id = 0 ;
@@ -1390,8 +1390,7 @@ namespace Project.FC2J.UI.ViewModels
                         UserName = UserName
                     };
 
-                    _saleData.Value.Total =
-                        _saleData.Value.TotalProductSalePrice + _saleData.Value.TotalProductTaxPrice;
+                    _saleData.Value.Total = _saleData.Value.TotalProductSalePrice + _saleData.Value.TotalProductTaxPrice;
 
 
                     var lineNo = 0;
@@ -1400,9 +1399,7 @@ namespace Project.FC2J.UI.ViewModels
                         lineNo++;
 
                         if (_saleData.Value.IsVatable == false)
-                        {
                             _saleData.Value.IsVatable = item.Product.IsTaxable;
-                        }
 
                         var unitPrice = item.Product.DeductionFixPrice > 0 ? item.Product.DeductionFixPrice : item.Product.SalePrice;
                         var taxRate = item.Product.IsTaxable ? _apiAppSetting.TaxRate : 0;
@@ -1411,8 +1408,7 @@ namespace Project.FC2J.UI.ViewModels
 
                         var subTotalProductSalePrice = unitPrice * (decimal)item.CartQuantity;
 
-                        var subTotalProductTaxPrice = subTotalProductSalePrice - Math.Round(subTotalProductSalePrice /
-                                                                             (1 + taxRate), 2) ;
+                        var subTotalProductTaxPrice = subTotalProductSalePrice - Math.Round(subTotalProductSalePrice / (1 + taxRate), 2) ;
 
                         _saleData.Value.SaleDetails.Add(new SaleDetail
                         {
@@ -1592,9 +1588,9 @@ namespace Project.FC2J.UI.ViewModels
         private async Task ProcessValidateSales()
         {
             _saleData.Value.Revalidate = true;
-            _saleData.Value.OrderStatusId = 2;
-            if (IsPickup)
-                _saleData.Value.OrderStatusId = (long)OrderStatusEnum.DELIVERED;
+            _saleData.Value.OrderStatusId = (long)OrderStatusEnum.VALIDATED;
+            //if (IsPickup)
+            //    _saleData.Value.OrderStatusId = (long)OrderStatusEnum.DELIVERED;
             _saleData.Value.OverrideUser = UserName;
             var id = await _saleEndpoint.PostSale(_saleData.Value);
 
