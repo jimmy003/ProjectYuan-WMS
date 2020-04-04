@@ -208,7 +208,9 @@ namespace Project.FC2J.UI.Reports
 
                         if (row[columnPurchaseDate].ToString().Equals("TOTAL ==>"))
                         {
-                            previousRow[columnTotalAmount] = totalAmount;
+                            if(previousRow != null)
+                                previousRow[columnTotalAmount] = totalAmount;
+
                             totalD += totalAmount;
 
                             row[columnAmount] = totalC;
@@ -236,8 +238,11 @@ namespace Project.FC2J.UI.Reports
                                 else
                                 {
 
+                                    if(previousRow != null)
+                                        previousRow[columnTotalAmount] = totalAmount;
 
-                                    previousRow[columnTotalAmount] = totalAmount;
+                                    if (row[columnTotalAmount] != DBNull.Value)
+                                        totalD += totalAmount;  
 
                                     purchaseDate = row[columnPurchaseDate].ToString();
                                     if (row[columnAmount] != DBNull.Value)
@@ -249,8 +254,6 @@ namespace Project.FC2J.UI.Reports
 
                             if (row[columnAmount] != DBNull.Value)
                                 totalC += Convert.ToDecimal(row[columnAmount]);
-                            if (row[columnTotalAmount] != DBNull.Value)
-                                totalD += ParseDecimal(row[columnTotalAmount].ToString());
                             if (row[columnWtax] != DBNull.Value)
                                 totalE += Convert.ToDecimal(row[columnWtax]);
                             if (row[columnNotConverted] != DBNull.Value)
@@ -319,7 +322,7 @@ namespace Project.FC2J.UI.Reports
                             {
                                 purchaseDate = row[columnPurchaseDate].ToString();
                                 if (row[columnAmount] != DBNull.Value)
-                                    totalAmount = Convert.ToDecimal(row[columnAmount]);
+                                    totalAmount += Convert.ToDecimal(row[columnAmount]);
                             }
                             else
                             {
@@ -334,6 +337,9 @@ namespace Project.FC2J.UI.Reports
 
                                     previousRow[columnTotalAmount] = totalAmount;
 
+                                    if (row[columnTotalAmount] != DBNull.Value)
+                                        totalD += totalAmount;
+
                                     purchaseDate = row[columnPurchaseDate].ToString();
                                     if (row[columnAmount] != DBNull.Value)
                                         totalAmount = Convert.ToDecimal(row[columnAmount]);
@@ -344,8 +350,6 @@ namespace Project.FC2J.UI.Reports
 
                             if (row[columnAmount] != DBNull.Value)
                                 totalC += Convert.ToDecimal(row[columnAmount]);
-                            if (row[columnTotalAmount] != DBNull.Value)
-                                totalD += ParseDecimal(row[columnTotalAmount].ToString());
 
                             if (row[columnVatableSales] != DBNull.Value)
                                 totalE += ParseDecimal(row[columnVatableSales].ToString());

@@ -343,6 +343,12 @@ namespace Project.FC2J.UI.Helpers.Excel
                                 || col.ToUpper().Equals("POSITION")
                     ? CellValues.String : CellValues.Number;
             }
+            else if (reportTypeEnum == ReportTypeEnum.PurchasesMonthlyBIR)
+            {
+                cell.DataType = col.Equals("purchaseDate")
+                                || col.Equals("invoiceNo")
+                    ? CellValues.String : CellValues.Number;
+            }
             else if (reportTypeEnum == ReportTypeEnum.PurchasesMTDFeeds)
             {
                 cell.DataType = col.ToUpper().Equals("SUPPLIERNAME") ? CellValues.String : CellValues.Number;
