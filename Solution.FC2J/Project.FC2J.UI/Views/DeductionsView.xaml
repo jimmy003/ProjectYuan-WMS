@@ -133,56 +133,61 @@
 
         </Border>
 
-        <Border x:Name="ListContainer" Grid.Column="1" Grid.Row="2" 
-                Margin="10" Background="White" Padding="10" CornerRadius="10" >
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
-            </Border.Effect>
 
-            <StackPanel>
+        <Grid Grid.Column="1" Grid.Row="2" >
 
-                <Grid>
-                    <materialDesign:PackIcon Kind="Search" VerticalAlignment="Bottom" Margin="13,0,2,8" Panel.ZIndex="1000" />
-                    <TextBox Padding="15,0,30,0" Name="SearchInput" 
-                             cal:Message.Attach="[DelayedEvent TextChanged] = [Action FilterLists(SearchInput.Text)]"
-                             VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="13,5,0,5" Width="198" Height="20"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                </Grid>
+            <Grid Grid.Row="0">
+                <materialDesign:PackIcon Kind="Search" VerticalAlignment="Bottom" Margin="13,0,2,8" Panel.ZIndex="1000" />
+                <TextBox Padding="15,0,30,0" Name="SearchInput" 
+                                 cal:Message.Attach="[DelayedEvent TextChanged] = [Action FilterLists(SearchInput.Text)]"
+                                 VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="13,5,0,5" Width="198" Height="20"/>
 
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+
+                <Border Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                    </Border.Effect>
+
                     <StackPanel>
                         <DataGrid x:Name="Deductions"                 
-                                  CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
-                                  materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
-                                  materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
-                                  SelectedItem="{Binding SelectedDeduction}">
+                                      CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
+                                      materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
+                                      materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
+                                      SelectedItem="{Binding SelectedDeduction}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Particular"
-                                                    Binding="{Binding Path=Particular}"
-                                                    Width="250"
-                                                    IsReadOnly="True" />
+                                                        Binding="{Binding Path=Particular}"
+                                                        Width="250"
+                                                        IsReadOnly="True" />
                                 <DataGridTextColumn Header="Amount"
-                                                    Width="150"
-                                                    Binding="{Binding Path=Amount, StringFormat=N2}" IsReadOnly="True"/>
+                                                        Width="150"
+                                                        Binding="{Binding Path=Amount, StringFormat=N2}" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="PO No"
-                                                    Width="140"
-                                                    Binding="{Binding Path=PONo}" IsReadOnly="True"/>
+                                                        Width="140"
+                                                        Binding="{Binding Path=PONo}" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="Used Amount"
-                                                    Width="150"
-                                                    Binding="{Binding Path=UsedAmount, StringFormat=N2}" IsReadOnly="True"/>
+                                                        Width="150"
+                                                        Binding="{Binding Path=UsedAmount, StringFormat=N2}" IsReadOnly="True"/>
 
                             </DataGrid.Columns>
 
                         </DataGrid>
                     </StackPanel>
 
-                </ScrollViewer>
+                </Border>
 
-            </StackPanel>
+            </ScrollViewer>
 
-            
-
-        </Border>
+        </Grid>
+        
 
     </Grid>
 </UserControl>
