@@ -29,6 +29,7 @@ namespace Project.FC2J.UI.Reports
         private ReportTypeEnum _reportTypeEnum;
         private string _reportTIN;
 
+        private const string _report0 = "BMEG Report";
         private const string _report1 = "Month to Date Sales Report";
         private const string _report2 = "Month to Date Purchases Report";
         private const string _report3 = "Monthly Sales Report (For BIR)";
@@ -59,6 +60,9 @@ namespace Project.FC2J.UI.Reports
             OverlayLoading.Visibility = Visibility.Visible;
             switch (_selectedReport)
             {
+                case _report0:
+                    await OnGenerateBMEGReport();
+                    break;
                 case _report1:
                     await OnGenerateMTDSalesReport();
                     break;
@@ -82,10 +86,40 @@ namespace Project.FC2J.UI.Reports
             Generate.IsEnabled = true;
         }
 
+        private async Task OnGenerateBMEGReport()
+        {
+            var reportParameter = new ProjectReportParameter
+            {
+                DateFrom = DateRangePicker.From,
+                DateTo = DateRangePicker.To
+            };
+
+            var dt = await _reportEndpoint.GetBMEGReport(reportParameter);
+
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show($"Record not found", "System Information", MessageBoxButton.OK);
+                return;
+            }
+
+            dt.TableName = "BMEG_Report";
+
+            dt.DefaultView.Sort = "[Delivery Date], [Customer Name], [LINENO]";
+            dt = dt.DefaultView.ToTable();
+            dt.Columns.Remove("LINENO");
+            var dataset = new DataSet("Mainreport");
+            dataset.Tables.Add(dt);
+
+            await SaveToFile(reportParameter, dataset);
+
+            GeneratedMTDSales.Text = _mtdSalesFilename;
+            ViewMTDSales.Visibility = Visibility.Visible;
+
+
+        }
+
         private async Task OnGenerateCustomerAccountSummaryReport()
         {
-            
-
             var reportParameter = new ProjectReportParameter
             {
                 DateFrom = DateRangePicker.From,
@@ -907,8 +941,14 @@ namespace Project.FC2J.UI.Reports
                     $"CustomerAccountSummaryReport-AsOf-{DateTime.Now.ToString("ddMMMyyyy-hhmmss")}.xlsx";
 
             }
+            else if (_selectedReport == _report0)
+            {
+                _mtdSalesFilename =
+                    $"BMEG-Report-AsOf-{DateTime.Now.ToString("ddMMMyyyy-hhmmss")}.xlsx";
 
-            if (_selectedReport == _report1 || _selectedReport == _report2 || _selectedReport == _report5)
+            }
+
+            if (_selectedReport == _report1 || _selectedReport == _report2 || _selectedReport == _report5 || _selectedReport == _report0)
             {
                 _mtdSalesFolder = Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("ddMMMyyyy");
             }
@@ -1145,10 +1185,20 @@ namespace Project.FC2J.UI.Reports
             ReportLabel.Visibility = Visibility.Collapsed;
             Report1Parameter.Visibility = Visibility.Collapsed;
             Report2Parameter.Visibility = Visibility.Collapsed;
+            IsFeeds.Visibility = Visibility.Visible;
             Generate.IsEnabled = false;
 
             switch (_selectedReport)
             {
+                case _report0:
+                    _reportTypeEnum = ReportTypeEnum.BMEG;
+                    _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
+
+                    IsFeeds.Visibility = Visibility.Collapsed;
+                    Report1Parameter.Visibility = Visibility.Visible;
+                    ViewMTDSales.Visibility = Visibility.Collapsed;
+                    Generate.IsEnabled = true;
+                    break;
                 case _report1:
                     _reportTypeEnum = ReportTypeEnum.SalesMTDFeeds;
                     _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
@@ -1162,7 +1212,6 @@ namespace Project.FC2J.UI.Reports
                     _reportTypeEnum = ReportTypeEnum.PurchasesMTDFeeds;
                     _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
 
-
                     IsFeeds.IsChecked = true;
                     Report1Parameter.Visibility = Visibility.Visible;
                     ViewMTDSales.Visibility = Visibility.Collapsed;
@@ -1171,6 +1220,8 @@ namespace Project.FC2J.UI.Reports
 
                 case _report3:
                     _reportTypeEnum = ReportTypeEnum.SalesMonthlyBIR;
+
+                    IsFeeds.Visibility = Visibility.Collapsed;
                     Report2Parameter.Visibility = Visibility.Visible;
                     Generate.IsEnabled = MonthYearDate.SelectedDate != null;
                     ViewMonthly.Visibility = Visibility.Collapsed;
@@ -1178,6 +1229,7 @@ namespace Project.FC2J.UI.Reports
 
                 case _report4:
                     _reportTypeEnum = ReportTypeEnum.PurchasesMonthlyBIR;
+                    IsFeeds.Visibility = Visibility.Collapsed;
                     Report2Parameter.Visibility = Visibility.Visible;
                     Generate.IsEnabled = MonthYearDate.SelectedDate != null;
                     ViewMonthly.Visibility = Visibility.Collapsed;

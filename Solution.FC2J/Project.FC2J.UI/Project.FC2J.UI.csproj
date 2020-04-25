@@ -252,6 +252,9 @@
     </Compile>
     <Compile Include="Reports\SelectedDateFormatToIsCheckedConverter.cs" />
     <Compile Include="Reports\StyleToIsCheckedConverter.cs" />
+    <Compile Include="ReturnWindow.xaml.cs">
+      <DependentUpon>ReturnWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="UserControls\AdjustInventoryWindow.xaml.cs">
       <DependentUpon>AdjustInventoryWindow.xaml</DependentUpon>
@@ -382,6 +385,10 @@
     <Page Include="Reports\SampleCustomStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ReturnWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\Buttons.xaml">
       <SubType>Designer</SubType>

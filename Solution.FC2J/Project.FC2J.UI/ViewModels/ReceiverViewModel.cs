@@ -141,38 +141,35 @@ namespace Project.FC2J.UI.ViewModels
         {
             return async () =>
             {
-                if (SelectedPONo != null)
+                if (SelectedPONo == null) return;
+                _saleHeader = await _saleEndpoint.GetSaleHeader(SelectedPONo.CustomerId, SelectedPONo.Id);
+                if (_saleHeader != null)
                 {
-                    _saleHeader = await _saleEndpoint.GetSaleHeader(SelectedPONo.CustomerId, SelectedPONo.Id);
-                    if (_saleHeader != null)
-                    {
-                        //initial Order Status, that is 4=Delivered                     
-                        _saleHeader.OrderStatusId = (long)OrderStatusEnum.DELIVERED;
-                    }
-
-                    //store the ordered items
-                    _orderedProducts = await _saleEndpoint.GetSaleDetails(SelectedPONo.Id, SelectedPONo.CustomerId);
-
-                    OnLoadOrderedProducts();
-                    OnClearReturnProducts();
-
-                    NotifyOfPropertyChange(() => DeliveryDate);
-                    NotifyOfPropertyChange(() => Customer);
-                    NotifyOfPropertyChange(() => DueDate);
-                    NotifyOfPropertyChange(() => Address);
-                    NotifyOfPropertyChange(() => PaymentTerms);
-                    NotifyOfPropertyChange(() => SONo);
-                    NotifyOfPropertyChange(() => TotalAmountDue);
-                    NotifyOfPropertyChange(() => VATExemptSales);
-                    NotifyOfPropertyChange(() => PromoDiscount);
-                    NotifyOfPropertyChange(() => PickupDiscount);
-                    NotifyOfPropertyChange(() => CashDiscount);
-                    NotifyOfPropertyChange(() => Outright);
-                    NotifyOfPropertyChange(() => VAT12);
-                    NotifyOfPropertyChange(() => TotalOrderQuantity);
-                    NotifyOfPropertyChange(() => TotalOrderQuantityUOMComputed);
-
+                    //initial Order Status, that is 4=Delivered                     
+                    _saleHeader.OrderStatusId = (long)OrderStatusEnum.DELIVERED;
                 }
+
+                //store the ordered items
+                _orderedProducts = await _saleEndpoint.GetSaleDetails(SelectedPONo.Id, SelectedPONo.CustomerId);
+
+                OnLoadOrderedProducts();
+                OnClearReturnProducts();
+
+                NotifyOfPropertyChange(() => DeliveryDate);
+                NotifyOfPropertyChange(() => Customer);
+                NotifyOfPropertyChange(() => DueDate);
+                NotifyOfPropertyChange(() => Address);
+                NotifyOfPropertyChange(() => PaymentTerms);
+                NotifyOfPropertyChange(() => SONo);
+                NotifyOfPropertyChange(() => TotalAmountDue);
+                NotifyOfPropertyChange(() => VATExemptSales);
+                NotifyOfPropertyChange(() => PromoDiscount);
+                NotifyOfPropertyChange(() => PickupDiscount);
+                NotifyOfPropertyChange(() => CashDiscount);
+                NotifyOfPropertyChange(() => Outright);
+                NotifyOfPropertyChange(() => VAT12);
+                NotifyOfPropertyChange(() => TotalOrderQuantity);
+                NotifyOfPropertyChange(() => TotalOrderQuantityUOMComputed);
 
             };
         }
@@ -397,10 +394,54 @@ namespace Project.FC2J.UI.ViewModels
 
         public void Return()
         {
-            ReturnProducts.Add(SelectedProduct);
-            Products.Remove(SelectedProduct);
 
-            SelectedProduct = null;
+            var dialog = new ReturnWindow
+            {
+                Description = $"{SelectedProduct.ProductName} [Qty]: {SelectedProduct.OrderQuantity}",
+                MaxQuantity = SelectedProduct.OrderQuantity
+            };
+
+            if (dialog.ShowDialog() == false) return;
+
+            try
+            {
+                if (Math.Abs(dialog.EnteredQuantity - SelectedProduct.OrderQuantity) < TOLERANCE)
+                {
+                    ReturnProducts.Add(SelectedProduct);
+                    Products.Remove(SelectedProduct);
+                    SelectedProduct = null;
+                }
+                else
+                {
+
+                    var product = new SaleDetailDisplayModel
+                    {
+                        Id = SelectedProduct.Id,
+                        ProductId = SelectedProduct.ProductId,
+                        SupplierId = SelectedProduct.SupplierId,
+                        Supplier = SelectedProduct.Supplier,
+                        OrderQuantity = dialog.EnteredQuantity,
+                        ProductUnitOfMeasure = SelectedProduct.ProductUnitOfMeasure,
+                        ProductName = SelectedProduct.ProductName,
+                        DeductionFixPrice = SelectedProduct.DeductionFixPrice,
+                        ProductSalePrice = SelectedProduct.ProductSalePrice,
+                        SubTotalProductSalePrice = SelectedProduct.SubTotalProductSalePrice
+                    };
+                    product.SubTotalProductSalePrice = (decimal)product.OrderQuantity * Convert.ToDecimal(product.Price);
+                    ReturnProducts.Add(product);
+
+                    SelectedProduct.OrderQuantity -= dialog.EnteredQuantity;
+                    SelectedProduct.SubTotalProductSalePrice = (decimal)SelectedProduct.OrderQuantity * Convert.ToDecimal(SelectedProduct.Price);
+                }
+
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+
+
         }
 
         public bool CanRemove => SelectedReturnProduct != null;
@@ -409,7 +450,6 @@ namespace Project.FC2J.UI.ViewModels
         {
             Products.Add(SelectedReturnProduct);
             ReturnProducts.Remove(SelectedReturnProduct);
-
             SelectedReturnProduct = null;
         }
 
@@ -444,6 +484,6 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
-
+        public float TOLERANCE { get; private set; } = (float) 0.001;
     }
 }

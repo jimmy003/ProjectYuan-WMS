@@ -67,7 +67,7 @@ namespace Project.FC2J.DataStore.DataAccess
                 new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                 new SqlParameter("@WithReturns", receiveInvoice.Invoice.WithReturns)
             };
-
+            //update Invoice as Received
             await _spManageInvoice.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
             foreach (var _return in receiveInvoice.Returns)
@@ -77,24 +77,25 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                     new SqlParameter("@OrderDetailId", _return.Id),
                     new SqlParameter("@ProductId", _return.ProductId),
+                    new SqlParameter("@SupplierId", _return.SupplierId),
                     new SqlParameter("@ReturnQuantity", _return.OrderQuantity)
                 };
+                //for sale order detail updates 
+                //for product stock quantity updates based on the supplierId
                 await _spUpdateSaleDetailWithReturns.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
-                //Must Create Returned Inventory to negate the made transaction validated/delivered
-                foreach (var item in receiveInvoice.Returns)
+                
+                _sqlParameters = new List<SqlParameter>
                 {
-                    _sqlParameters = new List<SqlParameter>
-                    {
-                        new SqlParameter("@ProductId", item.ProductId),
-                        new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
-                        new SqlParameter("@Quantity", item.OrderQuantity),
-                        new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
-                        new SqlParameter("@SupplierId", item.SupplierId),
-                        new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Returned)
-                    };
-                    await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
-                }
+                    new SqlParameter("@ProductId", _return.ProductId),
+                    new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
+                    new SqlParameter("@Quantity", _return.OrderQuantity),
+                    new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                    new SqlParameter("@SupplierId", _return.SupplierId),
+                    new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Returned)
+                };
+                //for inventory record entry
+                await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
             }
 
@@ -123,11 +124,10 @@ namespace Project.FC2J.DataStore.DataAccess
                 new SqlParameter("@OrderStatusId", receiveInvoice.SaleHeader.OrderStatusId)
 
             };
-
+            //to update the corresponding OrderStatusId DELIVERED=4, DELIVERED_WITH_RETURNS=5, RETURNEDALL=6
             await _spUpdateSaleHeaderWithReturns.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
 
-            //re-set the used deductions in reference to PONo, if all items are returned 
             if (receiveInvoice.SaleHeader.OrderStatusId == (long)OrderStatusEnum.RETURNEDALL )
             {
                 _sqlParameters = new List<SqlParameter>
@@ -136,6 +136,7 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId)
                 };
+                //re-set the used deductions in reference to PONo, if all items are returned 
                 await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
             }
 

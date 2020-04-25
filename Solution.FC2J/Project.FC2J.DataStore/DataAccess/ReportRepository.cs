@@ -32,6 +32,7 @@ namespace Project.FC2J.DataStore.DataAccess
         private readonly string _spGetPurchasesReportMonthlyVatExempt = "GetPurchasesReportMonthlyVatExempt"; 
         private readonly string _spGetPurchasesReportMonthlyVatable = "GetPurchasesReportMonthlyVatable";
         private readonly string _spGetCustomerAccountSummary = "GetCustomerAccountSummary";
+        private readonly string _spGetBmegReport = "GetBmegReport";
         private List<SqlParameter> _sqlParameters;
 
         public async Task<DataTable> GetCustomerAccountSummary(ProjectReportParameter reportParameter)
@@ -43,6 +44,17 @@ namespace Project.FC2J.DataStore.DataAccess
             };
             return await _spGetCustomerAccountSummary.GetDataTable(_sqlParameters.ToArray());
         }
+
+        public async Task<DataTable> GetBMEGReport(ProjectReportParameter reportParameter)
+        {
+            _sqlParameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@FROM", reportParameter.DateFrom.ToString("yyyy-MM-dd")),
+                new SqlParameter("@TO", reportParameter.DateTo.ToString("yyyy-MM-d"))
+            };
+            return await _spGetBmegReport.GetDataTable(_sqlParameters.ToArray());
+        }
+
         public async Task<DataTable> GetPurchasesReportMonthlyVatable(ProjectReportParameter reportParameter)
         {
             _sqlParameters = new List<SqlParameter>()
