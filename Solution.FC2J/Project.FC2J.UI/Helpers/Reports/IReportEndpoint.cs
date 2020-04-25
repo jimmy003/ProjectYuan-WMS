@@ -31,5 +31,6 @@ namespace Project.FC2J.UI.Helpers.Reports
         Task<DataTable> GetPurchasesReportMonthlyVatExempt(ProjectReportParameter reportParameter);
         Task<DataTable> GetPurchasesReportMonthlyVatable(ProjectReportParameter reportParameter);
         Task<DataTable> GetCustomerAccountSummary(ProjectReportParameter reportParameter);
+        Task<DataTable> GetBMEGReport(ProjectReportParameter reportParameter);
     }
 }

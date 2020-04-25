@@ -67,9 +67,9 @@ namespace Project.FC2J.UI.Helpers.Purchase
             return await _apiHelper.GetList<POPayment>(_apiAppSetting.Purchase + $"/Payment?id={id}");
         }
 
-        public async Task DeletePayment(long id, string deletedBy)
+        public async Task DeletePayment(string invoiceNo, long id, string deletedBy)
         {
-            await _apiHelper.Remove(_apiAppSetting.Purchase +  $"/Payment?id={id}&deletedBy={deletedBy}");
+            await _apiHelper.Remove(_apiAppSetting.Purchase +  $"/Payment?id={id}&deletedBy={deletedBy}&invoiceNo={invoiceNo}");
         }
 
         public async Task InsertInvoiceDetail(long poHeaderId, long productId, string invoiceNo)

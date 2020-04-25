@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using AutoMapper;
@@ -40,17 +41,26 @@ namespace Project.FC2J.UI.ViewModels
        
         public void Print(object source)
         {
+            
             EnumVisual((Visual)this.GetView());
             PrintDialog printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
-                printDialog.PrintVisual(_toPrint, "Sales Order");
+                try
+                {
+                    printDialog.PrintVisual(_toPrint, "Sales Order");
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"{e.Message}","Printing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                
             }
         }
 
         public static void EnumVisual(Visual myVisual)
         {
-            
+            _toPrint = null;
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(myVisual); i++)
             {
                 // Retrieve child visual at specified index value.
@@ -80,11 +90,16 @@ namespace Project.FC2J.UI.ViewModels
             await LoadSales();
         }
 
+        public bool IsVisible { get; set; } = false;
+
         private async Task LoadSales()
         {
-            var salesList = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
+            IsVisible = false;
+            var salesList = await _saleEndpoint.GetSalesForPrint(_loggedInUser.User.UserName.ToLower());
             var sales = _mapper.Map<List<SalesDisplayModel>>(salesList);
+            IsVisible = true;
             Sales = new BindingList<SalesDisplayModel>(sales);
+            
         }
 
         public SaleSuggestionProvider PONoProvider
@@ -105,6 +120,7 @@ namespace Project.FC2J.UI.ViewModels
                 _sales = value;
                 NotifyOfPropertyChange(() => Sales);
                 NotifyOfPropertyChange(() => PONoProvider);
+                NotifyOfPropertyChange(() => IsVisible);
             }
         }
 

@@ -67,7 +67,7 @@ namespace Project.FC2J.UI.Helpers.Excel
                                 ResolveCellDataType(table, col, cell, reportTypeEnum);
                                 var value = cell.DataType == CellValues.Number
                                     ? dsrow[col].ToString().Replace(",","")
-                                    : dsrow[col].ToString();
+                                    : dsrow[col].ToString().Replace(" 12:00:00 AM", "");
                                 cell.CellValue = new CellValue(value); //
                                 newRow.AppendChild(cell);
                             }
@@ -342,6 +342,20 @@ namespace Project.FC2J.UI.Helpers.Excel
                                 || col.ToUpper().Equals("SALES PERSONNEL")
                                 || col.ToUpper().Equals("POSITION")
                     ? CellValues.String : CellValues.Number;
+            }
+            else if (reportTypeEnum == ReportTypeEnum.PurchasesMonthlyBIR)
+            {
+                cell.DataType = col.Equals("purchaseDate")
+                                || col.Equals("invoiceNo")
+                    ? CellValues.String : CellValues.Number;
+            }
+            else if (reportTypeEnum == ReportTypeEnum.BMEG)
+            {
+                cell.DataType = col.ToLower().Equals("order quantity") || col.ToLower().Equals("product sale price") ? CellValues.Number : CellValues.String;
+                //if (col.ToLower().Equals("delivery date"))
+                //    cell.DataType = CellValues.Date;
+                //else
+                    
             }
             else if (reportTypeEnum == ReportTypeEnum.PurchasesMTDFeeds)
             {

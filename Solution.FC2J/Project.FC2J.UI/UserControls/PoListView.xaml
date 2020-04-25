@@ -52,7 +52,7 @@
                                                         Binding="{Binding Path=PONo}" IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Total Amount"
-                                                                    Binding="{Binding Path=Total, StringFormat=N2}"
+                                                                    Binding="{Binding Path=Total, StringFormat=N4}"
                                                                     IsReadOnly="True" />
                                     <DataGridTextColumn Header="Delivery Date"
                                                                     Binding="{Binding Path=DeliveryDate, StringFormat=d, ConverterCulture=en-GB}"

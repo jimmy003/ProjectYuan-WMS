@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Project.FC2J.UI.Helpers
 {
@@ -13,6 +11,13 @@ namespace Project.FC2J.UI.Helpers
         {
             Thread.Sleep(value * 1000);
             return true;
+        }
+
+        public static T CloneObject<T>(this object source)
+        {
+            T result = Activator.CreateInstance<T>();
+            //// **** made things  
+            return result;
         }
 
     }

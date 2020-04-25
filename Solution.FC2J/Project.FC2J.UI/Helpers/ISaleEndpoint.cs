@@ -12,6 +12,7 @@ namespace Project.FC2J.UI.Helpers
         Task<string> GetSONo();
         Task<SalesInvoice> GetInvoiceNo();
         Task<List<OrderHeader>> GetSales(string userName);
+        Task<List<OrderHeader>> GetSalesForPrint(string userName);
         Task<List<OrderHeader>> GetCollection(string userName);
         Task<List<OrderHeader>> GetCollected(string userName, int isPaid);
         Task<List<SaleDetail>> GetSaleDetails(long valueId, long customerId);
@@ -20,7 +21,6 @@ namespace Project.FC2J.UI.Helpers
         Task<SaleHeader> GetSaleHeader(long customerId, long id);
         Task PayInvoice(SalePayment salePayment);
         Task RetrievePaidBadSale(SalePayment salePayment);
-
-       
+        Task UpdatePONumber(string customerId, string _poNo, string _newPoNO, long salesId);
     }
 }

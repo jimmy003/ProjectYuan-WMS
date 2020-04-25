@@ -104,11 +104,22 @@ namespace Project.FC2J.UI.ViewModels
 
 
         #region Sales List
+        //private List<Product> allRecords = new List<Product>();
+        //private async Task LoadProducts()
+        //{
+        //    allRecords = await _productEndpoint.GetList();
+        //    var products = _mapper.Map<List<ProductDisplayModel>>(allRecords);
+        //    Products = new ObservableCollection<ProductDisplayModel>(products);
+        //    IsGridVisible = true;
+        //    NotifyOfPropertyChange(() => Count);
+        //}
+
+        private List<OrderHeader> allRecords = new List<OrderHeader>();
 
         private async Task LoadSales()
         {
-            var salesList = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
-            var sales = _mapper.Map<List<SalesDisplayModel>>(salesList);
+            allRecords = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
+            var sales = _mapper.Map<List<SalesDisplayModel>>(allRecords);
             Sales = new ObservableCollection<SalesDisplayModel>(sales);
             await Show("0");
             IsGridVisible = true;
@@ -146,6 +157,49 @@ namespace Project.FC2J.UI.ViewModels
                 _selectedSale = value;
                 NotifyOfPropertyChange(() => SelectedSale);
             }
+        }
+
+        private string _searchInput;
+        public string SearchInput
+        {
+            get { return _searchInput; }
+            set
+            {
+                _searchInput = value;
+                NotifyOfPropertyChange(() => SearchInput);
+            }
+        }
+
+        public async Task FilterLists(string value)
+        {
+            await Task.Run(() =>
+            {
+                List<SalesDisplayModel> sales;
+                SearchInput = value;
+
+                if (string.IsNullOrWhiteSpace(SearchInput))
+                {
+                    if (Sales.Count != allRecords.Count)
+                        sales = _mapper.Map<List<SalesDisplayModel>>(allRecords);
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    sales = _mapper.Map<List<SalesDisplayModel>>(allRecords.Where(c => c.DeliveryDate.ToString("dd/MM/yyyy").Contains(SearchInput)));
+                    if (sales.Count == 0) //by Customer Name
+                    {
+                        sales = _mapper.Map<List<SalesDisplayModel>>(allRecords.Where(c => c.CustomerName.ToLower().Contains(SearchInput.ToLower())));
+                    }
+                    if (sales.Count == 0) //by PO No
+                    {
+                        sales = _mapper.Map<List<SalesDisplayModel>>(allRecords.Where(c => c.PONo.Contains(SearchInput)));
+                    }
+                }
+                Sales = new ObservableCollection<SalesDisplayModel>(sales);
+            });
         }
 
         private ObservableCollection<SalesDisplayModel> _sales;
@@ -189,15 +243,16 @@ namespace Project.FC2J.UI.ViewModels
         {
             value = SelectedSale;
 
-            if (value.OrderStatusId <= 3)
-            {
-                await Show("1");
-                await OnShowSalesDetail(value);
-            }
-            else
-            {
-                MessageBox.Show($"Record is {value.OrderStatus} already", "System Information", MessageBoxButton.OK);
-            }
+            await Show("1");
+            await OnShowSalesDetail(value);
+
+            //if (value.OrderStatusId <= 3)
+            //{
+            //}
+            //else
+            //{
+            //    MessageBox.Show($"Record is {value.OrderStatus} already", "System Information", MessageBoxButton.OK);
+            //}
         }
 
         
@@ -347,6 +402,7 @@ namespace Project.FC2J.UI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => TotalQuantity);
+            
             NotifyOfPropertyChange(() => TotalQuantityUOMComputed);
             NotifyOfPropertyChange(() => CanCheckOut);
             NotifyOfPropertyChange(() => StockQuantity);
@@ -399,8 +455,15 @@ namespace Project.FC2J.UI.ViewModels
         private async Task LoadProducts()
         {
             var productList = await _customerEndpoint.GetCustomerPriceList(SelectedPartner.Id, Convert.ToInt32(_supplierEnum));
-            var products = _mapper.Map<List<ProductDisplayModel>>(productList);
-            Products = new BindingList<ProductDisplayModel>(products);
+            if(productList.Count > 0 )
+            {
+                var products = _mapper.Map<List<ProductDisplayModel>>(productList);
+                Products = new BindingList<ProductDisplayModel>(products);
+            }
+            else
+            {
+                MessageBox.Show("Selected Partner does not have assigned pricelist", "Pricelist not mapped", MessageBoxButton.OK, MessageBoxImage.Error); 
+            }
         }
 
         private async Task LoadPartners()
@@ -425,6 +488,7 @@ namespace Project.FC2J.UI.ViewModels
                 NotifyOfPropertyChange(() => IsSalesId);
                 NotifyOfPropertyChange(() => CanValidateSale);
                 NotifyOfPropertyChange(() => PONoEnabled);
+                NotifyOfPropertyChange(() => CanEditPONo);
                 NotifyOfPropertyChange(() => PartnersControlEnabled);
                 NotifyOfPropertyChange(() => SupplierEnabled);
                 NotifyOfPropertyChange(() => DeliveryDateEnabled);
@@ -594,35 +658,36 @@ namespace Project.FC2J.UI.ViewModels
             }
             set
             {
-                _selectedPartner = value;
-
-                NotifyOfPropertyChange(() => SelectedPartner);
-                SelectedPaymentType = null;
-                if (SelectedPartner != null)
+                if (_selectedPartner != value)
                 {
-                    var existingPaymentType = Payments.FirstOrDefault(x => x.Id == _selectedPartner.PaymentTypeId);
-                    SelectedPaymentType = existingPaymentType;
+                    _selectedPartner = value;
+
+                    NotifyOfPropertyChange(() => SelectedPartner);
+                    DeliveryDate = DateTime.Now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    SelectedPaymentType = null;
+                    if (SelectedPartner != null)
+                    {
+                        var existingPaymentType = Payments.FirstOrDefault(x => x.Id == _selectedPartner.PaymentTypeId);
+                        SelectedPaymentType = existingPaymentType;
+                    }
+                    NotifyOfPropertyChange(() => CanCheckOut);
+                    NotifyOfPropertyChange(() => CanValidateSale);
+
+                    NotifyOfPropertyChange(() => Brgy);
+                    NotifyOfPropertyChange(() => City);
+                    NotifyOfPropertyChange(() => PriceListId);
+                    NotifyOfPropertyChange(() => PriceList);
+
+                    _events.Publish("SelectedPartner Changed", action =>
+                    {
+                        Task.Factory.StartNew(OnLoadProducts());
+                    });
+
+                    NotifyOfPropertyChange(() => ProductsControlEnabled);
+                    NotifyOfPropertyChange(() => ItemQuantityEnabled);
+                    NotifyOfPropertyChange(() => CanShowPriceList);
+                    NotifyOfPropertyChange(() => CanShowDeduction);
                 }
-                NotifyOfPropertyChange(() => CanCheckOut);
-                NotifyOfPropertyChange(() => CanValidateSale);
-
-                NotifyOfPropertyChange(() => Brgy);
-                NotifyOfPropertyChange(() => City);
-                NotifyOfPropertyChange(() => PriceListId);
-                NotifyOfPropertyChange(() => PriceList);
-
-                _events.Publish("SelectedPartner Changed", action =>
-                {
-                    Task.Factory.StartNew(OnLoadProducts());
-                });
-
-                NotifyOfPropertyChange(() => ProductsControlEnabled);
-                NotifyOfPropertyChange(() => ItemQuantityEnabled);
-                NotifyOfPropertyChange(() => CanShowPriceList);
-                NotifyOfPropertyChange(() => CanShowDeduction);
-
-
-
             }
         }
 
@@ -655,35 +720,11 @@ namespace Project.FC2J.UI.ViewModels
                 _selectedPaymentType = value;
                 NotifyOfPropertyChange(() => SelectedPaymentType);
                 NotifyOfPropertyChange(() => CanCheckOut);
-                CalculateDeliveryDate();
+                CalculateDueDate();
             }
         }
 
-        private void CalculateDeliveryDate()
-        {
-            DeliveryDate = DateTime.Now.ToString("MM/dd/yyyy",
-                System.Globalization.CultureInfo.InvariantCulture);
-
-            if (_selectedPaymentType != null)
-            {
-                try
-                {
-                    if (!_selectedPaymentType.PaymentType.ToLower().Equals("immediate payment"))
-                    {
-                        var d = Convert.ToInt32(_selectedPaymentType.PaymentType.ToLower().Replace(" days", ""));
-                        DeliveryDate = DateTime.Now.AddDays(d).ToString("MM/dd/yyyy",
-                            System.Globalization.CultureInfo.InvariantCulture);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    ErrorMessage = $"SelectedPaymentType: {ex.Message}";
-                }
-            }
-            //DueDate = DeliveryDate;
-
-        }
+       
 
         private ProductDisplayModel _selectedProduct;
 
@@ -838,16 +879,40 @@ namespace Project.FC2J.UI.ViewModels
                     _deliveryDate = value;
                     NotifyOfPropertyChange(() => DeliveryDate);
                     NotifyOfPropertyChange(() => CanValidateSale);
-                    try
-                    {
-                        DueDate = Convert.ToDateTime(_deliveryDate).ToShortDateString();
-                    }
-                    catch (Exception e)
-                    {
-                        DueDate = string.Empty;
-                    }
+                    CalculateDueDate();
                 }
             }
+        }
+
+        private void CalculateDueDate()
+        {
+            
+            if (_selectedPaymentType != null)
+            {
+                try
+                {
+                    if (!_selectedPaymentType.PaymentType.ToLower().Equals("immediate payment"))
+                    {
+                        var d = Convert.ToInt32(_selectedPaymentType.PaymentType.ToLower().Replace(" days", ""));
+                        DueDate = Convert.ToDateTime(DeliveryDate).AddDays(d).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        DueDate = Convert.ToDateTime(DeliveryDate).ToShortDateString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    ErrorMessage = $"SelectedPaymentType: {ex.Message}";
+                }
+            }
+            else
+            {
+                DueDate = DeliveryDate;
+            }
+            
+
         }
 
         private string _dueDate;
@@ -951,6 +1016,7 @@ namespace Project.FC2J.UI.ViewModels
 
        
         public string SubTotal => "P" + CalculateSubTotal().ToString("C").Substring(1);
+
         private decimal CalculateSubTotal()
         {
             decimal subTotal = 0;
@@ -1186,6 +1252,7 @@ namespace Project.FC2J.UI.ViewModels
             NotifyOfPropertyChange(() => Deductions);
             NotifyOfPropertyChange(() => PickupDiscount);
             NotifyOfPropertyChange(() => SubTotal);
+            
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             
@@ -1206,6 +1273,7 @@ namespace Project.FC2J.UI.ViewModels
                 return output;
             }
         }
+        
 
         public void OnEditDetail()
         {
@@ -1279,8 +1347,8 @@ namespace Project.FC2J.UI.ViewModels
             {
                 try
                 {
-
-                    OrderStatusId = 1;
+                    
+                    OrderStatusId = (int)OrderStatusEnum.SUBMITTED; 
                     decimal lessPriceValue;
                     Decimal.TryParse(OtherDeduction?.Replace("P",""), out lessPriceValue);
                     long _id = 0 ;
@@ -1322,8 +1390,7 @@ namespace Project.FC2J.UI.ViewModels
                         UserName = UserName
                     };
 
-                    _saleData.Value.Total =
-                        _saleData.Value.TotalProductSalePrice + _saleData.Value.TotalProductTaxPrice;
+                    _saleData.Value.Total = _saleData.Value.TotalProductSalePrice + _saleData.Value.TotalProductTaxPrice;
 
 
                     var lineNo = 0;
@@ -1332,9 +1399,7 @@ namespace Project.FC2J.UI.ViewModels
                         lineNo++;
 
                         if (_saleData.Value.IsVatable == false)
-                        {
                             _saleData.Value.IsVatable = item.Product.IsTaxable;
-                        }
 
                         var unitPrice = item.Product.DeductionFixPrice > 0 ? item.Product.DeductionFixPrice : item.Product.SalePrice;
                         var taxRate = item.Product.IsTaxable ? _apiAppSetting.TaxRate : 0;
@@ -1343,8 +1408,7 @@ namespace Project.FC2J.UI.ViewModels
 
                         var subTotalProductSalePrice = unitPrice * (decimal)item.CartQuantity;
 
-                        var subTotalProductTaxPrice = subTotalProductSalePrice - Math.Round(subTotalProductSalePrice /
-                                                                             (1 + taxRate), 2) ;
+                        var subTotalProductTaxPrice = subTotalProductSalePrice - Math.Round(subTotalProductSalePrice / (1 + taxRate), 2) ;
 
                         _saleData.Value.SaleDetails.Add(new SaleDetail
                         {
@@ -1524,15 +1588,30 @@ namespace Project.FC2J.UI.ViewModels
         private async Task ProcessValidateSales()
         {
             _saleData.Value.Revalidate = true;
-            _saleData.Value.OrderStatusId = 2;
-            if (IsPickup)
-                _saleData.Value.OrderStatusId = (long)OrderStatusEnum.DELIVERED;
+            _saleData.Value.OrderStatusId = (long)OrderStatusEnum.VALIDATED;
+            //if (IsPickup)
+            //    _saleData.Value.OrderStatusId = (long)OrderStatusEnum.DELIVERED;
             _saleData.Value.OverrideUser = UserName;
             var id = await _saleEndpoint.PostSale(_saleData.Value);
 
             MessageBox.Show("Sales is validated!", "System Confirmation", MessageBoxButton.OK);
             OrderStatusId = (int)_saleData.Value.OrderStatusId;
 
+        }
+
+        public bool CanEditPONo => string.IsNullOrEmpty(SalesId) == false;
+
+        public async Task EditPONo()
+        {
+            string customerId = _saleData.Value.CustomerId.ToString();
+            string salesId = _saleData.Value.Id.ToString();
+            
+            var adjustPONo = new AdjustPONumber(PONo, customerId, salesId, _saleEndpoint);
+            adjustPONo.ShowDialog();
+
+            PONo = adjustPONo.NewPONo;
+
+            _saleData.Value.PONo = PONo;
         }
 
 
@@ -2364,8 +2443,10 @@ namespace Project.FC2J.UI.ViewModels
             }
             else if (OrderStatusId != 3)
             {
+                
                 IsDeductionControlsVisible = true;
                 await LoadDeductions();
+
                 _usedDeductions.ForEach(item =>
                 {
                     var _newDeduction = new Deduction
@@ -2376,10 +2457,20 @@ namespace Project.FC2J.UI.ViewModels
                         PONo = item.PONo,
                         UsedAmount = item.UsedAmount,
                     };
-                    _allDeductions.Add(_newDeduction);
-                    var deduction = _mapper.Map<DeductionDisplayModel>(_newDeduction);
-                    deduction.IsChecked = true;
-                    DeductionsList.Add(deduction);
+
+                    var deductionItem = DeductionsList.FirstOrDefault(i => i.PONo == item.PONo);
+                    if (deductionItem != null)
+                    {
+                        deductionItem.IsChecked = true;
+                    }
+                    else
+                    {
+                        _allDeductions.Add(_newDeduction);
+                        var deduction = _mapper.Map<DeductionDisplayModel>(_newDeduction);
+                        deduction.IsChecked = true;
+                        DeductionsList.Add(deduction);
+                    }
+
                 });
 
                 

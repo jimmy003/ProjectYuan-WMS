@@ -13,7 +13,7 @@ namespace Project.FC2J.UI.Helpers.Purchase
         Task<PurchaseOrder> GetPurchaseOrder(string poNo);
         Task<POPayment> InsertPayment(POPayment value);
         Task<List<POPayment>> GetPayments(long id);
-        Task DeletePayment(long id, string deletedBy);
+        Task DeletePayment(string invoiceNo, long id, string deletedBy);
         Task InsertInvoiceDetail(long poHeaderId, long productId, string invoiceNo);
         Task<List<PoHeader>> GetPurchasesOrder(string userName);
     }

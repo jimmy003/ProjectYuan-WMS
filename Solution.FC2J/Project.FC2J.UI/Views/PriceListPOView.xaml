@@ -177,10 +177,10 @@
                                                             Binding="{Binding Path=UnitOfMeasure}"
                                                             IsReadOnly="True" />
                                                 <DataGridTextColumn Header="Sale Price"
-                                                            Binding="{Binding Path=SalePrice, StringFormat=N2}"
+                                                            Binding="{Binding Path=SalePrice, StringFormat=N4}"
                                                             IsReadOnly="True" />
                                                 <DataGridTextColumn Header="Unit Discount"
-                                                            Binding="{Binding Path=UnitDiscount, StringFormat=N2}"
+                                                            Binding="{Binding Path=UnitDiscount, StringFormat=N4}"
                                                             IsReadOnly="True" />
 
                                             </DataGrid.Columns>
@@ -214,11 +214,11 @@
                                      IsEnabled="False"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
 
-                                    <TextBox x:Name="SalePrice" Text="{Binding SalePrice, StringFormat=N2}"    
+                                    <TextBox x:Name="SalePrice" Text="{Binding SalePrice, StringFormat=N4}"    
                                      materialDesign:HintAssist.Hint="Selling Price" 
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
 
-                                    <TextBox x:Name="UnitDiscount" Text="{Binding UnitDiscount, StringFormat=N2}"    
+                                    <TextBox x:Name="UnitDiscount" Text="{Binding UnitDiscount, StringFormat=N4}"    
                                      materialDesign:HintAssist.Hint="Unit Discount" 
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
 

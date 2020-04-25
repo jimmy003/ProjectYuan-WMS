@@ -84,6 +84,14 @@ namespace Project.FC2J.UI.Helpers
             return await _apiHelper.GetRecord<SaleHeader>(_apiAppSetting.Sale, sale);
         }
 
+        public async Task<List<OrderHeader>> GetSalesForPrint(string userName)
+        {
+            return await _apiHelper.GetList<OrderHeader>(_apiAppSetting.Sale + @"/ForPrint" + $"?userName={userName}");
+        }
 
+        public async Task UpdatePONumber(string customerId, string _poNo, string _newPoNO, long salesId)
+        {
+            await _apiHelper.Update(_apiAppSetting.Sale + @"/UpdatePONumber" + $"?customerId={customerId}&poNo={_poNo}&newPoNO={_newPoNO}&salesId={salesId}");
+        }
     }
 }

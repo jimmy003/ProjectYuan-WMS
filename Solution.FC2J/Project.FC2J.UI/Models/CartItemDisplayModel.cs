@@ -152,7 +152,17 @@ namespace Project.FC2J.UI.Models
                 return subTotal;
             }
         }
-
+        public decimal NetPrice
+        {
+            get
+            {
+                decimal subTotal = 0;
+                subTotal = (Product.DeductionFixPrice > 0 ? Product.DeductionFixPrice : Product.SalePrice) * (decimal)CartQuantity;
+                decimal deduction = (Outright + Promo + (decimal)Discount) * (decimal)CartQuantity;
+                subTotal -= deduction;
+                return subTotal;
+            }
+        }
         public decimal SubTotalCostPrice
         {
             get

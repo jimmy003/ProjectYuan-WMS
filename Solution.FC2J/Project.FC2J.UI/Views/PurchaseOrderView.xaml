@@ -16,7 +16,7 @@
              Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="{DynamicResource MaterialDesignFont}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="1000">
+             d:DesignHeight="550" d:DesignWidth="1000">
     <UserControl.Resources>
         <DataTemplate x:Key="ProductTemplate">
             <Grid>
@@ -273,19 +273,19 @@
                                                         IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Unit Selling Price"
-                                                            Binding="{Binding SalePrice, StringFormat=N2}"
+                                                            Binding="{Binding SalePrice, StringFormat=N4}"
                                                             IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Unit Discounts"
-                                                        Binding="{Binding UnitDiscount, StringFormat=N2}"
+                                                        Binding="{Binding UnitDiscount, StringFormat=N4}"
                                                         IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Amount"
-                                                            Binding="{Binding SubTotalCostPrice, StringFormat=N2}"
+                                                            Binding="{Binding SubTotalCostPrice, StringFormat=N4}"
                                                             IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Tax"
-                                                        Binding="{Binding PoTax, StringFormat=N2}"
+                                                        Binding="{Binding PoTax, StringFormat=N4}"
                                                         IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Transaction Type"
@@ -325,19 +325,19 @@
                                                         IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Unit Selling Price"
-                                                            Binding="{Binding SalePrice, StringFormat=N2}"
+                                                            Binding="{Binding SalePrice, StringFormat=N4}"
                                                             IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Unit Discounts"
-                                                        Binding="{Binding UnitDiscount, StringFormat=N2}"
+                                                        Binding="{Binding UnitDiscount, StringFormat=N4}"
                                                         IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Amount"
-                                                            Binding="{Binding SubTotalCostPrice, StringFormat=N2}"
+                                                            Binding="{Binding SubTotalCostPrice, StringFormat=N4}"
                                                             IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Tax"
-                                                        Binding="{Binding PoTax, StringFormat=N2}"
+                                                        Binding="{Binding PoTax, StringFormat=N4}"
                                                         IsReadOnly="True" />
 
                                     <DataGridTextColumn Header="Transaction Type"
@@ -379,7 +379,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Text="Sub Total:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                                    <TextBlock TextAlignment="Right" x:Name="SubTotal" Text="{Binding SubTotal, StringFormat=N2}" Grid.Column="1" Margin="10, 0"
+                                    <TextBlock TextAlignment="Right" x:Name="SubTotal" Text="{Binding SubTotal, StringFormat=N4}" Grid.Column="1" Margin="10, 0"
                                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                 </Grid>
                             </StackPanel>
@@ -391,7 +391,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Text="Tax Price:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                                    <TextBlock TextAlignment="Right" x:Name="TaxPrice" Text="{Binding TaxPrice, StringFormat=N2}" Grid.Column="1" Margin="10, 0"
+                                    <TextBlock TextAlignment="Right" x:Name="TaxPrice" Text="{Binding TaxPrice, StringFormat=N4}" Grid.Column="1" Margin="10, 0"
                                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                 </Grid>
                             </StackPanel>
@@ -403,7 +403,7 @@
                                     </Grid.ColumnDefinitions>
                                     
                                     <TextBlock Text="Amount:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                                    <TextBlock TextAlignment="Right" x:Name="Total" Grid.Column="1" Margin="10, 0"
+                                    <TextBlock TextAlignment="Right" x:Name="Total" Text="{Binding Total, StringFormat=N4}" Grid.Column="1" Margin="10, 0"
                                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                 </Grid>
                             </StackPanel>

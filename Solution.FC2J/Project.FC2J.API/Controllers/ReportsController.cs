@@ -28,6 +28,12 @@ namespace Project.FC2J.API.Controllers
             return Ok(await _repo.GetCustomerAccountSummary(reportParameter));
         }
 
+        [HttpPost, Route("GetBMEGReport")]
+        public async Task<IActionResult> GetBMEGReport(ProjectReportParameter reportParameter)
+        {
+            return Ok(await _repo.GetBMEGReport(reportParameter));
+        }
+
         [HttpPost, Route("GetPurchasesReportMonthlyVatExempt")]
         public async Task<IActionResult> GetPurchasesReportMonthlyVatExempt(ProjectReportParameter reportParameter)
         {

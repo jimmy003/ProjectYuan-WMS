@@ -29,5 +29,6 @@ namespace Project.FC2J.DataStore.Interfaces
         Task<DataTable> GetPurchasesReportMonthlyVatExempt(ProjectReportParameter reportParameter);
         Task<DataTable> GetPurchasesReportMonthlyVatable(ProjectReportParameter reportParameter);
         Task<DataTable> GetCustomerAccountSummary(ProjectReportParameter reportParameter);
+        Task<DataTable> GetBMEGReport(ProjectReportParameter reportParameter);
     }
 }

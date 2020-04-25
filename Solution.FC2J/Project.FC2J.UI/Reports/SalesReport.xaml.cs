@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -28,6 +29,7 @@ namespace Project.FC2J.UI.Reports
         private ReportTypeEnum _reportTypeEnum;
         private string _reportTIN;
 
+        private const string _report0 = "BMEG Report";
         private const string _report1 = "Month to Date Sales Report";
         private const string _report2 = "Month to Date Purchases Report";
         private const string _report3 = "Monthly Sales Report (For BIR)";
@@ -58,6 +60,9 @@ namespace Project.FC2J.UI.Reports
             OverlayLoading.Visibility = Visibility.Visible;
             switch (_selectedReport)
             {
+                case _report0:
+                    await OnGenerateBMEGReport();
+                    break;
                 case _report1:
                     await OnGenerateMTDSalesReport();
                     break;
@@ -81,10 +86,40 @@ namespace Project.FC2J.UI.Reports
             Generate.IsEnabled = true;
         }
 
+        private async Task OnGenerateBMEGReport()
+        {
+            var reportParameter = new ProjectReportParameter
+            {
+                DateFrom = DateRangePicker.From,
+                DateTo = DateRangePicker.To
+            };
+
+            var dt = await _reportEndpoint.GetBMEGReport(reportParameter);
+
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show($"Record not found", "System Information", MessageBoxButton.OK);
+                return;
+            }
+
+            dt.TableName = "BMEG_Report";
+
+            dt.DefaultView.Sort = "[Delivery Date], [Customer Name], [LINENO]";
+            dt = dt.DefaultView.ToTable();
+            dt.Columns.Remove("LINENO");
+            var dataset = new DataSet("Mainreport");
+            dataset.Tables.Add(dt);
+
+            await SaveToFile(reportParameter, dataset);
+
+            GeneratedMTDSales.Text = _mtdSalesFilename;
+            ViewMTDSales.Visibility = Visibility.Visible;
+
+
+        }
+
         private async Task OnGenerateCustomerAccountSummaryReport()
         {
-            
-
             var reportParameter = new ProjectReportParameter
             {
                 DateFrom = DateRangePicker.From,
@@ -103,6 +138,47 @@ namespace Project.FC2J.UI.Reports
 
             var mainDataSet = new DataSet("Mainreport");
             mainDataSet.Tables.Add(dtCustomerAccountSummary);
+
+            #region Aggregation of columns
+            
+            var totalC = 0m;
+            var totalE = 0m;
+            var totalF = 0m;
+            var totalG = 0m;
+
+            var columnA = 0;
+            var columnC = 2;
+            var columnE = 4;
+            var columnF = 5;
+            var columnG = 6;
+
+            var dr = dtCustomerAccountSummary.NewRow(); //Create New Row
+            dr[0] = "TOTAL ==>"; // Set Column Value
+            dtCustomerAccountSummary.Rows.Add(dr); 
+
+            //C, E, F, G
+            foreach (DataRow row in dtCustomerAccountSummary.Rows)
+            {
+                if (row[columnA].ToString().Equals("TOTAL ==>"))
+                {
+                    row[columnC] = totalC;
+                    row[columnE] = totalE;
+                    row[columnF] = totalF;
+                    row[columnG] = totalG;
+                }
+                else
+                {
+                    if(row[columnC] != DBNull.Value)
+                        totalC += Convert.ToDecimal(row[columnC]);
+                    if (row[columnE] != DBNull.Value)
+                        totalE += Convert.ToDecimal(row[columnE]);
+                    if (row[columnF] != DBNull.Value)
+                        totalF += Convert.ToDecimal(row[columnF]);
+                    if (row[columnG] != DBNull.Value)
+                        totalG += Convert.ToDecimal(row[columnG]);
+                }
+            }
+            #endregion
 
             await SaveToFile(reportParameter, mainDataSet);
 
@@ -132,8 +208,204 @@ namespace Project.FC2J.UI.Reports
 
                 var vatExempt = await _reportEndpoint.GetPurchasesReportMonthlyVatExempt(reportParameter);
                 vatExempt.TableName = "VATEXEMPT";
+
                 var vatable = await _reportEndpoint.GetPurchasesReportMonthlyVatable(reportParameter);
                 vatable.TableName = "VATABLE";
+
+                #region Aggregation of VATEXEMPT
+                if(vatExempt.Rows.Count > 0)
+                {
+                    var totalC = 0m;
+                    var totalD = 0m;
+                    var totalE = 0m;
+                    var totalF = 0m;
+                    var totalG = 0m;
+                    var totalAmount = 0m;
+                    var purchaseDate = string.Empty;
+
+                    var columnPurchaseDate = 0;
+
+                    var columnAmount = 2;
+                    var columnTotalAmount = 3;
+                    var columnWtax = 4;
+                    var columnNotConverted = 5;
+                    var columnConverted = 6;
+
+                    var dr = vatExempt.NewRow(); //Create New Row
+                    dr[0] = "TOTAL ==>"; // Set Column Value
+                    vatExempt.Rows.Add(dr);
+
+                    DataRow previousRow = null;
+                    //C, E, F, G
+                    foreach (DataRow row in vatExempt.Rows)
+                    {
+
+                        if (row[columnPurchaseDate].ToString().Equals("TOTAL ==>"))
+                        {
+                            if(previousRow != null)
+                                previousRow[columnTotalAmount] = totalAmount;
+
+                            totalD += totalAmount;
+
+                            row[columnAmount] = totalC;
+                            row[columnTotalAmount] = totalD;
+                            row[columnWtax] = totalE;
+                            row[columnNotConverted] = totalF;
+                            row[columnConverted] = totalG;
+                        }
+                        else
+                        {
+
+                            if (string.IsNullOrEmpty(purchaseDate))
+                            {
+                                purchaseDate = row[columnPurchaseDate].ToString();
+                                if (row[columnAmount] != DBNull.Value)
+                                    totalAmount = Convert.ToDecimal(row[columnAmount]);
+                            }
+                            else
+                            {
+                                if (purchaseDate == row[columnPurchaseDate].ToString())
+                                {
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount += Convert.ToDecimal(row[columnAmount]);
+                                }
+                                else
+                                {
+
+                                    if(previousRow != null)
+                                        previousRow[columnTotalAmount] = totalAmount;
+
+                                    if (row[columnTotalAmount] != DBNull.Value)
+                                        totalD += totalAmount;  
+
+                                    purchaseDate = row[columnPurchaseDate].ToString();
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount = Convert.ToDecimal(row[columnAmount]);
+
+                                }
+                            }
+
+
+                            if (row[columnAmount] != DBNull.Value)
+                                totalC += Convert.ToDecimal(row[columnAmount]);
+                            if (row[columnWtax] != DBNull.Value)
+                                totalE += Convert.ToDecimal(row[columnWtax]);
+                            if (row[columnNotConverted] != DBNull.Value)
+                                totalF += Convert.ToDecimal(row[columnNotConverted]);
+                            if (row[columnConverted] != DBNull.Value)
+                                totalG += Convert.ToDecimal(row[columnConverted]);
+
+
+                        }
+
+                        previousRow = row;
+
+                    }
+                }
+                #endregion
+
+                #region Aggregation of VATABLE
+                if(vatable.Rows.Count > 0)
+                {
+                    var totalC = 0m;
+                    var totalD = 0m;
+                    var totalE = 0m;
+                    var totalF = 0m;
+                    var totalG = 0m;
+                    var totalH = 0m;
+                    var totalI = 0m;
+                    var totalAmount = 0m;
+                    var purchaseDate = string.Empty;
+
+                    var columnPurchaseDate = 0;
+
+                    var columnAmount = 2;
+                    var columnTotalAmount = 3;
+                    var columnVatableSales = 4;
+                    var columnVat = 5;
+                    var columnWtax = 6;
+                    var columnNotConverted = 7;
+                    var columnConverted = 8;
+
+                    var dr = vatable.NewRow(); //Create New Row
+                    dr[0] = "TOTAL ==>"; // Set Column Value
+                    vatable.Rows.Add(dr);
+
+                    DataRow previousRow = null;
+                    
+                    foreach (DataRow row in vatable.Rows)
+                    {
+
+                        if (row[columnPurchaseDate].ToString().Equals("TOTAL ==>"))
+                        {
+                            previousRow[columnTotalAmount] = totalAmount;
+                            totalD += totalAmount;
+
+                            row[columnAmount] = totalC;
+                            row[columnTotalAmount] = totalD;
+                            row[columnVatableSales] = totalE;
+                            row[columnVat] = totalF;
+                            row[columnWtax] = totalG;
+                            row[columnNotConverted] = totalH;
+                            row[columnConverted] = totalI;
+                        }
+                        else
+                        {
+
+                            if (string.IsNullOrEmpty(purchaseDate))
+                            {
+                                purchaseDate = row[columnPurchaseDate].ToString();
+                                if (row[columnAmount] != DBNull.Value)
+                                    totalAmount += Convert.ToDecimal(row[columnAmount]);
+                            }
+                            else
+                            {
+                                if (purchaseDate == row[columnPurchaseDate].ToString())
+                                {
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount += Convert.ToDecimal(row[columnAmount]);
+                                }
+                                else
+                                {
+
+
+                                    previousRow[columnTotalAmount] = totalAmount;
+
+                                    if (row[columnTotalAmount] != DBNull.Value)
+                                        totalD += totalAmount;
+
+                                    purchaseDate = row[columnPurchaseDate].ToString();
+                                    if (row[columnAmount] != DBNull.Value)
+                                        totalAmount = Convert.ToDecimal(row[columnAmount]);
+
+                                }
+                            }
+
+
+                            if (row[columnAmount] != DBNull.Value)
+                                totalC += Convert.ToDecimal(row[columnAmount]);
+
+                            if (row[columnVatableSales] != DBNull.Value)
+                                totalE += ParseDecimal(row[columnVatableSales].ToString());
+                            if (row[columnVat] != DBNull.Value)
+                                totalF += ParseDecimal(row[columnVat].ToString());
+
+                            if (row[columnWtax] != DBNull.Value)
+                                totalG += Convert.ToDecimal(row[columnWtax]);
+                            if (row[columnNotConverted] != DBNull.Value)
+                                totalH += Convert.ToDecimal(row[columnNotConverted]);
+                            if (row[columnConverted] != DBNull.Value)
+                                totalI += Convert.ToDecimal(row[columnConverted]);
+
+
+                        }
+
+                        previousRow = row;
+
+                    }
+                }
+                #endregion
+
 
                 var mainDataSet = new DataSet("Mainreport");
                 mainDataSet.Tables.Add(vatExempt);
@@ -149,6 +421,20 @@ namespace Project.FC2J.UI.Reports
                 MessageBox.Show(e.Message, "Error",MessageBoxButton.OK);
             }
 
+        }
+
+        private decimal ParseDecimal(string value)
+        {
+            decimal number;
+            NumberStyles style;
+            CultureInfo provider;
+
+            style = NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands;
+            provider = new CultureInfo("en-US");
+
+            if (string.IsNullOrEmpty(value)) return 0;
+            number = Decimal.Parse(value, style, provider);
+            return number;
         }
 
         private async Task OnProcessMonthly()
@@ -655,8 +941,14 @@ namespace Project.FC2J.UI.Reports
                     $"CustomerAccountSummaryReport-AsOf-{DateTime.Now.ToString("ddMMMyyyy-hhmmss")}.xlsx";
 
             }
+            else if (_selectedReport == _report0)
+            {
+                _mtdSalesFilename =
+                    $"BMEG-Report-AsOf-{DateTime.Now.ToString("ddMMMyyyy-hhmmss")}.xlsx";
 
-            if (_selectedReport == _report1 || _selectedReport == _report2 || _selectedReport == _report5)
+            }
+
+            if (_selectedReport == _report1 || _selectedReport == _report2 || _selectedReport == _report5 || _selectedReport == _report0)
             {
                 _mtdSalesFolder = Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("ddMMMyyyy");
             }
@@ -893,10 +1185,20 @@ namespace Project.FC2J.UI.Reports
             ReportLabel.Visibility = Visibility.Collapsed;
             Report1Parameter.Visibility = Visibility.Collapsed;
             Report2Parameter.Visibility = Visibility.Collapsed;
+            IsFeeds.Visibility = Visibility.Visible;
             Generate.IsEnabled = false;
 
             switch (_selectedReport)
             {
+                case _report0:
+                    _reportTypeEnum = ReportTypeEnum.BMEG;
+                    _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
+
+                    IsFeeds.Visibility = Visibility.Collapsed;
+                    Report1Parameter.Visibility = Visibility.Visible;
+                    ViewMTDSales.Visibility = Visibility.Collapsed;
+                    Generate.IsEnabled = true;
+                    break;
                 case _report1:
                     _reportTypeEnum = ReportTypeEnum.SalesMTDFeeds;
                     _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
@@ -910,7 +1212,6 @@ namespace Project.FC2J.UI.Reports
                     _reportTypeEnum = ReportTypeEnum.PurchasesMTDFeeds;
                     _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
 
-
                     IsFeeds.IsChecked = true;
                     Report1Parameter.Visibility = Visibility.Visible;
                     ViewMTDSales.Visibility = Visibility.Collapsed;
@@ -919,6 +1220,8 @@ namespace Project.FC2J.UI.Reports
 
                 case _report3:
                     _reportTypeEnum = ReportTypeEnum.SalesMonthlyBIR;
+
+                    IsFeeds.Visibility = Visibility.Collapsed;
                     Report2Parameter.Visibility = Visibility.Visible;
                     Generate.IsEnabled = MonthYearDate.SelectedDate != null;
                     ViewMonthly.Visibility = Visibility.Collapsed;
@@ -926,6 +1229,7 @@ namespace Project.FC2J.UI.Reports
 
                 case _report4:
                     _reportTypeEnum = ReportTypeEnum.PurchasesMonthlyBIR;
+                    IsFeeds.Visibility = Visibility.Collapsed;
                     Report2Parameter.Visibility = Visibility.Visible;
                     Generate.IsEnabled = MonthYearDate.SelectedDate != null;
                     ViewMonthly.Visibility = Visibility.Collapsed;
@@ -971,6 +1275,7 @@ namespace Project.FC2J.UI.Reports
         private void DateRangePicker_DateRangeChanged(object sender, RoutedPropertyChangedEventArgs<Rh.DateRange.Picker.DateRangeValue> e)
         {
             var value = DateRangePicker.From;
+            _dateRange = $"{DateRangePicker.From.ToString("dd-MMM-yyyy")} till {DateRangePicker.To.ToString("dd-MMM-yyyy")}";
         }
     }
 }

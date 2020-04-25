@@ -187,7 +187,8 @@ namespace Project.FC2J.UI.Reports
                 }
                 else
                 {
-                    table1.Columns.Add(customer.CustomerName.Trim()); //.Replace("'","''")
+                    var customerName = $"{customer.CustomerName.Trim()}_{customer.CustomerId}";
+                    table1.Columns.Add(customerName); 
                 }
 
                 rowValue.Add(""); //template row value
@@ -233,24 +234,6 @@ namespace Project.FC2J.UI.Reports
                 }
             }
 
-            ////last but not the least, adding all products without category
-            //stageProducts = products.Where(item => item.Category.Trim().Equals(string.Empty));
-            //{
-            //    //insert category row with empty fields on the right
-            //    var stageRow = new List<string> { "<Blank Category>" };
-            //    stageRow.AddRange(rowValue);
-            //    table1.Rows.Add(stageRow.ToArray());
-
-            //    foreach (var product in stageProducts)
-            //    {
-            //        //adding individual product row under the current category 
-            //        stageRow = new List<string> { product.Name };
-            //        stageRow.AddRange(rowValue);
-            //        table1.Rows.Add(stageRow.ToArray());
-            //    }
-
-            //}
-
             #endregion
 
             decimal value;
@@ -275,11 +258,11 @@ namespace Project.FC2J.UI.Reports
                     {
                         // need to search target column 
                         var i = -1;
-
+                        var customerName = $"{inventory.CustomerName.Trim()}_{inventory.CustomerId}";
                         foreach (DataColumn column in table1.Columns)
                         {
                             i += 1;
-                            if (column.ColumnName.Trim().Equals(inventory.CustomerName.Trim()))
+                            if (column.ColumnName.Trim().Equals(customerName))
                             {
                                 break;
                             }

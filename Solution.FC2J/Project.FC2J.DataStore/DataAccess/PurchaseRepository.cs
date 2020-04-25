@@ -30,6 +30,7 @@ namespace Project.FC2J.DataStore.DataAccess
         private readonly string _spGetPayments_FC2J = "GetPayments_FC2J";
         private readonly string _spDeletePayment_FC2J = "DeletePayment_FC2J";
         private readonly string _spInsertInvoiceDetail = "InsertInvoiceDetail";
+        private readonly string _spInsertPaymentDetail_FC2J = "InsertPaymentDetail_FC2J";
         private readonly string _spGetPurchases = "GetPurchases";
         private List<SqlParameter> _sqlParameters;
 
@@ -70,12 +71,13 @@ namespace Project.FC2J.DataStore.DataAccess
             await _spInsertInvoiceDetail.ExecuteNonQueryAsync(_sqlParameters.ToArray());
         }
 
-        public async Task DeletePayment(long id, string deletedBy)
+        public async Task DeletePayment(long id, string deletedBy, string invoiceNo)
         {
             _sqlParameters = new List<SqlParameter>()
             {
                 new SqlParameter("@Id", id),
-                new SqlParameter("@DeletedBy", deletedBy)
+                new SqlParameter("@DeletedBy", deletedBy),
+                new SqlParameter("@InvoiceNo", invoiceNo)
             };
             await _spDeletePayment_FC2J.ExecuteNonQueryAsync(_sqlParameters.ToArray());
         }
@@ -94,9 +96,10 @@ namespace Project.FC2J.DataStore.DataAccess
                 {
                     new SqlParameter("@POHeaderId", value.OrderHeaderId),
                     new SqlParameter("@ProductId", item.Id),
+                    new SqlParameter("@Quantity", item.Quantity),
                     new SqlParameter("@InvoiceNo", value.InvoiceNo)
                 };
-                await _spInsertInvoiceDetail.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                await _spInsertPaymentDetail_FC2J.ExecuteNonQueryAsync(_sqlParameters.ToArray());
             }
 
             _sqlParameters = new List<SqlParameter>()
@@ -359,8 +362,8 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@ProductId", detail.ProductId),
                     new SqlParameter("@IsDelivered", detail.IsDelivered),
                     new SqlParameter("@DeliveredUser", value.PoHeader.UserName),
-                    new SqlParameter("@Quantity", detail.Quantity) //this will update StockQuantity of Product if the Delivered
-
+                    new SqlParameter("@Quantity", detail.Quantity), //this will update StockQuantity of Product if the Delivered
+                    new SqlParameter("@SupplierId", supplierId)
                 };
                 await _spUpdatePurchaseDetail.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 

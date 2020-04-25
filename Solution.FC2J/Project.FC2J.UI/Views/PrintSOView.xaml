@@ -46,6 +46,7 @@
                                 materialDesign:HintAssist.Hint="PO Number"
                                 CharacterCasing="Upper"
                                 DisplayMember="PONo"
+                                Visibility="{Binding IsVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                                 Provider="{Binding PONoProvider}"
                                 ItemTemplate="{StaticResource ResourceKey=PONoTemplate}"
                                 Margin="15,5,0,5" VerticalAlignment="Center" 
@@ -149,12 +150,12 @@
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="45" />
                                                             <ColumnDefinition Width="45" />
-                                                            <ColumnDefinition Width="224" />
-                                                            <ColumnDefinition Width="65" />
-                                                            <ColumnDefinition Width="90" />
+                                                            <ColumnDefinition Width="259" />
+                                                            <ColumnDefinition Width="60" />
+                                                            <ColumnDefinition Width="60" />
                                                         </Grid.ColumnDefinitions>
                                                         <Grid.RowDefinitions>
-                                                            <RowDefinition Height="10"/>
+                                                            <RowDefinition Height="13"/>
                                                         </Grid.RowDefinitions>
                                                         <TextBlock Grid.Row="0" Grid.Column="0" Style="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding OrderQuantity, StringFormat=N2}" />
                                                         <TextBlock Grid.Row="0" Grid.Column="1" Style="{x:Null}" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding ProductUnitOfMeasure}"/>
@@ -197,7 +198,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="105" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="Cash Discount:" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="Passbook promo:" HorizontalAlignment="Right" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="{Binding CashDiscount}" Margin="6,0,0,0" />
                                         </Grid>
                                         <Grid x:Name="GridPickupDiscount" Margin="0,2">

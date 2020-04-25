@@ -9,6 +9,13 @@ using Project.FC2J.Models.Sale;
 
 namespace Project.FC2J.DataStore.DataAccess
 {
+    public enum CancelledOrReturnedEnum
+    {
+        None =0,
+        Cancelled =1,
+        Returned = 2
+    }
+
     public class SaleRepository : ISaleRepository
     {
         private readonly string _spGetSONo = "GetSONo";
@@ -20,6 +27,8 @@ namespace Project.FC2J.DataStore.DataAccess
         private readonly string _spUpdateSaleHeader = "UpdateSaleHeader";
         private readonly string _spValidateSaleHeader = "ValidateSaleHeader";
         private readonly string _spGetSales = "GetSales";
+        private readonly string _spUpdatePONo = "UpdatePONo";
+        private readonly string _spGetSalesForPrint = "GetSalesPrint";
         private readonly string _spGetCollections = "GetCollections";
         private readonly string _spGetCollected = "GetCollected";
         private readonly string _spGetSaleDetails = "GetSaleDetails";
@@ -58,7 +67,7 @@ namespace Project.FC2J.DataStore.DataAccess
                 new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                 new SqlParameter("@WithReturns", receiveInvoice.Invoice.WithReturns)
             };
-
+            //update Invoice as Received
             await _spManageInvoice.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
             foreach (var _return in receiveInvoice.Returns)
@@ -68,10 +77,26 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                     new SqlParameter("@OrderDetailId", _return.Id),
                     new SqlParameter("@ProductId", _return.ProductId),
+                    new SqlParameter("@SupplierId", _return.SupplierId),
                     new SqlParameter("@ReturnQuantity", _return.OrderQuantity)
                 };
-
+                //for sale order detail updates 
+                //for product stock quantity updates based on the supplierId
                 await _spUpdateSaleDetailWithReturns.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+                
+                _sqlParameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@ProductId", _return.ProductId),
+                    new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
+                    new SqlParameter("@Quantity", _return.OrderQuantity),
+                    new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                    new SqlParameter("@SupplierId", _return.SupplierId),
+                    new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Returned)
+                };
+                //for inventory record entry
+                await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
             }
 
             _sqlParameters = new List<SqlParameter>()
@@ -99,11 +124,10 @@ namespace Project.FC2J.DataStore.DataAccess
                 new SqlParameter("@OrderStatusId", receiveInvoice.SaleHeader.OrderStatusId)
 
             };
-
+            //to update the corresponding OrderStatusId DELIVERED=4, DELIVERED_WITH_RETURNS=5, RETURNEDALL=6
             await _spUpdateSaleHeaderWithReturns.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
 
-            //re-set the used deductions in reference to PONo, if all items are returned 
             if (receiveInvoice.SaleHeader.OrderStatusId == (long)OrderStatusEnum.RETURNEDALL )
             {
                 _sqlParameters = new List<SqlParameter>
@@ -112,6 +136,7 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId)
                 };
+                //re-set the used deductions in reference to PONo, if all items are returned 
                 await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
             }
 
@@ -264,28 +289,29 @@ namespace Project.FC2J.DataStore.DataAccess
                         await _spUpdateSaleHeader.ExecuteNonQueryAsync(_sqlParameters.ToArray());
                         await ProcessSaleDetails(sale.CustomerId, sale, sale.Id.ToString());
 
-                        //_sqlParameters = new List<SqlParameter>
-                        //{
-                        //    new SqlParameter("@t", 9),
-                        //    new SqlParameter("@PONo", sale.PONo),
-                        //    new SqlParameter("@CustomerId", sale.CustomerId)
-                        //};
-                        //await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                        //-- reset the deductions using Id only with PONo
+                        _sqlParameters = new List<SqlParameter>
+                        {
+                            new SqlParameter("@t", 9),
+                            new SqlParameter("@PONo", sale.PONo),
+                            new SqlParameter("@CustomerId", sale.CustomerId)
+                        };
+                        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
-                        //if (sale.Deductions.Count > 0)
-                        //{
-                        //    foreach (var deduction in sale.Deductions)
-                        //    {
-                        //        _sqlParameters = new List<SqlParameter>
-                        //        {
-                        //            new SqlParameter("@t", 7),
-                        //            new SqlParameter("@PONo", sale.PONo),
-                        //            new SqlParameter("@Id", deduction),
-                        //            new SqlParameter("@CustomerId", sale.CustomerId)
-                        //        };
-                        //        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
-                        //    }
-                        //}
+                        if (sale.Deductions.Count > 0)
+                        {
+                            foreach (var deduction in sale.Deductions)
+                            {
+                                _sqlParameters = new List<SqlParameter>
+                                {
+                                    new SqlParameter("@t", 7),
+                                    new SqlParameter("@PONo", sale.PONo),
+                                    new SqlParameter("@Id", deduction),
+                                    new SqlParameter("@CustomerId", sale.CustomerId)
+                                };
+                                await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                            }
+                        }
                         #endregion
                         break;
 
@@ -348,6 +374,7 @@ namespace Project.FC2J.DataStore.DataAccess
 
                     }
                     case 3:
+
                         _sqlParameters = new List<SqlParameter>()
                         {
                             new SqlParameter("@Id", sale.Id),
@@ -355,8 +382,41 @@ namespace Project.FC2J.DataStore.DataAccess
                             new SqlParameter("@PONo", sale.PONo),
                             new SqlParameter("@OverrideUser", sale.OverrideUser)
                         };
-
                         await _spCancelSaleOrder.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+                        //Must Create Cancelled Inventory to negate the 
+                        foreach (var item in sale.SaleDetails)
+                        {
+                            _sqlParameters = new List<SqlParameter>
+                            {
+                                new SqlParameter("@ProductId", item.ProductId),
+                                new SqlParameter("@CustomerId", sale.CustomerId),
+                                new SqlParameter("@Quantity", item.OrderQuantity),
+                                new SqlParameter("@PONo", sale.PONo),
+                                new SqlParameter("@SupplierId", item.SupplierId),
+                                new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Cancelled)
+                            };
+                            await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                        }
+
+                        //_sqlParameters = new List<SqlParameter>
+                        //{
+                        //    new SqlParameter("@PONo", sale.PONo),
+                        //    new SqlParameter("@CustomerId", sale.CustomerId),
+                        //    new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
+                        //};
+                        //await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+                        //-- reset the deductions using Id only with PONo
+                        _sqlParameters = new List<SqlParameter>
+                        {
+                            new SqlParameter("@t", 9),
+                            new SqlParameter("@PONo", sale.PONo),
+                            new SqlParameter("@CustomerId", sale.CustomerId)
+                        };
+                        await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+
+
                         break;
                 }
             }
@@ -417,11 +477,12 @@ namespace Project.FC2J.DataStore.DataAccess
             {
                 _sqlParameters = new List<SqlParameter>
                 {
-                    new SqlParameter("@PONo", sale.PONo)
+                    new SqlParameter("@PONo", sale.PONo),
+                    new SqlParameter("@CustomerId", customerId),
+                    new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
                 };
                 await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
             }
-
             foreach (var item in sale.SaleDetails)
             {
                 _sqlParameters = new List<SqlParameter>
@@ -454,6 +515,25 @@ namespace Project.FC2J.DataStore.DataAccess
                     await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
                 }
             }
+        }
+
+        public async Task<List<OrderHeader>> GetSalesForPrint(string userName)
+        {
+            var value = await _spGetSalesForPrint.GetList<OrderHeader>(new SqlParameter("@UserName", userName));
+            return value;
+        }
+
+        public async Task UpdatePONumber(string customerId, string poNo, string newPoNO, long salesId)
+        {
+
+            _sqlParameters = new List<SqlParameter>
+                    {
+                        new SqlParameter("@CustomerId", customerId),
+                        new SqlParameter("@OldPONo", poNo),
+                        new SqlParameter("@NewPONo", newPoNO),
+                        new SqlParameter("@Id", salesId)
+                    };
+            await _spUpdatePONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project.FC2J.UI.Helpers;
 
 namespace Project.FC2J.UI.Models
 {
@@ -11,12 +12,26 @@ namespace Project.FC2J.UI.Models
         public long Id { get; set; }
         public int LineNo { get; set; }
         public long ProductId { get; set; }
-        public float OrderQuantity { get; set; }
+
+        private float _orderQuantity;
+        public float OrderQuantity
+        {
+            get { return _orderQuantity; }
+            set { _orderQuantity = value; CallPropertyChanged(nameof(OrderQuantity)); }
+        }
+
         public string ProductName { get; set; }
         public string ProductDescription { get; set; }
         public string ProductCategory { get; set; }
         public decimal TaxRate { get; set; }
-        public decimal SubTotalProductSalePrice { get; set; }
+
+        private decimal _subTotalProductSalePrice;
+        public decimal SubTotalProductSalePrice
+        {
+            get { return _subTotalProductSalePrice; }
+            set { _subTotalProductSalePrice = value; CallPropertyChanged(nameof(SubTotalProductSalePrice)); }
+        }
+
         public decimal SubTotalProductTaxPrice { get; set; }
         public decimal DeductionOutright { get; set; }
         public double Discount { get; set; }
@@ -73,5 +88,6 @@ namespace Project.FC2J.UI.Models
         }
 
         public string Price => (DeductionFixPrice > 0 ? DeductionFixPrice : ProductSalePrice).ToString("C").Substring(1);
+
     }
 }

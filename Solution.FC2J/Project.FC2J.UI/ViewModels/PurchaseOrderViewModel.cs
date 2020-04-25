@@ -99,6 +99,7 @@ namespace Project.FC2J.UI.ViewModels
             IsSubmitted = false;
             RetrieveLabel = "RETRIEVE";
             IsDeliveredAll = false;
+            SubmitLabel = "SUBMIT";
             Id = 0;
         }
 
@@ -218,7 +219,7 @@ namespace Project.FC2J.UI.ViewModels
                     Quantity = cartItemDisplayModel.CartQuantity,
                     Name = cartItemDisplayModel.Product.Name,
                     Category = cartItemDisplayModel.Product.Category,
-                    SalePrice = cartItemDisplayModel.Product.CostPrice,
+                    SalePrice = cartItemDisplayModel.Product.SalePrice,
                     UnitDiscount = cartItemDisplayModel.Product.UnitDiscount,
                     UnitOfMeasure = cartItemDisplayModel.Product.UnitOfMeasure,
                     SFAUnitOfMeasure = cartItemDisplayModel.Product.SFAUnitOfMeasure,
@@ -290,15 +291,7 @@ namespace Project.FC2J.UI.ViewModels
         private async Task ReloadPODetails()
         {
             var pono = PONo;
-
-            try
-            {
-                PurchaseOrder = await _purchaseEndpoint.GetPurchaseOrder(PONo);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            PurchaseOrder = await _purchaseEndpoint.GetPurchaseOrder(PONo);
 
             if (PurchaseOrder == null)
             {
@@ -471,7 +464,7 @@ namespace Project.FC2J.UI.ViewModels
                 Items = Cart
             };
 
-            if (inputDialog.ShowDialog() != true) return;
+            if (inputDialog.ShowDialog() == false) return;
             try
             {
                 var poPayment = await _purchaseEndpoint.InsertPayment(inputDialog.POPayment);
@@ -480,8 +473,10 @@ namespace Project.FC2J.UI.ViewModels
                 foreach (var item in inputDialog.POPayment.items)
                 {
                     var cart = Cart.FirstOrDefault(i => i.Product.Id == item.Id);
-                    if(cart!= null)
-                        cart.InvoiceNo = inputDialog.POPayment.InvoiceNo;
+                    if(cart == null) continue;
+                    cart.CartQuantity -= item.Quantity;
+                    if (cart.CartQuantity > 0) continue;
+                    cart.InvoiceNo = "Invoiced";
                 }
             }
             catch (Exception exception)
@@ -495,24 +490,16 @@ namespace Project.FC2J.UI.ViewModels
 
         public async Task DeletePaymentInvoice()
         {
-            if (MessageBox.Show("Are you sure?", $"Delete Payment Invoice ({SelectedPaymentInvoice.InvoiceNo}) Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            var invoiceNo = SelectedPaymentInvoice.InvoiceNo;
+
+            if (MessageBox.Show("Are you sure?", $"Delete Payment Invoice ({invoiceNo}) Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                await _purchaseEndpoint.DeletePayment(SelectedPaymentInvoice.Id, _loggedInUser.User.UserName.ToLower());
-
-
-                MessageBox.Show("Payment Invoice successfully deleted.", "Confirmation", MessageBoxButton.OK);
+                await _purchaseEndpoint.DeletePayment(invoiceNo, SelectedPaymentInvoice.Id, _loggedInUser.User.UserName.ToLower());
                 await LoadPaymentInvoices();
-
-                foreach (var cartItemDisplayModel in Cart)
-                {
-                    if (cartItemDisplayModel.InvoiceNo == SelectedPaymentInvoice.InvoiceNo)
-                        cartItemDisplayModel.InvoiceNo = string.Empty;
-                }
-
+                await ReloadPODetails();
+                MessageBox.Show("Payment Invoice successfully deleted.", "Confirmation", MessageBoxButton.OK);
             }
         }
-
-
 
         private string _attachmentMessage;
 
@@ -830,7 +817,7 @@ namespace Project.FC2J.UI.ViewModels
                     .Sum(item => item.CartQuantity);
             }
         }
-        public decimal SubTotal => CalculateSubTotal();
+        public decimal SubTotal => CalculateSubTotal() - CalculateTaxPrice();
         public decimal TaxPrice => CalculateTaxPrice();
 
         private decimal CalculateSubTotal()
@@ -851,12 +838,13 @@ namespace Project.FC2J.UI.ViewModels
                 .Sum(item => item.PoTax);
         }
 
-        public string Total => "P" + CalculateTotal().ToString("C").Substring(1);
+        public string Total => "P" + CalculateTotal().ToString("N4");
 
         private decimal CalculateTotal()
         {
-            return CalculateSubTotal() + CalculateTaxPrice();
+            return CalculateSubTotal();// + CalculateTaxPrice();
         }
+
         private string _deliveryDate;
         public string DeliveryDate
         {

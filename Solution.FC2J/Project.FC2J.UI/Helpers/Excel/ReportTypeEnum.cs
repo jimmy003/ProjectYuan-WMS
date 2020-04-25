@@ -13,6 +13,7 @@
         SalesMonthlyBIR = 8,
         PurchasesMonthlyBIR = 9,
         CustomerAccountSummary = 10,
-        Inventory = 11
+        Inventory = 11,
+        BMEG = 12
     }
 }

@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Caliburn.Micro;
 using Project.FC2J.Models.Product;
 using Project.FC2J.UI.Helpers.Products;
-using Xceed.Wpf.Toolkit.Panels;
 
 namespace Project.FC2J.UI.UserControls
 {
@@ -90,8 +81,7 @@ namespace Project.FC2J.UI.UserControls
         // Use the PreviewTextInputHandler to respond to key presses 
         private void PreviewTextInputHandler(Object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !IsTextAllowed(e.Text);
-            
+            e.Handled = !IsTextAllowed(e.Text);            
         }
 
         private void PastingHandler(object sender, DataObjectPastingEventArgs e)
@@ -112,15 +102,15 @@ namespace Project.FC2J.UI.UserControls
                           Quantity.Text.Length > 0 && 
                           string.IsNullOrWhiteSpace(_supplier) == false;
 
-            if (IsAction.IsChecked == false) //signifies minus the current stock
-            {
-                float quantity;
-                float stock;
+            //if (IsAction.IsChecked == false) //signifies minus the current stock
+            //{
+            //    float quantity;
+            //    float stock;
 
-                float.TryParse(Quantity.Text, out quantity);
-                float.TryParse(StockQuantity.Text, out stock);
-                output = !(stock - quantity <= 0);
-            }
+            //    float.TryParse(Quantity.Text, out quantity);
+            //    float.TryParse(StockQuantity.Text, out stock);
+            //    output = !(stock - quantity <= 0);
+            //}
 
             Save.IsEnabled = output;
         }

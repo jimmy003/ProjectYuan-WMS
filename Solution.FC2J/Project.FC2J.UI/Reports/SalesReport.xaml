@@ -47,6 +47,7 @@
                           materialDesign:HintAssist.Hint="Select Report" 
                           Margin="10,0"
                           Style="{StaticResource MaterialDesignFloatingHintComboBox}" FontSize="20">
+                    <ComboBoxItem Name="Report0">BMEG Report</ComboBoxItem>
                     <ComboBoxItem Name="Report1">Month to Date Sales Report</ComboBoxItem>
                     <ComboBoxItem Name="Report2">Month to Date Purchases Report</ComboBoxItem>
                     <ComboBoxItem Name="Report3">Monthly Sales Report (For BIR)</ComboBoxItem>

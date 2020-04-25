@@ -50,6 +50,11 @@ namespace Project.FC2J.UI.Helpers.Reports
             return await _apiHelper.GetDataTable(_apiAppSetting.Report + "/GetCustomerAccountSummary", reportParameter);
         }
 
+        public async Task<DataTable> GetBMEGReport(ProjectReportParameter reportParameter)
+        {
+            return await _apiHelper.GetDataTable(_apiAppSetting.Report + "/GetBMEGReport", reportParameter);
+        }
+
         public async Task<DataTable> GetSalesReportSMAHC(ProjectReportParameter reportParameter)
         {
             return await _apiHelper.GetDataTable(_apiAppSetting.Report + "/GetSalesReportSMAHC", reportParameter);

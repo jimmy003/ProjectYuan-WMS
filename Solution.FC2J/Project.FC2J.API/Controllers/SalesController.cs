@@ -94,6 +94,21 @@ namespace Project.F2CJ.API.Controllers
             }
         }
 
+        
+        [HttpPut, Route("UpdatePONumber")]
+        public async Task<IActionResult> UpdatePONumber(string customerId, string poNo, string newPoNO, long salesId)
+        {
+            await _repo.UpdatePONumber(customerId, poNo, newPoNO, salesId);
+            return Ok();
+        }
+
+        [HttpGet, Route("ForPrint")]
+        public async Task<IActionResult> GetSalesForPrint(string userName)
+        {
+            var list = await _repo.GetSalesForPrint(userName);
+            return Ok(list);
+        }
+
         [HttpGet, Route("Collections")]
         public async Task<IActionResult> GetCollections(string userName)
         {

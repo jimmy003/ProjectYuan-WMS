@@ -57,7 +57,7 @@
 
         </materialDesign:Card>
 
-      
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -91,7 +91,7 @@
                             </Button>
                         </Grid>
                     </Border>
-                    
+
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                         <Border Padding="0,10">
                             <StackPanel >
@@ -167,7 +167,7 @@
                                 <ColumnDefinition Width="200" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            
+
                             <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
                                 <Button x:Name="Update" 
                                         Style="{StaticResource MaterialDesignFlatButton}" Padding="2,4" Margin="0,0,4,0">
@@ -221,7 +221,7 @@
                             </StackPanel>
 
                         </Grid>
-                        
+
 
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" >
                             <Border Padding="10">
@@ -229,6 +229,17 @@
                                     <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
                                 </Border.Effect>
                                 <StackPanel >
+                                    <StackPanel Orientation="Horizontal">
+                                        <Grid>
+                                            <TextBox Name="ProductSearchInput" 
+                                                    materialDesign:HintAssist.Hint="Product Search" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                                 cal:Message.Attach="[DelayedEvent TextChanged] = [Action FilterProductLists(ProductSearchInput.Text)]"
+                                                 VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="0,5,0,5" Width="200"/>
+                                            
+                                        </Grid>
+
+
+                                    </StackPanel>
                                     <DataGrid x:Name="Products" 
                                           CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False" Width="Auto"
                                         materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" 
@@ -291,7 +302,7 @@
                     </Grid>
 
                     <Grid Grid.Row="1">
-                        
+
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -357,13 +368,13 @@
         </Grid>
 
         <!--Column 0-->
-        
-
-       
 
 
-        
 
 
-        </Grid>
+
+
+
+
+    </Grid>
 </UserControl>
