@@ -1,23 +1,17 @@
 ﻿using AutoMapper;
 using Caliburn.Micro;
 using Project.FC2J.Models.Product;
-using Project.FC2J.UI.Helpers;
 using Project.FC2J.UI.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Project.FC2J.Models.Report;
-using Project.FC2J.UI.AttachedProperties;
 using Project.FC2J.UI.Helpers.AppSetting;
 using Project.FC2J.UI.Helpers.Products;
 

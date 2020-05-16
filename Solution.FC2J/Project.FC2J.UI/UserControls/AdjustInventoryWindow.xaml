@@ -4,12 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Project.FC2J.UI.UserControls"
-        xmlns:attachedProperties="clr-namespace:Project.FC2J.UI.AttachedProperties"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Adjust Inventory" Height="400" Width="450" WindowStartupLocation="CenterScreen" ContentRendered="Window_ContentRendered" ResizeMode="NoResize">
     <Grid>
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <Border Margin="10" Background="White" Padding="10" CornerRadius="10" MinWidth="330" >
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>

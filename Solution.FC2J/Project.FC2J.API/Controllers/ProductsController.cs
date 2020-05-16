@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project.FC2J.Models.Product;
 using Project.FC2J.DataStore.Interfaces;
-using System.Threading.Tasks;
+using Project.FC2J.Models.Product;
 
-namespace Project.F2CJ.API.Controllers
+namespace Project.FC2J.API.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]

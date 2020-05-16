@@ -149,38 +149,36 @@
 
             </Grid>
 
-            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="1" CanContentScroll="True" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
 
                 <Border Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
                     </Border.Effect>
 
-                    <StackPanel>
-                        <DataGrid x:Name="Deductions"                 
-                                      CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
-                                      materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
-                                      materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
-                                      SelectedItem="{Binding SelectedDeduction}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Particular"
-                                                        Binding="{Binding Path=Particular}"
-                                                        Width="250"
-                                                        IsReadOnly="True" />
-                                <DataGridTextColumn Header="Amount"
-                                                        Width="150"
-                                                        Binding="{Binding Path=Amount, StringFormat=N2}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="PO No"
-                                                        Width="140"
-                                                        Binding="{Binding Path=PONo}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Used Amount"
-                                                        Width="150"
-                                                        Binding="{Binding Path=UsedAmount, StringFormat=N2}" IsReadOnly="True"/>
+                    <DataGrid x:Name="Deductions"                 
+                              CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
+                              materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
+                              SelectedItem="{Binding SelectedDeduction}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Particular"
+                                                Binding="{Binding Path=Particular}"
+                                                Width="250"
+                                                IsReadOnly="True" />
+                            <DataGridTextColumn Header="Amount"
+                                                Width="150"
+                                                Binding="{Binding Path=Amount, StringFormat=N2}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="PO No"
+                                                Width="140"
+                                                Binding="{Binding Path=PONo}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Used Amount"
+                                                Width="150"
+                                                Binding="{Binding Path=UsedAmount, StringFormat=N2}" IsReadOnly="True"/>
 
-                            </DataGrid.Columns>
+                        </DataGrid.Columns>
 
-                        </DataGrid>
-                    </StackPanel>
+                    </DataGrid>
 
                 </Border>
 

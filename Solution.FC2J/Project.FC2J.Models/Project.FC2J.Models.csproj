@@ -58,10 +58,14 @@
     <Compile Include="Customer\TargetCustomer.cs" />
     <Compile Include="Dtos\AuthenticatedUser.cs" />
     <Compile Include="Dtos\CustomerForSaveDto.cs" />
+    <Compile Include="Dtos\KeyValueDto.cs" />
+    <Compile Include="Dtos\ObjectWrapper.cs" />
     <Compile Include="Dtos\UserForLoginDto.cs" />
     <Compile Include="Dtos\UserForRegisterDto.cs" />
     <Compile Include="Email\EmailPayload.cs" />
-    <Compile Include="Order\Enums.cs" />
+    <Compile Include="Enums\PeriodType.cs" />
+    <Compile Include="Enums\PoStatusEnum.cs" />
+    <Compile Include="Enums\OrderStatusEnum.cs" />
     <Compile Include="Product\CartItem.cs" />
     <Compile Include="Product\CustomerAddress2.cs" />
     <Compile Include="Product\InventoryAdjustment.cs" />
@@ -87,6 +91,7 @@
     <Compile Include="Sale\OrderHeader.cs" />
     <Compile Include="Customer\PriceList.cs" />
     <Compile Include="Sale\ReceiveInvoice.cs" />
+    <Compile Include="Sale\ReceiverSalesOrder.cs" />
     <Compile Include="Sale\SaleHeader.cs" />
     <Compile Include="Sale\SaleDetail.cs" />
     <Compile Include="Sale\SalePayment.cs" />

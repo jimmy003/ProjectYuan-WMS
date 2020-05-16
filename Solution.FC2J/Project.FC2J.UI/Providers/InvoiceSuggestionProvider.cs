@@ -25,7 +25,7 @@ namespace Project.FC2J.UI.Providers
             if (string.IsNullOrWhiteSpace(filter)) return null;
             return
                 _invoices
-                    .Where(state => state.PONo.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
+                    .Where(state => state.PoNo.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
                     .ToList();
 
         }

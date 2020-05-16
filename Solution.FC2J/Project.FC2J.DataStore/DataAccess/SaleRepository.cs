@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Project.FC2J.Models.Order;
+using Project.FC2J.Models.Enums;
 using Project.FC2J.Models.Sale;
 
 namespace Project.FC2J.DataStore.DataAccess
@@ -42,6 +42,7 @@ namespace Project.FC2J.DataStore.DataAccess
 
         private readonly string _spInsertSaleHeaderPayment = "InsertSaleHeaderPayment";
         private readonly string _spRetrievePaidBadSale = "RetrievePaidBadSale";
+        private readonly string _spGetReceiverSalesOrders = "GetReceiverSalesOrders";
 
         private List<SqlParameter> _sqlParameters;
 
@@ -57,13 +58,19 @@ namespace Project.FC2J.DataStore.DataAccess
             return value;
         }
 
+        public async Task<List<ReceiverSalesOrder>> GetReceiverSalesOrders()
+        {
+            var value = await _spGetReceiverSalesOrders.GetList<ReceiverSalesOrder>();           
+            return value;
+        }
+
         public async Task ReceivedInvoice(ReceiveInvoice receiveInvoice)
         {
             _sqlParameters = new List<SqlParameter>()
             {
                 new SqlParameter("@t", 1),
                 new SqlParameter("@Id", receiveInvoice.Invoice.Id),
-                new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                new SqlParameter("@PONo", receiveInvoice.Invoice.PoNo),
                 new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                 new SqlParameter("@WithReturns", receiveInvoice.Invoice.WithReturns)
             };
@@ -90,7 +97,7 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@ProductId", _return.ProductId),
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                     new SqlParameter("@Quantity", _return.OrderQuantity),
-                    new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                    new SqlParameter("@PONo", receiveInvoice.Invoice.PoNo),
                     new SqlParameter("@SupplierId", _return.SupplierId),
                     new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Returned)
                 };
@@ -133,7 +140,7 @@ namespace Project.FC2J.DataStore.DataAccess
                 _sqlParameters = new List<SqlParameter>
                 {
                     new SqlParameter("@t", 9),
-                    new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                    new SqlParameter("@PONo", receiveInvoice.Invoice.PoNo),
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId)
                 };
                 //re-set the used deductions in reference to PONo, if all items are returned 

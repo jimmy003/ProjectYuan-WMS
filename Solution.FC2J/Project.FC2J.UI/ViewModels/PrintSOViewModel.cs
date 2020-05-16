@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using AutoMapper;
 using Caliburn.Micro;
-using Project.FC2J.Models;
 using Project.FC2J.Models.Sale;
 using Project.FC2J.Models.User;
 using Project.FC2J.UI.Helpers;

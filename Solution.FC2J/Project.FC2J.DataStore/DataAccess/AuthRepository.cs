@@ -1,16 +1,15 @@
-﻿using Project.FC2J.DataStore.Interfaces;
-using Project.FC2J.DataStore.Internal.DataAccess;
-using Project.FC2J.Models;
-using Project.FC2J.Models.Dtos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
+using Project.FC2J.DataStore.Interfaces;
+using Project.FC2J.DataStore.Internal.DataAccess;
+using Project.FC2J.Models.Dtos;
 using Project.FC2J.Models.User;
 
-namespace Project.FC2J.DataStore
+namespace Project.FC2J.DataStore.DataAccess
 {
     public class AuthRepository : IAuthRepository
     {
@@ -67,6 +66,12 @@ namespace Project.FC2J.DataStore
             }
 
             return user;
+        }
+
+        public async Task<User> ValidateUser(UserForLoginDto value)
+        {
+            var user = await GetUserByUserNameAsync(value.Username);
+            return !VerifyPasswordHash(value.Password, user.PasswordHash, user.PasswordSalt) ? null : user;
         }
 
         private bool VerifyPasswordHash(byte[] passwordHash1, byte[] passwordHash2)

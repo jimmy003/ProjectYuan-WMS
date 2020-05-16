@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using AutoMapper;
 using Caliburn.Micro;
-using Project.FC2J.Models;
-using Project.FC2J.Models.Order;
+using Project.FC2J.Models.Enums;
 using Project.FC2J.Models.Sale;
 using Project.FC2J.Models.User;
 using Project.FC2J.UI.Helpers;
@@ -26,6 +27,7 @@ namespace Project.FC2J.UI.ViewModels
         private readonly ISaleEndpoint _saleEndpoint;
         private readonly IEventAggregator _events;
         private readonly ILoggedInUser _loggedInUser;
+        private IEnumerable<Invoice> _invoices;
 
         public ReceiverViewModel(ISaleEndpoint saleEndpoint, ILoggedInUser loggedInUser, IMapper mapper, IEventAggregator events)
         {
@@ -39,24 +41,39 @@ namespace Project.FC2J.UI.ViewModels
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
+            IsLoadingVisible = true;
             await LoadInvoices();
+            IsLoadingVisible = false;
         }
 
-        private IEnumerable<Invoice> _invoices;
+        private bool _isLoadingVisible; 
+        public bool IsLoadingVisible
+        {
+            get => _isLoadingVisible;
+            set
+            {
+                _isLoadingVisible = value;
+                NotifyOfPropertyChange(() => IsLoadingVisible);
+            }
+        }
+
         private async Task LoadInvoices()
         {
             _invoices = await _saleEndpoint.GetInvoices();
-            NotifyOfPropertyChange(() => PONoProvider);
+
+            var allRecords = await _saleEndpoint.GetReceiverSalesOrders();
+            ReceiverSalesOrders = new ObservableCollection<ReceiverSalesOrder>(allRecords);
+
+            NotifyOfPropertyChange(() => PoNoProvider);
             NotifyOfPropertyChange(() => InvoiceCount);
         }
-
 
         public async Task Refresh()
         {
             await LoadInvoices();
         }
 
-        public InvoiceSuggestionProvider PONoProvider
+        public InvoiceSuggestionProvider PoNoProvider
         {
             get
             {
@@ -65,7 +82,41 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
-        public Invoice SelectedPONo
+        private ObservableCollection<ReceiverSalesOrder> _receiverSalesOrders;
+        public ObservableCollection<ReceiverSalesOrder> ReceiverSalesOrders
+        {
+            get => _receiverSalesOrders;
+            set
+            {
+                _receiverSalesOrders = value;
+                NotifyOfPropertyChange(() => ReceiverSalesOrders);
+                NotifyOfPropertyChange(() => CollectionView);
+            }
+        }
+
+        private CollectionView _collectionView = null;
+        public CollectionView CollectionView
+        {
+            get
+            {
+                _collectionView = (CollectionView)CollectionViewSource.GetDefaultView(ReceiverSalesOrders);
+                _collectionView?.SortDescriptions.Add(new SortDescription("Partner", ListSortDirection.Ascending));
+                return _collectionView;
+            }
+        }
+
+        private ReceiverSalesOrder _selectedSalesOrder;
+        public ReceiverSalesOrder SelectedSalesOrder
+        {
+            get => _selectedSalesOrder;
+            set
+            {
+                _selectedSalesOrder = value;
+                NotifyOfPropertyChange(() => SelectedSalesOrder);
+            }
+        }
+
+        public Invoice SelectedPoNo
         {
             get
             {
@@ -75,7 +126,7 @@ namespace Project.FC2J.UI.ViewModels
             {
                 _selectedPONo = value;
 
-                if (SelectedPONo != null)
+                if (SelectedPoNo != null)
                 {
                     _events.Publish("SelectedPONo Changed", action =>
                     {
@@ -83,7 +134,7 @@ namespace Project.FC2J.UI.ViewModels
                     });
                 }
 
-                NotifyOfPropertyChange(() => SelectedPONo);
+                NotifyOfPropertyChange(() => SelectedPoNo);
                 NotifyOfPropertyChange(() => CanReceive);
                 NotifyOfPropertyChange(() => IsOverlayVisible);
 
@@ -95,7 +146,7 @@ namespace Project.FC2J.UI.ViewModels
         {
             get
             {
-                if (SelectedPONo == null)
+                if (SelectedPoNo == null)
                 {
                     OnClearAfterReceive();
                     return true;
@@ -119,7 +170,6 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
-
         public string DueDate => _saleHeader?.DueDate.ToString("MMM-dd-yyyy");
         public string Customer => _saleHeader?.CustomerName;
         public string Address => _saleHeader?.CustomerAddress2;
@@ -134,15 +184,14 @@ namespace Project.FC2J.UI.ViewModels
         public string Outright => _saleHeader?.Outright.ToString("C").Substring(1);
         public string VATExemptSales => _saleHeader?.Total.ToString("C").Substring(1);
 
-
         private List<SaleDetail> _orderedProducts = new List<SaleDetail>();
 
         private System.Action OnLoadSelectedInvoiceDetails()
         {
             return async () =>
             {
-                if (SelectedPONo == null) return;
-                _saleHeader = await _saleEndpoint.GetSaleHeader(SelectedPONo.CustomerId, SelectedPONo.Id);
+                if (SelectedPoNo == null) return;
+                _saleHeader = await _saleEndpoint.GetSaleHeader(SelectedPoNo.CustomerId, SelectedPoNo.Id);
                 if (_saleHeader != null)
                 {
                     //initial Order Status, that is 4=Delivered                     
@@ -150,7 +199,7 @@ namespace Project.FC2J.UI.ViewModels
                 }
 
                 //store the ordered items
-                _orderedProducts = await _saleEndpoint.GetSaleDetails(SelectedPONo.Id, SelectedPONo.CustomerId);
+                _orderedProducts = await _saleEndpoint.GetSaleDetails(SelectedPoNo.Id, SelectedPoNo.CustomerId);
 
                 OnLoadOrderedProducts();
                 OnClearReturnProducts();
@@ -209,7 +258,6 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
-
         private BindingList<SaleDetailDisplayModel> _returnProducts;
         public BindingList<SaleDetailDisplayModel> ReturnProducts
         {
@@ -233,8 +281,7 @@ namespace Project.FC2J.UI.ViewModels
             }
         }
 
-
-        public bool CanReceive => SelectedPONo != null;
+        public bool CanReceive => SelectedPoNo != null;
 
         public async Task Receive()
         {
@@ -262,7 +309,7 @@ namespace Project.FC2J.UI.ViewModels
 
             MessageBox.Show("Invoice is received!", "System Confirmation", MessageBoxButton.OK);
 
-            SelectedPONo = null;
+            SelectedPoNo = null;
             OnClearAfterReceive();
 
             await LoadInvoices();

@@ -21,6 +21,9 @@ namespace Project.FC2J.DataStore.Interfaces
         Task PayInvoice(SalePayment salePayment);
         Task RetrievePaidBadSale(SalePayment salePayment);
         Task UpdatePONumber(string customerId, string poNo, string newPoNO, long salesId);
-        
+
+        Task<List<ReceiverSalesOrder>> GetReceiverSalesOrders();
+
+
     }
 }

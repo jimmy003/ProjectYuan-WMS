@@ -45,6 +45,7 @@ namespace Project.F2CJ.API
             services.AddScoped<IDeductionRepository, DeductionRepository>();
             services.AddScoped<IPurchaseRepository, PurchaseRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IKeyValueRepository, KeyValueRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                {

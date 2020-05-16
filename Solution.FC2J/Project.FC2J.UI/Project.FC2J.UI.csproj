@@ -213,10 +213,12 @@
     <Compile Include="Helpers\HelperExtensions.cs" />
     <Compile Include="Helpers\IDeductionEndpoint.cs" />
     <Compile Include="Helpers\IEndpoint.cs" />
+    <Compile Include="Helpers\IKeyValueEndpoint.cs" />
     <Compile Include="Helpers\IPriceListEndpoint.cs" />
     <Compile Include="Helpers\IProfileData.cs" />
     <Compile Include="Helpers\ISaleData.cs" />
     <Compile Include="Helpers\IUserEndpoint.cs" />
+    <Compile Include="Helpers\KeyValueEndpoint.cs" />
     <Compile Include="Helpers\ProjectExtension.cs" />
     <Compile Include="Helpers\Purchase\IPurchaseEndpoint.cs" />
     <Compile Include="Helpers\Purchase\PurchaseEndpoint.cs" />
@@ -271,6 +273,9 @@
     </Compile>
     <Compile Include="UserControls\PricelistDetails.xaml.cs">
       <DependentUpon>PricelistDetails.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SalesListFilterWindow.xaml.cs">
+      <DependentUpon>SalesListFilterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValueConverters\BaseValueConverter.cs" />
     <Compile Include="ValueConverters\BinaryToImageConverter.cs" />
@@ -431,6 +436,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\PricelistDetails.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\SalesListFilterWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

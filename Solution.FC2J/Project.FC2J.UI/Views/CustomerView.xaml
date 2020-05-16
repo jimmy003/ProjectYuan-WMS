@@ -71,77 +71,74 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                <Border Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
-                    </Border.Effect>
+            <Border Grid.Column="0" Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                </Border.Effect>
 
-                    <StackPanel >
-                        <DataGrid  
+                <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+                    <DataGrid  
                             x:Name="CollectionView" 
                             CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
                             materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                          
 						    SelectedItem="{Binding SelectedPartner}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Brgy"
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Brgy"
 								        Binding="{Binding Address1}"
 								        IsReadOnly="True"/>
-                                <DataGridTextColumn Header="City"
+                            <DataGridTextColumn Header="City"
 								        Binding="{Binding Address2}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Mobile"
+                            <DataGridTextColumn Header="Mobile"
 								        Binding="{Binding MobileNo}"
 								        IsReadOnly="True"  />
-                                <DataGridTextColumn Header="TIN"
+                            <DataGridTextColumn Header="TIN"
 								        Binding="{Binding TIN}"
 								        IsReadOnly="True"  />
-                                <DataGridTextColumn Header="Internal Reference"
+                            <DataGridTextColumn Header="Internal Reference"
 								        Binding="{Binding ReferenceNo}"
 								        IsReadOnly="True" />
-                                <DataGridTextColumn Header="Payment Terms"
+                            <DataGridTextColumn Header="Payment Terms"
 								        Binding="{Binding PaymentType}"
 								        IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Pricelist"
+                            <DataGridTextColumn Header="Pricelist"
 								        Binding="{Binding PriceList}"
 								        IsReadOnly="True" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </Border>
-            </ScrollViewer>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+            </Border>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                <Border Margin="10" Background="White" Padding="10" MinWidth="330" CornerRadius="10" >
+                <Border   Margin="10" Background="White" Padding="10" MinWidth="330" CornerRadius="10" >
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
                     </Border.Effect>
-
                     <StackPanel >
 
                         <TextBlock Text="Partner Details" FontSize="30" Margin="0,0,0,20"/>
 
                         <TextBox x:Name="PartnerName"  
-                                                     attachedProperties:IsFocusedProperty.Value ="True"
-                                                     materialDesign:HintAssist.Hint="Partner Name" 
-                                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                                                 attachedProperties:IsFocusedProperty.Value ="True"
+                                                 materialDesign:HintAssist.Hint="Partner Name" 
+                                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
                         <TextBox x:Name="Brgy"  
-                             materialDesign:HintAssist.Hint="Brgy" 
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                         materialDesign:HintAssist.Hint="Brgy" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
                         <TextBox x:Name="City"  
-                             materialDesign:HintAssist.Hint="City" 
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                         materialDesign:HintAssist.Hint="City" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
                         <TextBox x:Name="MobileNo"  
-                             materialDesign:HintAssist.Hint="Mobile No" 
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                         materialDesign:HintAssist.Hint="Mobile No" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
                         <TextBox x:Name="TIN"  
-                             materialDesign:HintAssist.Hint="TIN" 
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                         materialDesign:HintAssist.Hint="TIN" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
                         <StackPanel Orientation="Horizontal" >
                             <CheckBox x:Name="IsFarm" Content="Is Farm" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <ComboBox x:Name="Farms" SelectedItem="{Binding SelectedFarm}" IsEnabled="{Binding IsFarm}"
-                                      materialDesign:HintAssist.Hint="Farm" 
-                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5" Width="212" HorizontalAlignment="Center">
+                                  materialDesign:HintAssist.Hint="Farm" 
+                                  Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5" Width="212" HorizontalAlignment="Center">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Name}" />
@@ -149,14 +146,14 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
-                        
+
                         <TextBox x:Name="ReferenceNo"  
-                             materialDesign:HintAssist.Hint="ReferenceNo" 
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
+                         materialDesign:HintAssist.Hint="ReferenceNo" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="5,0,5,5"/>
 
                         <ComboBox x:Name="Payments" SelectedItem="{Binding SelectedPaymentType}" 
-                             materialDesign:HintAssist.Hint="Payment Terms" 
-                             Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
+                         materialDesign:HintAssist.Hint="Payment Terms" 
+                         Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding PaymentType}" />
@@ -165,8 +162,8 @@
                         </ComboBox>
 
                         <ComboBox x:Name="PriceLists" SelectedItem="{Binding SelectedPriceList}" 
-                              materialDesign:HintAssist.Hint="Pricelist" 
-                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
+                          materialDesign:HintAssist.Hint="Pricelist" 
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}" />
@@ -175,36 +172,14 @@
                         </ComboBox>
 
                         <ComboBox x:Name="Personnel" SelectedItem="{Binding SelectedPersonnel}" 
-                                  materialDesign:HintAssist.Hint="Sales Personnel" 
-                                  Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
+                              materialDesign:HintAssist.Hint="Sales Personnel" 
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <!--<Grid>
-                        <materialDesign:PackIcon Kind="PaymentSettings" VerticalAlignment="Bottom" Margin="2 12" Foreground="{Binding BorderBrush, ElementName=Payments}"/>
-                        <ComboBox x:Name="Payments1" SelectedItem="{Binding SelectedPaymentType}" materialDesign:HintAssist.Hint="Payment Terms" Margin="5" Padding="12 0 0 0" >
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding PaymentType}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </Grid>-->
-
-                        <!--<Grid>
-                        <materialDesign:PackIcon Kind="LibraryShelves" VerticalAlignment="Bottom" Margin="2 12" Foreground="{Binding BorderBrush, ElementName=PriceLists}"/>
-                        <ComboBox x:Name="PriceLists1" SelectedItem="{Binding SelectedPriceList}" materialDesign:HintAssist.Hint="Price Lists" Margin="5" Padding="12 0 0 0">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </Grid>-->
-
 
                         <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
                             <Button x:Name="Clear" Style="{StaticResource MaterialDesignFlatButton}"  Padding="2,4" Margin="0,0,4,0">
@@ -228,6 +203,7 @@
                         </StackPanel>
 
                     </StackPanel>
+
                 </Border>
             </ScrollViewer>
         </Grid>

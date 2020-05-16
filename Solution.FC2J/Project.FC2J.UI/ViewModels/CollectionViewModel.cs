@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using AutoMapper;
 using Caliburn.Micro;
-using Project.FC2J.Models.Order;
+using Project.FC2J.Models.Enums;
 using Project.FC2J.Models.Sale;
 using Project.FC2J.Models.User;
 using Project.FC2J.UI.Helpers;

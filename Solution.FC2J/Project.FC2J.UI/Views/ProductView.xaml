@@ -77,77 +77,79 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Column="0" 
+                          CanContentScroll="True" VerticalScrollBarVisibility="Disabled" 
+                          HorizontalScrollBarVisibility="Auto">
+
                 <Border Margin="10,10,0,10" Background="White" Padding="10" CornerRadius="10" >
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
                     </Border.Effect>
-
-                    <StackPanel >
-
-                        <DataGrid x:Name="CollectionView"                 
+                    <!--<StackPanel >
+                    </StackPanel>-->
+                    <DataGrid x:Name="CollectionView"                 
                                   CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
                                   materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto"                     
                                     SelectedItem="{Binding SelectedProduct}">
-                            <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsEditable}" Value="False">
-                                            <Setter Property="Foreground" Value="#3767ff" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding StockQuantity}" Value="0">
-                                            <Setter Property="Foreground" Value="OrangeRed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.RowStyle>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Reference No"
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEditable}" Value="False">
+                                        <Setter Property="Foreground" Value="#3767ff" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StockQuantity}" Value="0">
+                                        <Setter Property="Foreground" Value="OrangeRed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Reference No"
                                             Binding="{Binding Path=SFAReferenceNo}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Stock Coron"
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Stock Coron"
                                             Binding="{Binding Path=Stock_CORON}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Stock Lubang"
+                            <DataGridTextColumn Header="Stock Lubang"
                                                     Binding="{Binding Path=Stock_LUBANG}"
                                                     IsReadOnly="True" />
-                                <DataGridTextColumn Header="Stock San Ildefonso"
+                            <DataGridTextColumn Header="Stock San Ildefonso"
                                                     Binding="{Binding Path=Stock_SANILDEFONSO}"
                                                     IsReadOnly="True" />
-                                <DataGridTextColumn Header="SFA Category"
+                            <DataGridTextColumn Header="SFA Category"
                                             Binding="{Binding Path=Category}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Internal Category"
+                            <DataGridTextColumn Header="Internal Category"
                                             Binding="{Binding Path=InternalCategory}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Is Feeds"
+                            <DataGridTextColumn Header="Is Feeds"
                                                     Binding="{Binding Path=IsFeeds}"
                                                     IsReadOnly="True" />
-                                <DataGridTextColumn Header="Unit Of Measure"
+                            <DataGridTextColumn Header="Unit Of Measure"
                                             Binding="{Binding Path=UnitOfMeasure}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="SFA Unit Of Measure"
+                            <DataGridTextColumn Header="SFA Unit Of Measure"
                                             Binding="{Binding Path=SFAUnitOfMeasure}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Sale Price Coron"
+                            <DataGridTextColumn Header="Sale Price Coron"
                                             Binding="{Binding Path=SalePrice_CORON, StringFormat=N2}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Sale Price Lubang"
+                            <DataGridTextColumn Header="Sale Price Lubang"
                                                     Binding="{Binding Path=SalePrice_LUBANG, StringFormat=N2}"
                                                     IsReadOnly="True" />
-                                <DataGridTextColumn Header="Sale Price San Ildefonso"
+                            <DataGridTextColumn Header="Sale Price San Ildefonso"
                                                     Binding="{Binding Path=SalePrice_SANILDEFONSO, StringFormat=N2}"
                                                     IsReadOnly="True" />
-                                <DataGridTextColumn Header="Cost Price"
+                            <DataGridTextColumn Header="Cost Price"
                                             Binding="{Binding Path=CostPrice, StringFormat=N2}"
                                             IsReadOnly="True" />
-                                <DataGridTextColumn Header="Is Taxable"
+                            <DataGridTextColumn Header="Is Taxable"
                                                     Binding="{Binding Path=IsTaxable}"
                                                     IsReadOnly="True" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Border>
             </ScrollViewer>
 

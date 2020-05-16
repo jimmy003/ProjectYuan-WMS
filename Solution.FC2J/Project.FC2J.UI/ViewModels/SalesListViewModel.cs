@@ -11,11 +11,10 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Forms;
 using System.Windows.Input;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Project.FC2J.Models.Customer;
-using Project.FC2J.Models.Order;
+using Project.FC2J.Models.Dtos;
+using Project.FC2J.Models.Enums;
 using Project.FC2J.Models.User;
 using Project.FC2J.UI.Helpers.AppSetting;
 using Project.FC2J.UI.Helpers.Products;
@@ -46,6 +45,7 @@ namespace Project.FC2J.UI.ViewModels
         private readonly ISaleData _saleData;
         private readonly IEventAggregator _events;
         private readonly IMapper _mapper;
+        private readonly IKeyValueEndpoint _keyValueEndpoint;
         private readonly IProfileData _profileData;
         private readonly ILoggedInUser _loggedInUser;
 
@@ -74,7 +74,8 @@ namespace Project.FC2J.UI.ViewModels
             IEventAggregator events,
             ISaleData saleData,
             IPriceListEndpoint priceListEndpoint,
-            IMapper mapper, IApiAppSetting appSetting,
+            IMapper mapper, 
+            IKeyValueEndpoint keyValueEndpoint,
             IDeductionEndpoint deductionEndpoint)
         {
             _productEndpoint = productEndpoint;
@@ -87,6 +88,7 @@ namespace Project.FC2J.UI.ViewModels
             _saleData = saleData;
             _events = events;
             _mapper = mapper;
+            _keyValueEndpoint = keyValueEndpoint;
             _deductionEndpoint = deductionEndpoint;
             NotifyOfPropertyChange(() => IsListVisible);
         }
@@ -104,21 +106,37 @@ namespace Project.FC2J.UI.ViewModels
 
 
         #region Sales List
-        //private List<Product> allRecords = new List<Product>();
-        //private async Task LoadProducts()
-        //{
-        //    allRecords = await _productEndpoint.GetList();
-        //    var products = _mapper.Map<List<ProductDisplayModel>>(allRecords);
-        //    Products = new ObservableCollection<ProductDisplayModel>(products);
-        //    IsGridVisible = true;
-        //    NotifyOfPropertyChange(() => Count);
-        //}
+
+        private List<KeyValueDto> _keyValues = new List<KeyValueDto>();
+        private int _periodNumber = 1;
+        private PeriodType _period = PeriodType.Week;
+
+        private void OnSetOrderDetailFilter()
+        {
+            if (_keyValues == null) return;
+
+            var periodNumber = _keyValues.FirstOrDefault(x => x.Key.ToLower() == "periodnumber");
+            var period = _keyValues.FirstOrDefault(x => x.Key.ToLower() == "period");
+            if (periodNumber == null || period == null) return;
+
+            _periodNumber = Convert.ToInt32(periodNumber.Value);
+            _period = period.Value.ToLower() == "week" ? PeriodType.Week : PeriodType.Month;
+
+            NotifyOfPropertyChange(() => OrderDateFilter);
+        }
+
+        public string OrderDateFilter => $"Order Date Filter: Picking up records {_periodNumber} {_period} from Today {DateTime.Now.ToShortDateString()}";
 
         private List<OrderHeader> allRecords = new List<OrderHeader>();
 
         private async Task LoadSales()
         {
+            _keyValues = await _keyValueEndpoint.GetList();
+
+            OnSetOrderDetailFilter();
+
             allRecords = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
+
             var sales = _mapper.Map<List<SalesDisplayModel>>(allRecords);
             Sales = new ObservableCollection<SalesDisplayModel>(sales);
             await Show("0");
@@ -239,23 +257,33 @@ namespace Project.FC2J.UI.ViewModels
             Show("1");
         }
 
+        public async Task ChangeFilter()
+        {
+            var filter = new SalesListFilterWindow(_keyValueEndpoint, _periodNumber, _period);
+            var dialogResult = filter.ShowDialog();
+
+            if (Convert.ToBoolean(dialogResult))
+            {
+                if (_periodNumber != filter.PeriodNumber || _period != filter.Period)
+                {
+                    IsGridVisible = false;
+                    IsLoadingVisible = true;
+                    IsOverrideHidden = false;
+                    await LoadSales();
+                }
+
+            }
+
+        }
+
         public async Task OnShowSalesDetail(SalesDisplayModel value, string mode)
         {
             value = SelectedSale;
 
             await Show("1");
             await OnShowSalesDetail(value);
-
-            //if (value.OrderStatusId <= 3)
-            //{
-            //}
-            //else
-            //{
-            //    MessageBox.Show($"Record is {value.OrderStatus} already", "System Information", MessageBoxButton.OK);
-            //}
+           
         }
-
-        
 
         private List<Deduction> _usedDeductions = new List<Deduction>();
 

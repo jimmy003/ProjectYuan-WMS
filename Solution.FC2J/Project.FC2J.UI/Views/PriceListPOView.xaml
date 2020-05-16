@@ -157,8 +157,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <materialDesign:Card IsEnabled="{Binding IsNotEditPriceList}" Grid.Column="0" Padding="10" VerticalAlignment="Stretch" >
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <StackPanel >
+                                <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
                                         <DataGrid x:Name="Products" SelectedItem="{Binding SelectedProduct}" 
                                           CanUserSortColumns="True" CanUserAddRows="False" 
                                           AutoGenerateColumns="False"
@@ -185,7 +184,7 @@
 
                                             </DataGrid.Columns>
                                         </DataGrid>
-                                    </StackPanel>
+                                    
                                 </ScrollViewer>
                             </materialDesign:Card>
 

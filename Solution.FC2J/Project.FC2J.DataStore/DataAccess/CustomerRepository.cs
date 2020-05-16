@@ -1,13 +1,13 @@
-﻿using Project.FC2J.Models.Customer;
-using Project.FC2J.Models.Product;
-using Project.FC2J.DataStore.Interfaces;
-using Project.FC2J.DataStore.Internal.DataAccess;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Project.FC2J.DataStore.Interfaces;
+using Project.FC2J.DataStore.Internal.DataAccess;
+using Project.FC2J.Models.Customer;
+using Project.FC2J.Models.Product;
 
-namespace Project.FC2J.DataStore
+namespace Project.FC2J.DataStore.DataAccess
 {
     public class CustomerRepository : ICustomerRepository
     {

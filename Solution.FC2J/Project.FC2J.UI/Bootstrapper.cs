@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Caliburn.Micro;
-using Project.FC2J.Models;
 using Project.FC2J.Models.Customer;
 using Project.FC2J.Models.Product;
 using Project.FC2J.UI.Helpers;
@@ -12,7 +11,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Microsoft.Reporting.WinForms;
 using Project.FC2J.Models.Purchase;
 using Project.FC2J.Models.Sale;
 using Project.FC2J.Models.User;
@@ -149,7 +147,8 @@ namespace Project.FC2J.UI
                 .PerRequest<IPriceListEndpoint, PriceListEndpoint>()
                 .PerRequest<IUserEndpoint, UserEndpoint>()
                 .PerRequest<IDeductionEndpoint, DeductionEndpoint>()
-                .PerRequest<IPurchaseEndpoint, PurchaseEndpoint>();
+                .PerRequest<IPurchaseEndpoint, PurchaseEndpoint>()
+                .PerRequest<IKeyValueEndpoint, KeyValueEndpoint>();
 
             _container
                 .Singleton<IWindowManager, WindowManager>()
