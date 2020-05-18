@@ -81,6 +81,10 @@ AS BEGIN
 		BEGIN
 		set @date_From = dateadd(week,-1 * Convert(int, @PeriodNumber), @date_To)
 	END
+	if @Period = 'Day'
+		BEGIN
+		set @date_From = dateadd(day,-1 * Convert(int, @PeriodNumber), @date_To)
+	END
 
 
 	DECLARE @SQL AS NVARCHAR(MAX) = ''

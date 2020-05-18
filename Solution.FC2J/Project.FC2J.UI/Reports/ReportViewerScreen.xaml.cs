@@ -169,6 +169,8 @@ namespace Project.FC2J.UI.Reports
             table1.Columns.Add(" "); //string or sinulid
 
             //template row value
+            var convertedFlag = table1.TableName.Contains("inventory-");
+
 
             #region Setup header of excel
             var rowValue = new List<string> {""};
@@ -201,6 +203,10 @@ namespace Project.FC2J.UI.Reports
             }
 
             table1.Columns.Add("Total");
+            rowValue.Add(""); 
+
+            if (convertedFlag)
+                table1.Columns.Add("CONVERTED TO 50KGS");
 
             #endregion
 
@@ -214,6 +220,26 @@ namespace Project.FC2J.UI.Reports
             {
                 stageProducts = products.Where(item => item.Category.Equals(category.InternalCategory));
                 {
+                    //SMAHC
+                    if (convertedFlag)
+                    {
+                        if (category.InternalCategory.Equals("SMAHC", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            //one empty
+                            var addedRow = new List<string> { "TOTAL" };
+                            addedRow.AddRange(rowValue);
+                            table1.Rows.Add(addedRow.ToArray());
+
+                            for (int me = 0; me < 3; me++)
+                            {
+                                addedRow = new List<string> { string.Empty };
+                                addedRow.AddRange(rowValue);
+                                table1.Rows.Add(addedRow.ToArray());
+                            }
+                        }
+                    }
+
+
                     //insert category row with empty fields on the right
                     var stageRow = new List<string> {category.InternalCategory};
                     stageRow.AddRange(rowValue);
@@ -224,6 +250,8 @@ namespace Project.FC2J.UI.Reports
                         //adding individual product row under the current category 
                         stageRow = new List<string> {product.Name};
                         stageRow.AddRange(rowValue);
+                        if (convertedFlag)
+                            stageRow.Add(product.KiloPerUnit.ToString("N2"));
                         table1.Rows.Add(stageRow.ToArray());
                     }
 
@@ -251,8 +279,9 @@ namespace Project.FC2J.UI.Reports
                     }
                     else if (inventory.CustomerId == "Z")
                     {
-                        decimal.TryParse(dataRow[table1.Columns.Count - 2].ToString(), out value);
-                        dataRow[table1.Columns.Count - 2] = (value + inventory.Quantity).ToString("N2");
+                        var offset = convertedFlag ? 3 : 2;
+                        decimal.TryParse(dataRow[table1.Columns.Count - offset].ToString(), out value);
+                        dataRow[table1.Columns.Count - offset] = (value + inventory.Quantity).ToString("N2");
                     }
                     else
                     {
@@ -274,6 +303,7 @@ namespace Project.FC2J.UI.Reports
                 }
             }
 
+            decimal totalConverted =0 ;
             foreach (DataRow row in table1.Rows)
             {
                 bool hasValue = false;
@@ -281,15 +311,31 @@ namespace Project.FC2J.UI.Reports
 
                 for (int i = 2; i < table1.Columns.Count - 1; i++)
                 {
-                    if (i == 2 || i == table1.Columns.Count - 2)
+                    if (convertedFlag)
                     {
-                        decimal.TryParse(row[i].ToString(), out value);
-                        _total += value;
+                        if (i == 2 || i == table1.Columns.Count - 3)
+                        {
+                            decimal.TryParse(row[i].ToString(), out value);
+                            _total += value;
+                        }
+                        else
+                        {
+                            decimal.TryParse(row[i].ToString(), out value);
+                            _total -= value;
+                        }
                     }
                     else
                     {
-                        decimal.TryParse(row[i].ToString(), out value);
-                        _total -= value;
+                        if (i == 2 || i == table1.Columns.Count - 2)
+                        {
+                            decimal.TryParse(row[i].ToString(), out value);
+                            _total += value;
+                        }
+                        else
+                        {
+                            decimal.TryParse(row[i].ToString(), out value);
+                            _total -= value;
+                        }
                     }
 
                     if (string.IsNullOrWhiteSpace(row[i].ToString()) == false)
@@ -298,12 +344,41 @@ namespace Project.FC2J.UI.Reports
                     }
                 }
 
-                if (hasValue)
+                if (!hasValue) continue;
+
+                if (convertedFlag)
                 {
+                    //this holds the kilo per unit
                     decimal.TryParse(row[table1.Columns.Count - 1].ToString(), out value);
+
+                    //total 
+                    row[table1.Columns.Count - 2] = _total.ToString("N2");
+
+
+                    if (value > 0)
+                    {
+                        var converted = (_total * value) / 50;
+                        //convert per 50 kg
+                        totalConverted += converted;
+                        row[table1.Columns.Count - 1] = converted.ToString("N4");
+                    }
+                    else
+                        row[table1.Columns.Count - 1] = string.Empty;
+
+                }
+                else
                     row[table1.Columns.Count - 1] = _total.ToString("N2");
+            }
+
+            if (!convertedFlag) return;
+            {
+                var totalRowConverted = table1.AsEnumerable().FirstOrDefault(r => r[0].ToString() == "TOTAL");
+                if (totalRowConverted != null)
+                {
+                    totalRowConverted[table1.Columns.Count - 1] = totalConverted.ToString("N4");
                 }
             }
+
         }
 
         private string _pathFilename = Directory.GetCurrentDirectory();

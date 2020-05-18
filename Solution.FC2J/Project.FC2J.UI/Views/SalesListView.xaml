@@ -268,7 +268,7 @@
                 </Grid>
 
                 <Grid  Visibility="{Binding IsSalesOrderVisible, Converter={StaticResource BoolToHiddenConverter}, 
-                    FallbackValue=Collapsed}"
+                    FallbackValue=Visible}"
                     x:Name="SalesOrderContainer">
 
                     <!--Sales Order-->
@@ -297,14 +297,14 @@
                                     <StackPanel>
                                         <Grid>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                                <TextBlock Text="Sales Order" 
-                                                           FontSize="30" Margin="0 0 0 5"/>
-                                                <TextBlock Text="#" Foreground="Gray"
+                                                <TextBlock Text="Sales Order" VerticalAlignment="Center"
+                                                           FontSize="20" Margin="0 0 0 5"/>
+                                                <TextBlock Text="#" Foreground="Gray" VerticalAlignment="Center"
                                                            Visibility="{Binding IsSalesId, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                                                            Margin="4,0,0,0" HorizontalAlignment="Left"/>
-                                                <TextBlock x:Name="SalesId" FontSize="30" Margin="10,0,0,5"/>
+                                                <TextBlock x:Name="SalesId" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,5" />
                                             </StackPanel>
-                                            <TextBlock x:Name="OrderStatus" Foreground="{Binding OrderStatusId, Converter={StaticResource StatusIdToForegroundConverter}, FallbackValue=Black}"  FontSize="30" Margin="10,0,0,5" HorizontalAlignment="Right"/>
+                                            <TextBlock x:Name="OrderStatus" Foreground="{Binding OrderStatusId, Converter={StaticResource StatusIdToForegroundConverter}, FallbackValue=Black}" VerticalAlignment="Center" FontSize="22" Margin="10,0,0,5" HorizontalAlignment="Right"/>
                                         </Grid>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
                                             <Button x:Name="CancelSO" 
@@ -426,8 +426,8 @@
 
                                         <StackPanel Grid.Row="0">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="Total" FontSize="30" FontWeight="Bold"  Margin="0 0 0 5" Width="150"/>
-                                                <TextBlock x:Name="Total" FontSize="30"  Margin="0 0 0 5" TextAlignment="Right" Width="260" VerticalAlignment="Center"/>
+                                                <TextBlock Text="TOTAL" FontSize="22" VerticalAlignment="Center" FontWeight="Bold"  Margin="0 0 0 5" Width="150"/>
+                                                <TextBlock x:Name="Total" FontSize="24"  Margin="0 0 0 5" TextAlignment="Right" Width="260" VerticalAlignment="Center"/>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
                                                 <Button x:Name="CheckOut" HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFlatButton}" Margin="10,0,0,0">
@@ -507,7 +507,8 @@
                                                                 Visibility="{Binding IsDeductionControlsVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                                                                 HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFlatButton}" Margin="10,0,0,0">
                                                             <Grid>
-                                                                <materialDesign:PackIcon Kind="Pocket" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                                                <materialDesign:PackIcon Kind="Receipt" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="SHOW" FontSize="10" VerticalAlignment="Center" Margin="20,5,0,5"/>
                                                             </Grid>
                                                         </Button>
                                                     </StackPanel>
@@ -543,7 +544,7 @@
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate TargetType="ListBoxItem">
-                                                                    <CheckBox Margin="5,2"
+                                                                    <CheckBox Margin="5,2" IsEnabled="{Binding IsEnabled}"
                                                                               IsChecked="{Binding IsChecked}" Content="{Binding DisplayDescription}"
                                                                               cal:Message.Attach="[Event Checked] = [Action CheckBoxClicked()]; [Event Unchecked] = [Action CheckBoxClicked()]"/>
                                                                 </ControlTemplate>
@@ -570,7 +571,7 @@
                                     <DropShadowEffect BlurRadius="30" Color="LightGray" ShadowDepth="0"/>
                                 </Border.Effect>
                                 <StackPanel>
-                                    <TextBlock Text="Details" FontSize="30" Margin="0 0 0 5" Width="510" HorizontalAlignment="Left"/>
+                                    <TextBlock Text="DETAILS" FontSize="24" Margin="0 0 0 5" Width="510" HorizontalAlignment="Left"/>
                                     <StackPanel >
                                         <StackPanel Orientation="Horizontal">
                                             <editors:AutoCompleteTextBox 

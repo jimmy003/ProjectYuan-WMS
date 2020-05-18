@@ -40,7 +40,7 @@ namespace Project.FC2J.UI.UserControls
             var selected = PeriodTypeControl.SelectedItem;
             if (selected == null) return;
             var period = selected.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "");
-            Period = period == "Week" ? PeriodType.Week : PeriodType.Month;
+            Period = (PeriodType)Enum.Parse(typeof(PeriodType), period, true);
             CanSave();
             OnWarningCheck();
         }

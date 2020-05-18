@@ -29,6 +29,7 @@
                         <ComboBox Name="PeriodTypeControl" 
                                   materialDesign:HintAssist.Hint="Period" 
                                   Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="5,0,5,5" SelectionChanged="PeriodTypeControl_OnSelectionChanged" >
+                            <ComboBoxItem >Day</ComboBoxItem>
                             <ComboBoxItem >Week</ComboBoxItem>
                             <ComboBoxItem >Month</ComboBoxItem>
                         </ComboBox>

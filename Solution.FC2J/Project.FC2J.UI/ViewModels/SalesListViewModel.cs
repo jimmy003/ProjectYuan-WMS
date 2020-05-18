@@ -120,7 +120,7 @@ namespace Project.FC2J.UI.ViewModels
             if (periodNumber == null || period == null) return;
 
             _periodNumber = Convert.ToInt32(periodNumber.Value);
-            _period = period.Value.ToLower() == "week" ? PeriodType.Week : PeriodType.Month;
+            _period = (PeriodType)Enum.Parse(typeof(PeriodType), period.Value, true);
 
             NotifyOfPropertyChange(() => OrderDateFilter);
         }
@@ -138,7 +138,7 @@ namespace Project.FC2J.UI.ViewModels
             allRecords = await _saleEndpoint.GetSales(_loggedInUser.User.UserName.ToLower());
 
             var sales = _mapper.Map<List<SalesDisplayModel>>(allRecords);
-            Sales = new ObservableCollection<SalesDisplayModel>(sales);
+            Sales = new ObservableCollection<SalesDisplayModel>(sales.OrderByDescending( x => x.SubmittedDate ));
             await Show("0");
             IsGridVisible = true;
             IsLoadingVisible = false;
@@ -328,11 +328,7 @@ namespace Project.FC2J.UI.ViewModels
                 UserName = _saleData.Value.UserName;
                 PONo = _saleData.Value.PONo;
                 SalesId = _saleData.Value.Id.ToString();
-
                 
-                //SelectedSupplier = "System.Windows.Controls.ComboBoxItem: San Ildefonso" ;
-                //Supplier = _saleData.Value.SaleDetails[0].Supplier;
-
                 OrderStatusId = Convert.ToInt32(_saleData.Value.OrderStatusId);
                 SelectedSupplier = "System.Windows.Controls.ComboBoxItem: " + _saleData.Value.SaleDetails[0].Supplier;
                 IsSupplier = false;
@@ -1658,6 +1654,7 @@ namespace Project.FC2J.UI.ViewModels
         {
             if (MessageBox.Show("Are you sure you want to Cancel this Sales Order?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
+                _saleData.Value.OldOrderStatusId = _saleData.Value.OrderStatusId;
                 _saleData.Value.OrderStatusId = 3;
                 _saleData.Value.OverrideUser = _loggedInUser.User.UserName;
 
@@ -2435,7 +2432,19 @@ namespace Project.FC2J.UI.ViewModels
             _deductionEndpoint.SetParameters(0, SelectedPartner.Id);
             _allDeductions = await _deductionEndpoint.GetList();
             var deductions = _mapper.Map<List<DeductionDisplayModel>>(_allDeductions);
-            DeductionsList = new BindingList<DeductionDisplayModel>(deductions);
+            DeductionsList = new BindingList<DeductionDisplayModel>(deductions.Select(x => 
+                new DeductionDisplayModel
+                {
+                    Amount = x.Amount,
+                    IsEnabled = string.IsNullOrEmpty(x.PONo),
+                    CustomerId = x.CustomerId,
+                    Id = x.Id,
+                    IsChecked = x.IsChecked,
+                    Particular = x.Particular,
+                    PONo = x.PONo,
+                    UpdatedDate = x.UpdatedDate,
+                    UsedAmount = x.UsedAmount
+                }).ToList() );
         }
 
         public bool CanShowDeduction => SelectedPartner != null && (OrderStatusId == 1 || OrderStatusId == 0);
@@ -2466,6 +2475,7 @@ namespace Project.FC2J.UI.ViewModels
                 foreach (var deductionDisplayModel in DeductionsList)
                 {
                     deductionDisplayModel.IsChecked = true;
+                    deductionDisplayModel.IsEnabled = false;
                 }
 
             }
@@ -2489,6 +2499,7 @@ namespace Project.FC2J.UI.ViewModels
                     var deductionItem = DeductionsList.FirstOrDefault(i => i.PONo == item.PONo);
                     if (deductionItem != null)
                     {
+                        deductionItem.IsEnabled = true;
                         deductionItem.IsChecked = true;
                     }
                     else

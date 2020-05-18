@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project.FC2J.Models.Sale
 {
@@ -37,6 +34,7 @@ namespace Project.FC2J.Models.Sale
         public string TIN { get; set; }
         public string SFAReferenceNo { get; set; }
         public long OrderStatusId { get; set; }
+        public long OldOrderStatusId { get; set; }
         public string OrderStatus { get; set; }
         public bool Revalidate { get; set; }
         public long SelectedPaymentTypeId { get; set; }
