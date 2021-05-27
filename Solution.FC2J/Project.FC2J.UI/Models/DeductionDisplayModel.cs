@@ -69,7 +69,6 @@ namespace Project.FC2J.UI.Models
         }
 
         private bool _isChecked;
-
         public bool IsChecked
         {
             get { return _isChecked; }
@@ -79,7 +78,18 @@ namespace Project.FC2J.UI.Models
                 CallPropertyChanged(nameof(IsChecked));
             }
         }
- 
+
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+            get { return _isEnabled; }
+            set
+            {
+                _isEnabled = value;
+                CallPropertyChanged(nameof(IsEnabled));
+            }
+        }
+
         public string DisplayDescription => $"{Particular} (P {Amount.ToString("C").Substring(1)})";
 
 

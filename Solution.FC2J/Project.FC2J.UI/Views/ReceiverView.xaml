@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:editors="http://wpfcontrols.com/"
+             xmlns:userControls="clr-namespace:Project.FC2J.UI.UserControls"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              TextElement.FontWeight="Regular"
              TextElement.FontSize="13"
@@ -14,7 +15,7 @@
              TextOptions.TextRenderingMode="Auto"
              Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="{DynamicResource MaterialDesignFont}"
-            mc:Ignorable="d" 
+             mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1000">
     <Grid>
         <Grid.RowDefinitions>
@@ -22,6 +23,21 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <Grid Grid.RowSpan="3" 
+              Visibility="{Binding IsLoadingVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
+              Panel.ZIndex="1000" >
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </Grid.Background>
+            <!-- Add controls as needed -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <userControls:Spinner x:Name="Spinner" 
+                                      Margin="5" Width="180" Height="180"/>
+
+                <TextBlock Text="Loading ..." HorizontalAlignment="Center" FontSize="20" Foreground="White"/>
+            </StackPanel>
+        </Grid>
 
         <materialDesign:Card Grid.Row="0" Padding="10" Margin="16">
             <Grid>
@@ -53,17 +69,17 @@
                     <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" Text="Enter Invoice Number:" VerticalAlignment="Center"/>
 
                     <editors:AutoCompleteTextBox 
-                    x:Name="PONoControl"
-                    Style="{StaticResource MaterialAutoCompleteTextBox}"
-                    MaxLength="50"        
-                    materialDesign:HintAssist.Hint="Invoice number"
-                    CharacterCasing="Upper"
-                    DisplayMember="PONo"
-                    Provider="{Binding PONoProvider}"
-                    ItemTemplate="{StaticResource ResourceKey=PONoTemplate}"
-                    Margin="15,5,0,5" VerticalAlignment="Center" 
-                    SelectedItem="{Binding SelectedPONo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
-                    Height="37" HorizontalAlignment="Left" Width="410" >
+                        x:Name="PoNoControl"
+                        Style="{StaticResource MaterialAutoCompleteTextBox}"
+                        MaxLength="50"        
+                        materialDesign:HintAssist.Hint="Invoice number"
+                        CharacterCasing="Upper"
+                        DisplayMember="PoNo"
+                        Provider="{Binding PoNoProvider}"
+                        ItemTemplate="{StaticResource ResourceKey=SoNoTemplate}"
+                        Margin="15,5,0,5" VerticalAlignment="Center" 
+                        SelectedItem="{Binding SelectedPoNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                        Height="37" HorizontalAlignment="Left" Width="410" >
                         <editors:AutoCompleteTextBox.LoadingContent>
                             <TextBlock Text="Loading..." Margin="5" FontSize="14" />
                         </editors:AutoCompleteTextBox.LoadingContent>
@@ -88,7 +104,7 @@
                         Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Right" VerticalAlignment="Top" />
 
             </Grid>
-                
+
         </materialDesign:Card>
         <materialDesign:Card Grid.Row="1" Padding="10" Margin="16,0">
             <Grid>
@@ -102,160 +118,232 @@
                 <TextBlock Grid.Column="1" x:Name="Customer" Text="AJ &amp; MJ POULTRY SUPPLY" VerticalAlignment="Center" Margin="10,0" FontSize="20" />
                 <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" Text="Delivery Date:" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <TextBlock Grid.Column="3" x:Name="DeliveryDate" Text="Nov-22-2019" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="20"/>
-
             </Grid>
-
         </materialDesign:Card>
-        <materialDesign:Card Grid.Row="2" Padding="32" Margin="16" VerticalAlignment="Stretch">
-            <Grid>
-                <Grid x:Name="Overlay" 
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <materialDesign:Card Grid.Column="0" Padding="32" Margin="16" MinWidth="780" VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid x:Name="Overlay" 
                       Visibility="{Binding IsOverlayVisible, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                       Panel.ZIndex="1000" >
-                    <Grid.Background>
-                        <SolidColorBrush Color="#FFE4E6EA" Opacity="0.5"/>
-                    </Grid.Background>
-                </Grid>
-                <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="WithReturns" VerticalAlignment="Center"/>
-                    <TextBlock cal:Message.Attach="[Event PreviewMouseDown] = [Action ClickCheckBox()]"  Style="{DynamicResource MaterialDesignTitleTextBlock}" 
+                        <Grid.Background>
+                            <SolidColorBrush Color="#FFE4E6EA" Opacity="0.5"/>
+                        </Grid.Background>
+                    </Grid>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="WithReturns" VerticalAlignment="Center"/>
+                            <TextBlock cal:Message.Attach="[Event PreviewMouseDown] = [Action ClickCheckBox()]"  Style="{DynamicResource MaterialDesignTitleTextBlock}" 
                                Text="With Returns" VerticalAlignment="Center" Margin="0" />
-                </StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-
-                    <Border x:Name="OrderedItems" Grid.Column="0"  Padding="10">
-
+                        </StackPanel>
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" Text="Ordered Items:" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" x:Name="Return" 
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+
+                            <Border x:Name="OrderedItems" Grid.Column="0"  Padding="10">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" Text="Ordered Items:" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="1" x:Name="Return" 
                                     Visibility="{Binding WithReturns, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                                     Style="{StaticResource MaterialDesignFlatButton}" 
                                     Padding="30,5" Margin="10" 
                                     HorizontalAlignment="Right" 
                                     HorizontalContentAlignment="Center" 
                                     VerticalAlignment="Center">
-                                    <Grid>
-                                        <materialDesign:PackIcon Kind="CodeGreaterThan" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0"/>
-                                        <TextBlock Text="RETURN" FontSize="16" Margin="0,0,20,0" HorizontalAlignment="Left"/>
+                                            <Grid>
+                                                <materialDesign:PackIcon Kind="CodeGreaterThan" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0"/>
+                                                <TextBlock Text="RETURN" FontSize="16" Margin="0,0,20,0" HorizontalAlignment="Left"/>
+                                            </Grid>
+                                        </Button>
                                     </Grid>
-                                </Button>
-                            </Grid>
 
-                            <StackPanel Grid.Row="1" >
-                                <DataGrid x:Name="Products" SelectedItem="{Binding SelectedProduct}" 
+                                    <StackPanel Grid.Row="1" >
+                                        <DataGrid x:Name="Products" SelectedItem="{Binding SelectedProduct}" 
                                       CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
                                       materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto" >
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Qty"
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Qty"
                                                         Binding="{Binding OrderQuantity}"
                                                         IsReadOnly="True" />
 
-                                        <DataGridTextColumn Header="UOM"
+                                                <DataGridTextColumn Header="UOM"
                                                         Binding="{Binding ProductUnitOfMeasure}"
                                                         IsReadOnly="True" />
-                                        <DataGridTextColumn Header="Item"
+                                                <DataGridTextColumn Header="Item"
                                                         Binding="{Binding ProductName}"
                                                         Width="120"
                                                         IsReadOnly="True" />
 
-                                        <DataGridTextColumn Header="Price"
+                                                <DataGridTextColumn Header="Price"
                                                         Binding="{Binding Price, StringFormat=N2}"
                                                         IsReadOnly="True" />
 
-                                        <DataGridTextColumn Header="Sub Total"
+                                                <DataGridTextColumn Header="Sub Total"
                                                         Binding="{Binding SubTotalProductSalePrice, StringFormat=N2}"
                                                         IsReadOnly="True" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
 
-                        </Grid>
+                                </Grid>
 
+                            </Border>
 
-
-                    </Border>
-
-                    <Border x:Name="ReturnItems"
+                            <Border x:Name="ReturnItems"
                             Visibility="{Binding WithReturns, Converter={StaticResource BoolToHiddenConverter}, FallbackValue=Collapsed}"
                             Grid.Column="1" Padding="10">
 
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Button Grid.Column="0" x:Name="Remove" 
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" x:Name="Remove" 
                                         Style="{StaticResource MaterialDesignFlatButton}" 
                                         Padding="30,5" Margin="10" 
                                         HorizontalAlignment="Left" 
                                         HorizontalContentAlignment="Center" 
                                         VerticalAlignment="Center">
-                                    <Grid>
-                                        <materialDesign:PackIcon Kind="CodeLessThan" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0"/>
-                                        <TextBlock Text="REMOVE" FontSize="16" Margin="20,0,0,0" HorizontalAlignment="Right"/>
+                                            <Grid>
+                                                <materialDesign:PackIcon Kind="CodeLessThan" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0"/>
+                                                <TextBlock Text="REMOVE" FontSize="16" Margin="20,0,0,0" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                        </Button>
+                                        <TextBlock Grid.Column="1" Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" Text="Returned Items:" VerticalAlignment="Center"/>
+
                                     </Grid>
-                                </Button>
-                                <TextBlock Grid.Column="1" Style="{DynamicResource MaterialDesignTitleTextBlock}" HorizontalAlignment="Left" Text="Returned Items:" VerticalAlignment="Center"/>
 
-                            </Grid>
-
-                            <StackPanel Grid.Row="1">
-                                <DataGrid x:Name="ReturnProducts" SelectedItem="{Binding SelectedReturnProduct}" 
+                                    <StackPanel Grid.Row="1">
+                                        <DataGrid x:Name="ReturnProducts" SelectedItem="{Binding SelectedReturnProduct}" 
                                       CanUserSortColumns="True" CanUserAddRows="False" AutoGenerateColumns="False"
                                       materialDesign:DataGridAssist.CellPadding="13 8 8 8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" Width="Auto" >
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Qty"
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Qty"
                                                         Binding="{Binding OrderQuantity}"
                                                         IsReadOnly="True" />
 
-                                        <DataGridTextColumn Header="UOM"
+                                                <DataGridTextColumn Header="UOM"
                                                         Binding="{Binding ProductUnitOfMeasure}"
                                                         IsReadOnly="True" />
-                                        <DataGridTextColumn Header="Item"
+                                                <DataGridTextColumn Header="Item"
                                                         Binding="{Binding ProductName}"
                                                         Width="120"
                                                         IsReadOnly="True" />
 
-                                        <DataGridTextColumn Header="Price"
+                                                <DataGridTextColumn Header="Price"
                                                         Binding="{Binding Price, StringFormat=N2}"
                                                         IsReadOnly="True" />
 
-                                        <DataGridTextColumn Header="Sub Total"
+                                                <DataGridTextColumn Header="Sub Total"
                                                         Binding="{Binding SubTotalProductSalePrice, StringFormat=N2}"
                                                         IsReadOnly="True" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
 
 
-                            </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+
+
                         </Grid>
-                    </Border>
+                    </StackPanel>
+                </Grid>
 
+            </materialDesign:Card>
+
+            <Border Grid.Column="1" Margin="0,16,16,16" Padding="10"  Background="White" CornerRadius="10">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Color="LightGray" ShadowDepth="0"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" 
+                                               Text="List of Sales Order - To Be Received" 
+                                               Style="{DynamicResource MaterialDesignTitleTextBlock}" 
+                                               HorizontalAlignment="Left" 
+                                               VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" CanContentScroll="True" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" >
+                        
+                        <DataGrid 
+                                        x:Name="CollectionView" 
+                                        SelectedItem="{Binding SelectedSalesOrder}" 
+                                        CanUserSortColumns="True" CanUserAddRows="False" 
+                                        AutoGenerateColumns="False"
+                                        materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
+                                        materialDesign:DataGridAssist.ColumnHeaderPadding="8" 
+                                        Width="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date"
+                                                        Binding="{Binding Date}"
+                                                        IsReadOnly="True" />
+
+                                <DataGridTextColumn Header="Partner"
+                                                        Binding="{Binding Partner}"
+                                                        Width="140"
+                                                        IsReadOnly="True" />
+
+                                <DataGridTextColumn Header="SO #"
+                                                        Binding="{Binding SoNo}"
+                                                        IsReadOnly="True" />
+
+                                <DataGridTextColumn Header="Amount"
+                                                        Binding="{Binding Amount, StringFormat=N2}"
+                                                        IsReadOnly="True" />
+
+                                <DataGridTextColumn Header="Due Date"
+                                                        Binding="{Binding DueDate, StringFormat=d}"
+                                                        IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
 
                 </Grid>
-            </StackPanel>
-            </Grid>
-            
-        </materialDesign:Card>
+
+            </Border>
+
+
+        </Grid>
+
+
+
     </Grid>
 </UserControl>

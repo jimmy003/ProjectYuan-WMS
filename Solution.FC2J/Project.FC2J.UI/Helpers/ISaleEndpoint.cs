@@ -1,8 +1,6 @@
-﻿using Project.FC2J.Models;
-using Project.FC2J.Models.Sale;
+﻿using Project.FC2J.Models.Sale;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace Project.FC2J.UI.Helpers
 {
@@ -22,5 +20,6 @@ namespace Project.FC2J.UI.Helpers
         Task PayInvoice(SalePayment salePayment);
         Task RetrievePaidBadSale(SalePayment salePayment);
         Task UpdatePONumber(string customerId, string _poNo, string _newPoNO, long salesId);
+        Task<List<ReceiverSalesOrder>> GetReceiverSalesOrders();
     }
 }

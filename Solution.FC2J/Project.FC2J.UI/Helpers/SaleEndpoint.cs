@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Project.FC2J.Models.Sale;
-using System.Net.Http;
-using Project.FC2J.Models;
 using Project.FC2J.UI.Helpers.AppSetting;
 
 namespace Project.FC2J.UI.Helpers
@@ -14,12 +9,14 @@ namespace Project.FC2J.UI.Helpers
     {
 
         private readonly IApiAppSetting _apiAppSetting;
+        private readonly IKeyValueEndpoint _keyValueEndpoint;
         private readonly IAPIHelper _apiHelper;
 
-        public SaleEndpoint(IAPIHelper apiHelper, IApiAppSetting apiAppSetting)
+        public SaleEndpoint(IAPIHelper apiHelper, IApiAppSetting apiAppSetting, IKeyValueEndpoint keyValueEndpoint)
         {
             _apiHelper = apiHelper;
             _apiAppSetting = apiAppSetting;
+            _keyValueEndpoint = keyValueEndpoint;
         }
 
         public async Task<SalesInvoice> GetInvoiceNo()
@@ -92,6 +89,11 @@ namespace Project.FC2J.UI.Helpers
         public async Task UpdatePONumber(string customerId, string _poNo, string _newPoNO, long salesId)
         {
             await _apiHelper.Update(_apiAppSetting.Sale + @"/UpdatePONumber" + $"?customerId={customerId}&poNo={_poNo}&newPoNO={_newPoNO}&salesId={salesId}");
+        }
+
+        public async Task<List<ReceiverSalesOrder>> GetReceiverSalesOrders()
+        {
+            return await _apiHelper.GetList<ReceiverSalesOrder>(_apiAppSetting.Sale + @"/receiver-sales-orders");
         }
     }
 }

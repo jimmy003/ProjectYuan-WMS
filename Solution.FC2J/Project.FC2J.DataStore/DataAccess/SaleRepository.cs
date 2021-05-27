@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Project.FC2J.Models.Order;
+using Project.FC2J.Models.Enums;
 using Project.FC2J.Models.Sale;
 
 namespace Project.FC2J.DataStore.DataAccess
@@ -42,6 +42,7 @@ namespace Project.FC2J.DataStore.DataAccess
 
         private readonly string _spInsertSaleHeaderPayment = "InsertSaleHeaderPayment";
         private readonly string _spRetrievePaidBadSale = "RetrievePaidBadSale";
+        private readonly string _spGetReceiverSalesOrders = "GetReceiverSalesOrders";
 
         private List<SqlParameter> _sqlParameters;
 
@@ -57,13 +58,19 @@ namespace Project.FC2J.DataStore.DataAccess
             return value;
         }
 
+        public async Task<List<ReceiverSalesOrder>> GetReceiverSalesOrders()
+        {
+            var value = await _spGetReceiverSalesOrders.GetList<ReceiverSalesOrder>();           
+            return value;
+        }
+
         public async Task ReceivedInvoice(ReceiveInvoice receiveInvoice)
         {
             _sqlParameters = new List<SqlParameter>()
             {
                 new SqlParameter("@t", 1),
                 new SqlParameter("@Id", receiveInvoice.Invoice.Id),
-                new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                new SqlParameter("@PONo", receiveInvoice.Invoice.PoNo),
                 new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                 new SqlParameter("@WithReturns", receiveInvoice.Invoice.WithReturns)
             };
@@ -90,7 +97,7 @@ namespace Project.FC2J.DataStore.DataAccess
                     new SqlParameter("@ProductId", _return.ProductId),
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId),
                     new SqlParameter("@Quantity", _return.OrderQuantity),
-                    new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                    new SqlParameter("@PONo", receiveInvoice.Invoice.PoNo),
                     new SqlParameter("@SupplierId", _return.SupplierId),
                     new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Returned)
                 };
@@ -133,7 +140,7 @@ namespace Project.FC2J.DataStore.DataAccess
                 _sqlParameters = new List<SqlParameter>
                 {
                     new SqlParameter("@t", 9),
-                    new SqlParameter("@PONo", receiveInvoice.Invoice.PONo),
+                    new SqlParameter("@PONo", receiveInvoice.Invoice.PoNo),
                     new SqlParameter("@CustomerId", receiveInvoice.Invoice.CustomerId)
                 };
                 //re-set the used deductions in reference to PONo, if all items are returned 
@@ -298,20 +305,7 @@ namespace Project.FC2J.DataStore.DataAccess
                         };
                         await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
-                        if (sale.Deductions.Count > 0)
-                        {
-                            foreach (var deduction in sale.Deductions)
-                            {
-                                _sqlParameters = new List<SqlParameter>
-                                {
-                                    new SqlParameter("@t", 7),
-                                    new SqlParameter("@PONo", sale.PONo),
-                                    new SqlParameter("@Id", deduction),
-                                    new SqlParameter("@CustomerId", sale.CustomerId)
-                                };
-                                await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
-                            }
-                        }
+                        await OnDeduction(sale);
                         #endregion
                         break;
 
@@ -384,28 +378,21 @@ namespace Project.FC2J.DataStore.DataAccess
                         };
                         await _spCancelSaleOrder.ExecuteNonQueryAsync(_sqlParameters.ToArray());
 
-                        //Must Create Cancelled Inventory to negate the 
-                        foreach (var item in sale.SaleDetails)
-                        {
-                            _sqlParameters = new List<SqlParameter>
+                        //Must Create Cancelled Inventory to negate the only if Status is VALIDATED
+                        if (sale.OldOrderStatusId == 2)
+                            foreach (var item in sale.SaleDetails)
                             {
-                                new SqlParameter("@ProductId", item.ProductId),
-                                new SqlParameter("@CustomerId", sale.CustomerId),
-                                new SqlParameter("@Quantity", item.OrderQuantity),
-                                new SqlParameter("@PONo", sale.PONo),
-                                new SqlParameter("@SupplierId", item.SupplierId),
-                                new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Cancelled)
-                            };
-                            await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
-                        }
-
-                        //_sqlParameters = new List<SqlParameter>
-                        //{
-                        //    new SqlParameter("@PONo", sale.PONo),
-                        //    new SqlParameter("@CustomerId", sale.CustomerId),
-                        //    new SqlParameter("@SupplierId", sale.SaleDetails[0].SupplierId)
-                        //};
-                        //await _spClearSaleInventoryByPONo.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                                _sqlParameters = new List<SqlParameter>
+                                {
+                                    new SqlParameter("@ProductId", item.ProductId),
+                                    new SqlParameter("@CustomerId", sale.CustomerId),
+                                    new SqlParameter("@Quantity", item.OrderQuantity),
+                                    new SqlParameter("@PONo", sale.PONo),
+                                    new SqlParameter("@SupplierId", item.SupplierId),
+                                    new SqlParameter("@CancelledOrReturned", CancelledOrReturnedEnum.Cancelled)
+                                };
+                                await _spCreateSaleInventory.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                            }
 
                         //-- reset the deductions using Id only with PONo
                         _sqlParameters = new List<SqlParameter>
@@ -460,7 +447,8 @@ namespace Project.FC2J.DataStore.DataAccess
 
                 await ProcessSaleDetails(sale.CustomerId, sale, result.Id.ToString());
 
-                
+                await OnDeduction(sale);
+
 
                 #endregion
 
@@ -468,6 +456,24 @@ namespace Project.FC2J.DataStore.DataAccess
 
             return result;
 
+        }
+
+        private async Task OnDeduction(SaleHeader sale)
+        {
+            if (sale.Deductions.Count > 0)
+            {
+                foreach (var deduction in sale.Deductions)
+                {
+                    _sqlParameters = new List<SqlParameter>
+                    {
+                        new SqlParameter("@t", 7),
+                        new SqlParameter("@PONo", sale.PONo),
+                        new SqlParameter("@Id", deduction),
+                        new SqlParameter("@CustomerId", sale.CustomerId)
+                    };
+                    await _spManageSaleDeduction.ExecuteNonQueryAsync(_sqlParameters.ToArray());
+                }
+            }
         }
 
         private async Task ProcessSaleDetails(long customerId, SaleHeader sale, string id)

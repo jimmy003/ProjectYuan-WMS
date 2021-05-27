@@ -157,6 +157,11 @@
                     <TextBlock Text="{Binding PONo}"/>
                 </Grid>
             </DataTemplate>
+            <DataTemplate x:Key="SoNoTemplate">
+                <Grid>
+                    <TextBlock Text="{Binding PoNo}"/>
+                </Grid>
+            </DataTemplate>
 
         </ResourceDictionary>
     </Application.Resources>

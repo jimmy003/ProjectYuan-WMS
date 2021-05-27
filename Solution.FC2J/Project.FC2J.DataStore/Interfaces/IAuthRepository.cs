@@ -10,6 +10,7 @@ namespace Project.FC2J.DataStore.Interfaces
         Task<User> Register(User user, string password);
         Task<User> Login(string userName, string password);
         Task<User> Login(UserForLoginDto value);
+        Task<User> ValidateUser(UserForLoginDto value);
         Task<UserForLoginDto> GetHash(UserForLoginDto value);
         Task<bool> UserExists(string userName);
         Task<User> GetUserByUserNameAsync(string userName);

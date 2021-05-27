@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Project.FC2J.DataStore.Interfaces;
 using Project.FC2J.DataStore.Interfaces.Codesets;
 using Project.FC2J.DataStore.Internal.DataAccess;
-using Project.FC2J.Models;
 using Project.FC2J.Models.User;
 
 namespace Project.FC2J.DataStore.DataAccess.Codesets

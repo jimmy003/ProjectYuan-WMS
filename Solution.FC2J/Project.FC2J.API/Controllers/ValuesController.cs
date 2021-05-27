@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Project.FC2J.DataStore;
 
-namespace Project.F2CJ.API.Controllers
+namespace Project.FC2J.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

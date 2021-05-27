@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project.FC2J.DataStore.Interfaces;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Project.FC2J.DataStore.Interfaces;
 using Project.FC2J.Models.Sale;
 
-namespace Project.F2CJ.API.Controllers
+namespace Project.FC2J.API.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -40,6 +40,13 @@ namespace Project.F2CJ.API.Controllers
         public async Task<IActionResult> GetInvoiceNo()
         {
             var value = await _repo.GetSalesInvoice();
+            return Ok(value);
+        }
+
+        [HttpGet, Route("receiver-sales-orders")]
+        public async Task<IActionResult> GetReceiverSalesOrders()
+        {
+            var value = await _repo.GetReceiverSalesOrders();
             return Ok(value);
         }
 
